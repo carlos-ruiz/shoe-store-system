@@ -1,6 +1,6 @@
 <?php
 /* @var $this MaterialesController */
-/* @var $dataProvider que onda chava CActiveDataProvider */
+/* @var $dataProvider CActiveDataProvider */
 
 $this->breadcrumbs=array(
 	'Materiales',
