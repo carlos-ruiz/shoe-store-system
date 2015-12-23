@@ -1,20 +1,50 @@
 <?php
-/* @var $this SiteController */
-
-$this->pageTitle=Yii::app()->name;
+if(Yii::app()->user->isGuest){
+	$form=$this->beginWidget('CActiveForm', array(
+		'id'=>'login-form',
+		'htmlOptions'=>array('class' => 'login-form'),
+		'enableClientValidation'=>true,
+		'clientOptions'=>array(
+			'validateOnSubmit'=>true,
+		),
+	));
 ?>
 
-<h1>Welcome to <i><?php echo CHtml::encode(Yii::app()->name); ?></i></h1>
 
-<p>Congratulations! You have successfully created your Yii application.</p>
+		<h3 class="form-title" style="color:#1e90ff !important;">Iniciar sesión</h3>
+		<div class="alert alert-danger display-hide">
+			<button class="close" data-close="alert"></button>
+			<span>
+			Introduce usuario y contraseña </span>
+		</div>
 
-<p>You may change the content of this page by modifying the following two files:</p>
-<ul>
-	<li>View file: <code><?php echo __FILE__; ?></code></li>
-	<li>Layout file: <code><?php echo $this->getLayoutFile('main'); ?></code></li>
-</ul>
 
-<p>For more details on how to further develop this application, please read
-the <a href="http://www.yiiframework.com/doc/">documentation</a>.
-Feel free to ask in the <a href="http://www.yiiframework.com/forum/">forum</a>,
-should you have any questions.</p>
+		<div class="form-group ">
+			<?php echo $form->labelEx($model,'usuario', array('class'=>'control-label visible-ie8 visible-ie9')); ?>
+			<?php echo $form->textField($model,'usuario',array('size'=>60,'maxlength'=>200, 'class'=>'form-control form-control-solid placeholder-no-fix', 'placeholder'=>'Usuario')); ?>
+			<?php echo $form->error($model,'usuario', array('class'=>'help-block')); ?>
+		</div>
+
+		<div class="form-group ">
+			<?php echo $form->labelEx($model,'contrasenia', array('class'=>'control-label visible-ie8 visible-ie9')); ?>
+			<?php echo $form->passwordField($model,'contrasenia',array('class'=>'form-control form-control-solid placeholder-no-fix', 'type'=>'password', 'placeholder'=>'Contraseña')); ?>
+			<?php echo $form->error($model,'contrasenia', array('class'=>'help-block')); ?>
+
+		</div>
+
+		<div class="form-actions" style="color:black !important;">
+		<?php echo CHtml::submitButton('Entrar',array('class'=>'btn blue-stripe uppercase')); ?>
+			<?php echo $form->checkBox($model,'rememberMe'); ?>
+			<?php echo $form->label($model,'rememberMe',array('class'=>'rememberme check', 'style'=>'color: black !important;')); ?>
+			<?php echo $form->error($model,'rememberMe'); ?>
+		</div>
+
+<?php $this->endWidget();
+
+}
+else{
+?>
+<h1>Hola mundo!!!</h1>
+<?php
+}
+?>

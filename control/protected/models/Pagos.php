@@ -6,9 +6,10 @@
  * The followings are the available columns in table 'pagos':
  * @property integer $id
  * @property double $importe
+ * @property string $fecha
+ * @property string $descripcion
  * @property integer $id_pedidos
  * @property integer $id_formas_pago
- * @property string $descripcion
  *
  * The followings are the available model relations:
  * @property FormasPago $idFormasPago
@@ -32,12 +33,12 @@ class Pagos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('importe, id_pedidos, id_formas_pago, descripcion', 'required'),
+			array('importe, fecha, descripcion, id_pedidos, id_formas_pago', 'required'),
 			array('id_pedidos, id_formas_pago', 'numerical', 'integerOnly'=>true),
 			array('importe', 'numerical'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, importe, id_pedidos, id_formas_pago, descripcion', 'safe', 'on'=>'search'),
+			array('id, importe, fecha, descripcion, id_pedidos, id_formas_pago', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -62,9 +63,10 @@ class Pagos extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'importe' => 'Importe',
+			'fecha' => 'Fecha',
+			'descripcion' => 'Descripcion',
 			'id_pedidos' => 'Id Pedidos',
 			'id_formas_pago' => 'Id Formas Pago',
-			'descripcion' => 'Descripcion',
 		);
 	}
 
@@ -88,9 +90,10 @@ class Pagos extends CActiveRecord
 
 		$criteria->compare('id',$this->id);
 		$criteria->compare('importe',$this->importe);
+		$criteria->compare('fecha',$this->fecha,true);
+		$criteria->compare('descripcion',$this->descripcion,true);
 		$criteria->compare('id_pedidos',$this->id_pedidos);
 		$criteria->compare('id_formas_pago',$this->id_formas_pago);
-		$criteria->compare('descripcion',$this->descripcion,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

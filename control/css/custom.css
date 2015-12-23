@@ -1,0 +1,18 @@
+.width-all {
+	width: 100%;
+}
+
+.without-margin {
+	margin: 0 !important;
+}
+
+.login-panel {
+	width: 95%;
+	max-width: 500px;
+	margin: auto;
+}
+
+.submenu li {
+	text-decoration: none;
+	list-style: none;
+}

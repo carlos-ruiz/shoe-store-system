@@ -27,9 +27,32 @@ class SiteController extends Controller
 	 */
 	public function actionIndex()
 	{
+		$this->init();
+
+		if(Yii::app()->user->isGuest){
+			$this->layout='//layouts/loginForm';
+		}
+
+		$model=new LoginForm;
+
+		// if it is ajax validation request
+		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
+		{
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+
+		// collect user input data
+		if(isset($_POST['LoginForm']))
+		{
+			$model->attributes=$_POST['LoginForm'];
+			// validate user input and redirect to the previous page if valid
+			if($model->validate() && $model->login())
+				$this->redirect(Yii::app()->user->returnUrl);
+		}
 		// renders the view file 'protected/views/site/index.php'
 		// using the default layout 'protected/views/layouts/main.php'
-		$this->render('index');
+		$this->render('index',array('model'=>$model));
 	}
 
 	/**
@@ -105,5 +128,32 @@ class SiteController extends Controller
 	{
 		Yii::app()->user->logout();
 		$this->redirect(Yii::app()->homeUrl);
+	}
+
+	public function init()
+	{
+		if(PerfilesUsuarios::model()->count()==0){
+			$perfil = new PerfilesUsuarios;
+			$perfil->nombre="Administrador";
+			$perfil->save();
+			$perfil = new PerfilesUsuarios;
+			$perfil->nombre="Cortador";
+			$perfil->save();
+			$perfil = new PerfilesUsuarios;
+			$perfil->nombre="Invitado";
+			$perfil->save();
+		}
+
+
+		if(Usuarios::model()->find('usuario=?', array('admin')) == null){
+			$perfilAdministrador = PerfilesUsuarios::model()->find('nombre=?', array('Administrador'));
+			$usuario = new Usuarios;
+			$usuario->usuario = 'admin';
+			$usuario->contrasenia = base64_encode('admin');
+			$usuario->id_perfiles_usuarios = $perfilAdministrador->id;
+			$usuario->creacion = date('Y-m-d H:i:s');
+			$usuario->ultima_modificacion = '2000-01-01 00:00:00';
+			$usuario->save();
+		}
 	}
 }

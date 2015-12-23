@@ -1,25 +1,23 @@
 <?php
 
 /**
- * This is the model class for table "inventario_materiales".
+ * This is the model class for table "perfiles_usuarios".
  *
- * The followings are the available columns in table 'inventario_materiales':
+ * The followings are the available columns in table 'perfiles_usuarios':
  * @property integer $id
- * @property double $existencia
- * @property double $cantidad_apartada
- * @property integer $id_materiales
+ * @property string $nombre
  *
  * The followings are the available model relations:
- * @property Materiales $idMateriales
+ * @property Usuarios[] $usuarioses
  */
-class InventarioMateriales extends CActiveRecord
+class PerfilesUsuarios extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'inventario_materiales';
+		return 'perfiles_usuarios';
 	}
 
 	/**
@@ -30,12 +28,11 @@ class InventarioMateriales extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('existencia, id_materiales', 'required'),
-			array('id_materiales', 'numerical', 'integerOnly'=>true),
-			array('existencia, cantidad_apartada', 'numerical'),
+			array('nombre', 'required'),
+			array('nombre', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, existencia, cantidad_apartada, id_materiales', 'safe', 'on'=>'search'),
+			array('id, nombre', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -47,7 +44,7 @@ class InventarioMateriales extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idMateriales' => array(self::BELONGS_TO, 'Materiales', 'id_materiales'),
+			'usuarioses' => array(self::HAS_MANY, 'Usuarios', 'id_perfiles_usuarios'),
 		);
 	}
 
@@ -58,9 +55,7 @@ class InventarioMateriales extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'existencia' => 'Existencia',
-			'cantidad_apartada' => 'Cantidad Apartada',
-			'id_materiales' => 'Id Materiales',
+			'nombre' => 'Nombre',
 		);
 	}
 
@@ -83,9 +78,7 @@ class InventarioMateriales extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('existencia',$this->existencia);
-		$criteria->compare('cantidad_apartada',$this->cantidad_apartada);
-		$criteria->compare('id_materiales',$this->id_materiales);
+		$criteria->compare('nombre',$this->nombre,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -96,7 +89,7 @@ class InventarioMateriales extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return InventarioMateriales the static model class
+	 * @return PerfilesUsuarios the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

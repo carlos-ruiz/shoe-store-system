@@ -7,26 +7,26 @@
  */
 class LoginForm extends CFormModel
 {
-	public $username;
-	public $password;
+	public $usuario;
+	public $contrasenia;
 	public $rememberMe;
 
 	private $_identity;
 
 	/**
 	 * Declares the validation rules.
-	 * The rules state that username and password are required,
-	 * and password needs to be authenticated.
+	 * The rules state that usuario and contrasenia are required,
+	 * and contrasenia needs to be authenticated.
 	 */
 	public function rules()
 	{
 		return array(
-			// username and password are required
-			array('username, password', 'required'),
+			// usuario and contrasenia are required
+			array('usuario, contrasenia', 'required'),
 			// rememberMe needs to be a boolean
 			array('rememberMe', 'boolean'),
-			// password needs to be authenticated
-			array('password', 'authenticate'),
+			// contrasenia needs to be authenticated
+			array('contrasenia', 'authenticate'),
 		);
 	}
 
@@ -41,28 +41,28 @@ class LoginForm extends CFormModel
 	}
 
 	/**
-	 * Authenticates the password.
+	 * Authenticates the contrasenia.
 	 * This is the 'authenticate' validator as declared in rules().
 	 */
 	public function authenticate($attribute,$params)
 	{
 		if(!$this->hasErrors())
 		{
-			$this->_identity=new UserIdentity($this->username,$this->password);
+			$this->_identity=new UserIdentity($this->usuario,$this->contrasenia);
 			if(!$this->_identity->authenticate())
-				$this->addError('password','Incorrect username or password.');
+				$this->addError('contrasenia','Incorrect usuario or contrasenia.');
 		}
 	}
 
 	/**
-	 * Logs in the user using the given username and password in the model.
+	 * Logs in the user using the given usuario and contrasenia in the model.
 	 * @return boolean whether login is successful
 	 */
 	public function login()
 	{
 		if($this->_identity===null)
 		{
-			$this->_identity=new UserIdentity($this->username,$this->password);
+			$this->_identity=new UserIdentity($this->usuario,$this->contrasenia);
 			$this->_identity->authenticate();
 		}
 		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)

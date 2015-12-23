@@ -7,6 +7,9 @@
  */
 class UserIdentity extends CUserIdentity
 {
+	private $_id;
+	private $_perfil;
+
 	/**
 	 * Authenticates a user.
 	 * The example implementation makes sure if the username and password
@@ -17,17 +20,24 @@ class UserIdentity extends CUserIdentity
 	 */
 	public function authenticate()
 	{
-		$users=array(
-			// username => password
-			'demo'=>'demo',
-			'admin'=>'admin',
-		);
-		if(!isset($users[$this->username]))
+		$user = Usuarios::model()->find("usuario=?",array($this->username));
+
+		if($user===null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		elseif($users[$this->username]!==$this->password)
+		elseif($user->contrasenia!==base64_encode($this->password))
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
-		else
+		else{
+			$this->_id=$user->id;
+			Yii::app()->session['perfil'] = $user->perfil->nombre;
+			Yii::app()->user->setState('perfil',$user->perfil->nombre);
+			Yii::app()->user->setState('usuario_nombre',$user->usuario);
 			$this->errorCode=self::ERROR_NONE;
+		}
 		return !$this->errorCode;
 	}
+
+	public function getId()
+    {
+        return $this->_id;
+    }
 }

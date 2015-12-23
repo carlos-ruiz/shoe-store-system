@@ -15,6 +15,7 @@
  * @property Pedidos $idPedidos
  * @property Zapatos $idZapatos
  * @property EstatusZapatos $idEstatusZapatos
+ * @property ZapatoCortador[] $zapatoCortadors
  */
 class PedidosZapatos extends CActiveRecord
 {
@@ -53,6 +54,7 @@ class PedidosZapatos extends CActiveRecord
 			'idPedidos' => array(self::BELONGS_TO, 'Pedidos', 'id_pedidos'),
 			'idZapatos' => array(self::BELONGS_TO, 'Zapatos', 'id_zapatos'),
 			'idEstatusZapatos' => array(self::BELONGS_TO, 'EstatusZapatos', 'id_estatus_zapatos'),
+			'zapatoCortadors' => array(self::HAS_MANY, 'ZapatoCortador', 'id_pedidos_zapatos'),
 		);
 	}
 
