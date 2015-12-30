@@ -1,8 +1,8 @@
 <?php
 
-class SuelasController extends Controller
+class TipoClienteController extends Controller
 {
-	public $section = 'suelas';
+	public $section = 'clientes';
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -63,14 +63,14 @@ class SuelasController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new Suelas;
-
+		$model=new TipoCliente;
+		$model->descuento_par = 0;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Suelas']))
+		if(isset($_POST['TipoCliente']))
 		{
-			$model->attributes=$_POST['Suelas'];
+			$model->attributes=$_POST['TipoCliente'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
@@ -92,9 +92,9 @@ class SuelasController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Suelas']))
+		if(isset($_POST['TipoCliente']))
 		{
-			$model->attributes=$_POST['Suelas'];
+			$model->attributes=$_POST['TipoCliente'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
@@ -123,7 +123,7 @@ class SuelasController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('Suelas');
+		$dataProvider=new CActiveDataProvider('TipoCliente');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -134,10 +134,10 @@ class SuelasController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Suelas('search');
+		$model=new TipoCliente('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Suelas']))
-			$model->attributes=$_GET['Suelas'];
+		if(isset($_GET['TipoCliente']))
+			$model->attributes=$_GET['TipoCliente'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -148,12 +148,12 @@ class SuelasController extends Controller
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
-	 * @return Suelas the loaded model
+	 * @return TipoCliente the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id)
 	{
-		$model=Suelas::model()->findByPk($id);
+		$model=TipoCliente::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -161,11 +161,11 @@ class SuelasController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param Suelas $model the model to be validated
+	 * @param TipoCliente $model the model to be validated
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='suelas-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='tipo-cliente-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();

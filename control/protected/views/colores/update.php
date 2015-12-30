@@ -16,6 +16,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Update Colores <?php echo $model->id; ?></h1>
+<h1>Actualizar color: <?php echo $model->color; ?></h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>

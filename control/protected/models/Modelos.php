@@ -51,8 +51,8 @@ class Modelos extends CActiveRecord
 		return array(
 			'modelosColores' => array(self::HAS_MANY, 'ModelosColores', 'id_modelos'),
 			'modelosMateriales' => array(self::HAS_MANY, 'ModelosMateriales', 'id_modelos'),
-			'modelosNumeroses' => array(self::HAS_MANY, 'ModelosNumeros', 'id_modelos'),
-			'modelosSuelases' => array(self::HAS_MANY, 'ModelosSuelas', 'id_modelos'),
+			'modelosNumeros' => array(self::HAS_MANY, 'ModelosNumeros', 'id_modelos'),
+			'modelosSuelas' => array(self::HAS_MANY, 'ModelosSuelas', 'id_modelos'),
 		);
 	}
 
@@ -64,7 +64,7 @@ class Modelos extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'nombre' => 'Nombre',
-			'imagen' => 'Imagen',
+			'imagen' => 'Imágen',
 		);
 	}
 

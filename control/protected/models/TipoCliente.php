@@ -58,7 +58,7 @@ class TipoCliente extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'nombre' => 'Nombre',
-			'descuento_par' => 'Descuento Par',
+			'descuento_par' => 'Descuento por par',
 		);
 	}
 
@@ -98,5 +98,9 @@ class TipoCliente extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public function obtenerTiposCliente(){
+		return CHtml::listData(TipoCliente::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
 	}
 }

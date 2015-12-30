@@ -16,3 +16,32 @@
 	text-decoration: none;
 	list-style: none;
 }
+
+.btn-red-stripped {
+	background-color: #C12F2F !important;
+    border-radius: 10px !important;
+    border-left: solid 5px #333 !important;
+    color: white !important;
+}
+
+.btn-red-stripped:hover {
+	color: black !important;
+	background-color: #B94646 !important;
+	border-left: solid 5px #5D5D5D !important;
+}
+
+.navbar-static-side ul li.active a {
+    background: #AB3E3E;
+    transition: 0.2s all ease-in-out;
+    outline: none;
+    color: #FFF;
+}
+
+.grid-view table.items tr.odd {
+    background: #F4E5E6;
+}
+
+.form-body hr {
+	border: solid 1px #999;
+	margin-top: 0;
+}

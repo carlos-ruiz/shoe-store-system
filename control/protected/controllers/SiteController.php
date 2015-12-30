@@ -2,6 +2,8 @@
 
 class SiteController extends Controller
 {
+	public $section;
+	public $subSection;
 	/**
 	 * Declares class-based actions.
 	 */
@@ -27,6 +29,9 @@ class SiteController extends Controller
 	 */
 	public function actionIndex()
 	{
+		$this->section = 'index';
+		$this->subSection = 'index';
+		
 		$this->init();
 
 		if(Yii::app()->user->isGuest){

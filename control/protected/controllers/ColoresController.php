@@ -2,6 +2,8 @@
 
 class ColoresController extends Controller
 {
+	public $section = 'colores';
+	public $subSection;
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -61,7 +63,7 @@ class ColoresController extends Controller
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 */
 	public function actionCreate()
-	{
+	{		
 		$model=new Colores;
 
 		// Uncomment the following line if AJAX validation is needed

@@ -15,20 +15,19 @@
 	'enableAjaxValidation'=>false,
 )); ?>
 
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+	<div class="form-body">
+		<div class="form-group <?php if($form->error($model,'color')!=''){ echo 'has-error'; }?>">
+			<?php echo $form->labelEx($model,'color', array('class'=>'control-label')); ?>
+			<div class="input-group">
+				<?php echo $form->textField($model,'color',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+				<?php echo $form->error($model,'color', array('class'=>'help-block')); ?>
+			</div>
+		</div>
 
-	<?php echo $form->errorSummary($model); ?>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'color'); ?>
-		<?php echo $form->textField($model,'color',array('size'=>60,'maxlength'=>128)); ?>
-		<?php echo $form->error($model,'color'); ?>
+		<div class="form-group">
+			<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped')); ?>
+		</div>
 	</div>
-
-	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
-	</div>
-
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->

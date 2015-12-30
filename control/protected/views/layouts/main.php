@@ -13,7 +13,6 @@
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700">
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Oswald:400,700,300">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/jquery-ui-1.10.4.custom.min.css">
-    <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/css/custom.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/css/font-awesome/css/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/bootstrap.min.css">
@@ -24,6 +23,7 @@
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/zabuto_calendar.min.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/pace.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/jquery.news-ticker.css">
+    <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/css/custom.css">
 </head>
 <body>
     <div>
@@ -42,7 +42,7 @@
                         <ul class="dropdown-menu dropdown-user pull-right">
                             <li><a href="#"><i class="fa fa-user"></i>Perfil</a></li>
                             <li class="divider"></li>
-                            <li><a href="site/logout"><i class="fa fa-key"></i>Salir</a></li>
+                            <li><a href="<?= Yii::app()->request->baseUrl; ?>/site/logout"><i class="fa fa-key"></i>Salir</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -60,7 +60,7 @@
             <!--END SIDEBAR MENU-->
             <!--BEGIN PAGE WRAPPER-->
             <div id="page-wrapper">
-                <!--BEGIN TITLE & BREADCRUMB PAGE-->
+                <!--BEGIN TITLE & BREADCRUMB PAGE
                 <div id="title-breadcrumb-option-demo" class="page-title-breadcrumb">
                     <div class="page-header pull-left">
                         <div class="page-title">
@@ -74,7 +74,7 @@
                     <div class="clearfix">
                     </div>
                 </div>
-                <!--END TITLE & BREADCRUMB PAGE-->
+                END TITLE & BREADCRUMB PAGE-->
                 <!--BEGIN CONTENT-->
                 <div class="page-content">
                     <?php echo $content; ?>

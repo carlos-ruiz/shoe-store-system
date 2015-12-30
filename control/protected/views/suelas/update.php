@@ -16,6 +16,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Update Suelas <?php echo $model->id; ?></h1>
+<h1>Actualizar suela: <?php echo $model->nombre; ?></h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>

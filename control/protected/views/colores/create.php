@@ -13,6 +13,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Create Colores</h1>
+<h1>Nuevo color</h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>

@@ -1,18 +1,18 @@
 <?php
-/* @var $this ModelosController */
+/* @var $this TipoClienteController */
 /* @var $dataProvider CActiveDataProvider */
 
 $this->breadcrumbs=array(
-	'Modeloses',
+	'Tipo Clientes',
 );
 
 $this->menu=array(
-	array('label'=>'Create Modelos', 'url'=>array('create')),
-	array('label'=>'Manage Modelos', 'url'=>array('admin')),
+	array('label'=>'Create TipoCliente', 'url'=>array('create')),
+	array('label'=>'Manage TipoCliente', 'url'=>array('admin')),
 );
 ?>
 
-<h1>Modelos</h1>
+<h1>Tipo Clientes</h1>
 
 <?php $this->widget('zii.widgets.CListView', array(
 	'dataProvider'=>$dataProvider,

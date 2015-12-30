@@ -78,7 +78,7 @@ class Clientes extends CActiveRecord
 			'apellido_materno' => 'Apellido Materno',
 			'rfc' => 'RFC',
 			'razon_social' => 'Razon Social',
-			'id_tipo_cliente' => 'Id Tipo Cliente',
+			'id_tipo_cliente' => 'Tipo de cliente',
 			'id_direcciones' => 'Id Direcciones',
 			'telefono' => 'Teléfono',
 			'celular' => 'Celular',

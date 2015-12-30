@@ -13,6 +13,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Create Suelas</h1>
+<h1>Nueva suela</h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>
