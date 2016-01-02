@@ -15,30 +15,27 @@
 	'enableAjaxValidation'=>false,
 )); ?>
 
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+	<div class="form-body">
+		<hr/>
+		<div class="form-group <?php if($form->error($model,'nombre')!=''){ echo 'has-error'; }?>">
+			<?php echo $form->labelEx($model,'nombre', array('class'=>'control-label')); ?>
+			<div class="input-group">
+				<?php echo $form->textField($model,'nombre',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+				<?php echo $form->error($model,'nombre', array('class'=>'help-block')); ?>
+			</div>
+		</div>
 
-	<?php echo $form->errorSummary($model); ?>
+		<div class="form-group <?php if($form->error($model,'unidad_medida')!=''){ echo 'has-error'; }?>">
+			<?php echo $form->labelEx($model,'unidad_medida', array('class'=>'control-label')); ?>
+			<div class="input-group">
+				<?php echo $form->textField($model,'unidad_medida',array('size'=>45,'maxlength'=>45, 'class'=>'form-control')); ?>
+				<?php echo $form->error($model,'unidad_medida', array('class'=>'help-block')); ?>
+			</div>
+		</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'id'); ?>
-		<?php echo $form->textField($model,'id'); ?>
-		<?php echo $form->error($model,'id'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'nombre'); ?>
-		<?php echo $form->textField($model,'nombre',array('size'=>60,'maxlength'=>128)); ?>
-		<?php echo $form->error($model,'nombre'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'unidad_medida'); ?>
-		<?php echo $form->textField($model,'unidad_medida',array('size'=>45,'maxlength'=>45)); ?>
-		<?php echo $form->error($model,'unidad_medida'); ?>
-	</div>
-
-	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+		<div class="form-group">
+			<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped')); ?>
+		</div>
 	</div>
 
 <?php $this->endWidget(); ?>

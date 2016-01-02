@@ -13,7 +13,7 @@ $this->menu=array(
 );
 ?>
 
-<h1>Administración de Colores</h1>
+<h1>Administración de colores</h1>
 
 <div class="text-right">
 	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nuevo', array('colores/create'), array('class'=>'btn btn-red-stripped')); ?>

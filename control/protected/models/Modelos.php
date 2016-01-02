@@ -11,8 +11,8 @@
  * The followings are the available model relations:
  * @property ModelosColores[] $modelosColores
  * @property ModelosMateriales[] $modelosMateriales
- * @property ModelosNumeros[] $modelosNumeroses
- * @property ModelosSuelas[] $modelosSuelases
+ * @property ModelosNumeros[] $modelosNumeros
+ * @property ModelosSuelas[] $modelosSuelas
  */
 class Modelos extends CActiveRecord
 {
@@ -34,10 +34,10 @@ class Modelos extends CActiveRecord
 		return array(
 			array('nombre', 'required'),
 			array('nombre', 'length', 'max'=>128),
-			array('imagen', 'length', 'max'=>256),
+			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, nombre, imagen', 'safe', 'on'=>'search'),
+			array('id, nombre', 'safe', 'on'=>'search'),
 		);
 	}
 

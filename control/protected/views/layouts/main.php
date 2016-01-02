@@ -24,6 +24,8 @@
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/pace.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/jquery.news-ticker.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/css/custom.css">
+
+    <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-1.10.2.min.js"></script>
 </head>
 <body>
     <div>
@@ -83,14 +85,13 @@
                 <!--BEGIN FOOTER-->
                 <div id="footer">
                     <div class="copyright">
-                        <a href="http://themifycloud.com">2014 © KAdmin Responsive Multi-Purpose Template</a></div>
+                        <a href="http://bom.com.mx">2015 © Botas y Botines BOM</a></div>
                 </div>
                 <!--END FOOTER-->
             </div>
             <!--END PAGE WRAPPER-->
         </div>
     </div>
-    <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-1.10.2.min.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-migrate-1.2.1.min.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-ui.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/bootstrap.min.js"></script>

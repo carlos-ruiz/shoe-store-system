@@ -15,4 +15,9 @@ $this->menu=array(
 
 <h1>Nuevo modelo</h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<?php $this->renderPartial('_form', array(
+	'model'=>$model, 
+	'colores'=>$colores, 
+	'suelas'=>$suelas,
+	'materiales'=>$materiales,
+	)); ?>

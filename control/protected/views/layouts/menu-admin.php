@@ -31,6 +31,10 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-blue"></div>
                 </i><span class="menu-title">Clientes</span></a>
             </li>
+            <li class="<?php if($this->section == 'materiales'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/materiales/admin"><i class="fa fa-wrench fa-fw">
+                <div class="icon-bg bg-blue"></div>
+                </i><span class="menu-title">Materiales</span></a>
+            </li>
             <li><a href="#"><i class="fa fa-file-pdf-o fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Reportes</span></a>

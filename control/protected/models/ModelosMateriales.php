@@ -50,8 +50,8 @@ class ModelosMateriales extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idMateriales' => array(self::BELONGS_TO, 'Materiales', 'id_materiales'),
-			'idModelos' => array(self::BELONGS_TO, 'Modelos', 'id_modelos'),
+			'material' => array(self::BELONGS_TO, 'Materiales', 'id_materiales'),
+			'modelo' => array(self::BELONGS_TO, 'Modelos', 'id_modelos'),
 		);
 	}
 

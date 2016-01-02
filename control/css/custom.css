@@ -45,3 +45,16 @@
 	border: solid 1px #999;
 	margin-top: 0;
 }
+
+.imagen-modelo {
+	max-width: 300px;
+	border: solid 1px #AB3E3E;
+	border-radius: 5px;
+	background-color: white;
+	margin-top: 1em;
+	padding: 10px;
+}
+
+.inline-block {
+	display: inline-block;
+}

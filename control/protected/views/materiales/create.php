@@ -13,6 +13,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Create Materiales</h1>
+<h1>Nuevo material</h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>
