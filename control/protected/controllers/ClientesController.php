@@ -153,8 +153,9 @@ class ClientesController extends Controller
 	{
 		$model=new Clientes('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Clientes']))
+		if(isset($_GET['Clientes'])){
 			$model->attributes=$_GET['Clientes'];
+		}
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -187,5 +188,10 @@ class ClientesController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function obtenerNombreCompleto($data, $row)
+	{
+		return $data->obtenerNombreCompleto();
 	}
 }

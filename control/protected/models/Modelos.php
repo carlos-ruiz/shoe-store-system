@@ -34,10 +34,11 @@ class Modelos extends CActiveRecord
 		return array(
 			array('nombre', 'required'),
 			array('nombre', 'length', 'max'=>128),
-			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false),
+			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => false, 'on' => 'insert'),
+			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => true, 'on' => 'update'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, nombre', 'safe', 'on'=>'search'),
+			array('id, nombre, imagen', 'safe', 'on'=>'search'),
 		);
 	}
 

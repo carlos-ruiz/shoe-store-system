@@ -18,4 +18,9 @@ $this->menu=array(
 
 <h1>Actualizar modelo: <?php echo $model->nombre; ?></h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<?php $this->renderPartial('_form', array(
+	'model'=>$model, 
+	'colores'=>$colores, 
+	'suelas'=>$suelas,
+	'materiales'=>$materiales,
+	)); ?>

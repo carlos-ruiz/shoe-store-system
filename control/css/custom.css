@@ -58,3 +58,23 @@
 .inline-block {
 	display: inline-block;
 }
+
+.wrapper-parent {
+	height: 100%;
+}
+
+.wrapper {
+	height: 100% !important;
+}
+
+#page-wrapper {
+	height: 100% !important;
+}
+
+.page-content {
+	height: 100% !important;
+}
+
+.align-right {
+	text-align: right;
+}

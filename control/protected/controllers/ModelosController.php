@@ -93,13 +93,14 @@ class ModelosController extends Controller
 				$model->attributes=$_POST['Modelos'];
 
 				//Guardando la imagen seleccionada
-				$uploadedFile = CUploadedFile::getInstance($model,'imagen');;
-				$tempNameArray = explode('.',$uploadedFile->name);
-				$ext = ".".$tempNameArray[sizeof($tempNameArray)-1];
-	            $fileName = time().rand(1, 999).$ext;
-				$uploadedFile->saveAs($folderImagesPath.$fileName);
-				$model->imagen = Yii::app()->request->baseUrl."/images/modelos/".$fileName;
-
+				$uploadedFile = CUploadedFile::getInstance($model,'imagen');
+				if(isset($uploadedFile)){
+					$tempNameArray = explode('.',$uploadedFile->name);
+					$ext = ".".$tempNameArray[sizeof($tempNameArray)-1];
+		            $fileName = time().rand(1, 999).$ext;
+					$uploadedFile->saveAs($folderImagesPath.$fileName);
+					$model->imagen = Yii::app()->request->baseUrl."/images/modelos/".$fileName;
+				}
 				if($model->save()){
 					if(isset($_POST['ModelosSuelas'])){
 						foreach ($_POST['ModelosSuelas']['id_suelas'] as $id => $value) {
@@ -163,19 +164,94 @@ class ModelosController extends Controller
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
-
+		$colores = Colores::model()->findAll();
+		$suelas = Suelas::model()->findAll();
+		$materiales = Materiales::model()->findAll();
+		$folderImagesPath = Yii::getPathOfAlias('webroot').'/images/modelos/';
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Modelos']))
 		{
-			$model->attributes=$_POST['Modelos'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$transaction = Yii::app()->db->beginTransaction();
+			try{
+				foreach ($model->modelosSuelas as $modeloSuela) {
+					$modeloSuela->delete();
+				}
+				foreach ($model->modelosColores as $modeloColor) {
+					$modeloColor->delete();
+				}
+				foreach ($model->modelosMateriales as $modeloMaterial) {
+					$modeloMaterial->delete();
+				}
+				foreach ($model->modelosNumeros as $modeloNumero) {
+					$modeloNumero->delete();
+				}
+
+				$model->attributes=$_POST['Modelos'];
+
+				//Guardando la imagen seleccionada
+				$uploadedFile = CUploadedFile::getInstance($model,'imagen');
+				if (isset($uploadedFile)) {
+					$tempNameArray = explode('.',$uploadedFile->name);
+					$ext = ".".$tempNameArray[sizeof($tempNameArray)-1];
+		            $fileName = time().rand(1, 999).$ext;
+					$uploadedFile->saveAs($folderImagesPath.$fileName);
+					$model->imagen = Yii::app()->request->baseUrl."/images/modelos/".$fileName;
+				}
+
+				if($model->save()){
+					if(isset($_POST['ModelosSuelas'])){
+						foreach ($_POST['ModelosSuelas']['id_suelas'] as $id => $value) {
+							$modeloSuela = new ModelosSuelas;
+							$modeloSuela->id_modelos = $model->id;
+							$modeloSuela->id_suelas = $id;
+							$modeloSuela->save();
+						}
+					}
+
+					if(isset($_POST['ModelosColores'])){
+						foreach ($_POST['ModelosColores']['id_colores'] as $id => $value) {
+							$modeloColor = new ModelosColores;
+							$modeloColor->id_modelos = $model->id;
+							$modeloColor->id_colores = $id;
+							$modeloColor->save();
+						}
+					}
+
+					if(isset($_POST['ModelosNumeros'])){
+						foreach ($_POST['ModelosNumeros']['numero'] as $numero => $value) {
+							$modeloNumero = new ModelosNumeros;
+							$modeloNumero->id_modelos = $model->id;
+							$modeloNumero->numero = $numero;
+							$modeloNumero->save();
+						}
+					}
+
+					if (isset($_POST['ModelosMateriales'])) {
+						foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value) {
+							$modeloMaterial = new ModelosMateriales;
+							$modeloMaterial->id_modelos = $model->id;
+							$modeloMaterial->id_materiales = $id;
+							$modeloMaterial->cantidad = $_POST['ModelosMateriales']['cantidad'][$id];
+							$modeloMaterial->unidad_medida = $_POST['ModelosMateriales']['unidad_medida'][$id];
+							$modeloMaterial->save();
+						}
+					}
+
+					$transaction->commit();
+					$this->redirect(array('view','id'=>$model->id));
+				}
+			}catch(Exception $ex){
+				$transaction->rollback();
+			}
 		}
 
 		$this->render('update',array(
 			'model'=>$model,
+			'colores'=>$colores, 
+			'suelas'=>$suelas,
+			'materiales'=>$materiales,
 		));
 	}
 
@@ -186,7 +262,26 @@ class ModelosController extends Controller
 	 */
 	public function actionDelete($id)
 	{
-		$this->loadModel($id)->delete();
+		$model = $this->loadModel($id);
+		$transaction = Yii::app()->db->beginTransaction();
+		try{
+			foreach ($model->modelosSuelas as $modeloSuela) {
+				$modeloSuela->delete();
+			}
+			foreach ($model->modelosColores as $modeloColor) {
+				$modeloColor->delete();
+			}
+			foreach ($model->modelosMateriales as $modeloMaterial) {
+				$modeloMaterial->delete();
+			}
+			foreach ($model->modelosNumeros as $modeloNumero) {
+				$modeloNumero->delete();
+			}
+			$model->delete();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+		}
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))

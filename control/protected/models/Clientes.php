@@ -131,4 +131,9 @@ class Clientes extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerNombreCompleto()
+	{
+		return $this->nombre.' '.$this->apellido_paterno.' '.$this->apellido_materno;
+	}
 }

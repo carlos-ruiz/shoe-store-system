@@ -26,18 +26,19 @@ $this->menu=array(
 	'filter'=>$model,
 	'columns'=>array(
 		'id',
-		'nombre',
-		'apellido_paterno',
-		'apellido_materno',
-		'rfc',
-		'razon_social',
-		/*
-		'id_tipo_cliente',
-		'id_direcciones',
+		array(
+			'name'=>'nombre',
+			'value'=>array($this, 'obtenerNombreCompleto')
+			),
+		// 'rfc',
+		// 'razon_social',
+		
+		// 'id_tipo_cliente',
+		'direccion.ciudad',
 		'telefono',
-		'celular',
+		// 'celular',
 		'correo_electronico',
-		*/
+		
 		array(
 			'class'=>'CButtonColumn',
 		),

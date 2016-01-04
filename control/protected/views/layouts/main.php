@@ -28,7 +28,7 @@
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-1.10.2.min.js"></script>
 </head>
 <body>
-    <div>
+    <div class="wrapper-parent">
         <!--BEGIN BACK TO TOP-->
         <a id="totop" href="#"><i class="fa fa-angle-up"></i></a>
         <!--END BACK TO TOP-->
