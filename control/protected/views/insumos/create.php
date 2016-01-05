@@ -13,6 +13,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Create Insumos</h1>
+<h1>Nuevo insumo</h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>

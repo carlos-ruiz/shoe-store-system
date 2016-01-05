@@ -55,11 +55,11 @@ class Pedidos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'pagoses' => array(self::HAS_MANY, 'Pagos', 'id_pedidos'),
-			'idClientes' => array(self::BELONGS_TO, 'Clientes', 'id_clientes'),
-			'idEstatusPedidos' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
-			'idFormasPago' => array(self::BELONGS_TO, 'FormasPago', 'id_formas_pago'),
-			'pedidosZapatoses' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos'),
+			'pagos' => array(self::HAS_MANY, 'Pagos', 'id_pedidos'),
+			'cliente' => array(self::BELONGS_TO, 'Clientes', 'id_clientes'),
+			'estatisPedido' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
+			'formaPago' => array(self::BELONGS_TO, 'FormasPago', 'id_formas_pago'),
+			'pedidoZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos'),
 		);
 	}
 

@@ -26,6 +26,8 @@
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/css/custom.css">
 
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-1.10.2.min.js"></script>
+    <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-migrate-1.2.1.min.js"></script>
+    <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-ui.js"></script>
 </head>
 <body>
     <div class="wrapper-parent">
@@ -37,7 +39,7 @@
             <nav id="topbar" role="navigation" style="margin-bottom: 0;" data-step="3" class="navbar navbar-default navbar-static-top">
             <div class="navbar-header">
                 <button type="button" data-toggle="collapse" data-target=".sidebar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
-                <a id="logo" href="index.html" class="navbar-brand"><span class="fa fa-rocket"></span><span class="logo-text">BOM</span><span style="display: none" class="logo-text-icon">µ</span></a></div>
+                <a id="logo" href="<?= Yii::app()->request->baseUrl; ?>/site/index" class="navbar-brand"><span class="fa fa-rocket"></span><span class="logo-text"><img height="40px" src="<?= Yii::app()->request->baseUrl; ?>/images/icons/logo.png"></span><span style="display: none" class="logo-text-icon">µ</span></a></div>
             <div class="topbar-main"><a id="menu-toggle" href="#" class="hidden-xs"><i class="fa fa-bars"></i></a>
                 <ul class="nav navbar navbar-top-links navbar-right mbn">
                     <li class="dropdown topbar-user"><a data-hover="dropdown" href="#" class="dropdown-toggle"><img src="<?= Yii::app()->request->baseurl; ?>/images/avatar/48.jpg" alt="" class="img-responsive img-circle"/>&nbsp;<span class="hidden-xs"><?= Yii::app()->user->getState('usuario_nombre'); ?></span>&nbsp;<span class="caret"></span></a>
@@ -92,8 +94,6 @@
             <!--END PAGE WRAPPER-->
         </div>
     </div>
-    <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-migrate-1.2.1.min.js"></script>
-    <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-ui.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/bootstrap.min.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/bootstrap-hover-dropdown.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/html5shiv.js"></script>

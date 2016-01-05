@@ -16,6 +16,8 @@
  */
 class Modelos extends CActiveRecord
 {
+	public $id_colores;
+	public $numero;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -36,6 +38,8 @@ class Modelos extends CActiveRecord
 			array('nombre', 'length', 'max'=>128),
 			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => false, 'on' => 'insert'),
 			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => true, 'on' => 'update'),
+			array('id, numero, id_colores', 'required', 'on' => 'generarEtiqueta'),
+			array('nombre, imagen', 'safe', 'on'=>'generarEtiqueta'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, nombre, imagen', 'safe', 'on'=>'search'),
@@ -63,9 +67,11 @@ class Modelos extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
+			'id' => 'Modelo',
 			'nombre' => 'Nombre',
 			'imagen' => 'Imágen',
+			'numero' => 'Número',
+			'id_colores'=>'Color',
 		);
 	}
 
@@ -105,5 +111,27 @@ class Modelos extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public function obtenerModelos(){
+		return CHtml::listData(Modelos::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
+	}
+
+	public function obtenerColores($id_modelos){
+		$modeloColores=ModelosColores::model()->findAll("id_modelos=?", array($id_modelos));
+		$colores = array();
+		foreach ($modeloColores as $modeloColor) {
+			array_push($colores, $modeloColor->color);
+		}
+		return CHtml::listData($colores, 'id', 'color');
+	}
+
+	public function obtenerNumeros($id_modelos){
+		$modeloNumeros=ModelosNumeros::model()->findAll("id_modelos=?", array($id_modelos));
+		$numeros = array();
+		foreach ($modeloNumeros as $modeloNumero) {
+			array_push($numeros, $modeloNumero->numero);
+		}
+		return CHtml::listData($numeros, 'id', 'numero');
 	}
 }

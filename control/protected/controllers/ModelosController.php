@@ -32,7 +32,7 @@ class ModelosController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'delete'),
+				'actions'=>array('create','update', 'delete', 'generarEtiqueta', 'coloresPorModelo', 'numerosPorModelo'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -340,5 +340,47 @@ class ModelosController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionGenerarEtiqueta()
+	{
+		$this->section = 'etiquetas';
+		$model = new Modelos('generarEtiqueta');
+		$model->nombre = 'nada';
+		if(isset($_POST['Modelos'])){
+			$model->attributes = $_POST['Modelos'];
+			if($model->validate()){
+				$modelo = $this->loadModel($_POST['Modelos']['id']);
+				$color = Colores::model()->findByPk($_POST['Modelos']['id_colores']);
+				$numero = ModelosNumeros::model()->findByPk($_POST['Modelos']['numero']);
+				$datos = array('modelo'=>$modelo->nombre, 'color'=>$color->color, 'numero'=>$numero->numero, 'foto'=>$modelo->imagen);
+				$this->imprimirEtiqueta($datos);
+			}
+		}
+		$this->render('generarEtiqueta', array(
+			'model'=>$model,
+		));
+	}
+
+	public function imprimirEtiqueta($datos)
+	{
+		$pdf = new ImprimirEtiqueta('P','cm','letter');
+		$pdf->AddPage();
+		$pdf->contenido($datos);
+		$pdf->Output();
+	}
+
+	public function actionColoresPorModelo()
+	{
+		$list = ModelosColores::model()->findAll("id_modelos=?",array($_POST["Modelos"]["id"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+	}
+
+	public function actionNumerosPorModelo()
+	{
+		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["Modelos"]["id"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
 	}
 }

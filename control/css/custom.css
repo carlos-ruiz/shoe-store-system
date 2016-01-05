@@ -78,3 +78,7 @@
 .align-right {
 	text-align: right;
 }
+
+a#logo {
+	padding: 5px;
+}

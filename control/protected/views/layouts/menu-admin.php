@@ -3,7 +3,7 @@ data-position="right" class="navbar-default navbar-static-side">
     <div class="sidebar-collapse menu-scroll">
         <ul id="side-menu" class="nav">
             <div class="clearfix"></div>
-            <li><a href="<?= Yii::app()->request->baseUrl; ?>/colores/admin"><i class="fa fa-list-alt fa-fw">
+            <li class="<?php if($this->section == 'pedidos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/pedidos/admin"><i class="fa fa-list-alt fa-fw">
                 <div class="icon-bg bg-orange"></div>
                 </i><span class="menu-title">Pedidos</span></a>
                 <!-- <ul class="submenu">
@@ -34,6 +34,18 @@ data-position="right" class="navbar-default navbar-static-side">
             <li class="<?php if($this->section == 'materiales'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/materiales/admin"><i class="fa fa-wrench fa-fw">
                 <div class="icon-bg bg-blue"></div>
                 </i><span class="menu-title">Materiales</span></a>
+            </li>
+            <li class="<?php if($this->section == 'insumos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/insumos/admin"><i class="fa fa-cogs fa-fw">
+                <div class="icon-bg bg-blue"></div>
+                </i><span class="menu-title">Insumos</span></a>
+            </li>
+            <li class="<?php if($this->section == 'etiquetas'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/modelos/generarEtiqueta"><i class="fa fa-tag fa-fw">
+                <div class="icon-bg bg-red"></div>
+                </i><span class="menu-title">Etiquetas</span></a>
+            </li>
+            <li class="<?php if($this->section == 'inventarios'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/inventarios/index"><i class="fa fa-cubes fa-fw">
+                <div class="icon-bg bg-red"></div>
+                </i><span class="menu-title">Inventarios</span></a>
             </li>
             <li><a href="#"><i class="fa fa-file-pdf-o fa-fw">
                 <div class="icon-bg bg-red"></div>
