@@ -30,7 +30,11 @@
 	border-left: solid 5px #5D5D5D !important;
 }
 
-.navbar-static-side ul li.active a {
+.navbar-static-side ul li.active a{
+    background: none;
+}
+
+.navbar-static-side ul li.active>a {
     background: #AB3E3E;
     transition: 0.2s all ease-in-out;
     outline: none;
@@ -63,7 +67,7 @@
 	height: 100%;
 }
 
-.wrapper {
+#wrapper {
 	height: 100% !important;
 }
 
@@ -81,4 +85,24 @@
 
 a#logo {
 	padding: 5px;
+}
+
+ul ul {
+	text-decoration: none;
+}
+
+ul.submenu li {
+	padding: 10px 0;
+}
+
+ul.submenu li.submenu-active {
+	background-color: #A56464;
+}
+
+.submenu {
+	display: none;
+}
+
+.navbar-static-side ul li a {
+	padding: 15px !important;
 }

@@ -99,4 +99,8 @@ class FormasPago extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerFormasPago(){
+		return CHtml::listData(FormasPago::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
+	}
 }

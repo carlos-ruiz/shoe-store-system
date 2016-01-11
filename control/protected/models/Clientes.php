@@ -136,4 +136,13 @@ class Clientes extends CActiveRecord
 	{
 		return $this->nombre.' '.$this->apellido_paterno.' '.$this->apellido_materno;
 	}
+
+	public function obtenerClientes(){
+		$clientes = Clientes::model()->findAll(array('order'=>'nombre'));
+		$listData = array();
+		foreach ($clientes as $cliente) {
+			$listData[$cliente->id] = $cliente->obtenerNombreCompleto();
+		}
+		return $listData;
+	}
 }

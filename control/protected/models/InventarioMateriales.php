@@ -14,6 +14,7 @@
  */
 class InventarioMateriales extends CActiveRecord
 {
+	public $cantidad;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -32,7 +33,8 @@ class InventarioMateriales extends CActiveRecord
 		return array(
 			array('existencia, id_materiales', 'required'),
 			array('id_materiales', 'numerical', 'integerOnly'=>true),
-			array('existencia, cantidad_apartada', 'numerical'),
+			array('existencia, cantidad_apartada, cantidad', 'numerical'),
+			array('cantidad', 'required', 'on'=>'agregarMaterial'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, existencia, cantidad_apartada, id_materiales', 'safe', 'on'=>'search'),
@@ -47,7 +49,7 @@ class InventarioMateriales extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idMateriales' => array(self::BELONGS_TO, 'Materiales', 'id_materiales'),
+			'material' => array(self::BELONGS_TO, 'Materiales', 'id_materiales'),
 		);
 	}
 
@@ -59,8 +61,9 @@ class InventarioMateriales extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'existencia' => 'Existencia',
-			'cantidad_apartada' => 'Cantidad Apartada',
+			'cantidad_apartada' => 'Cantidad apartada',
 			'id_materiales' => 'Id Materiales',
+			'cantidad' => 'Cantidad',
 		);
 	}
 
@@ -101,5 +104,9 @@ class InventarioMateriales extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public function obtenerMateriales(){
+		return CHtml::listData(Materiales::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
 	}
 }

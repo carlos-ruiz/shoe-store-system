@@ -47,6 +47,44 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Inventarios</span></a>
             </li>
+            <li class="menu <?php if($this->section == 'extras'){ echo 'active'; } ?>"><a href="#"><i class="fa fa-chevron-circle-down fa-fw">
+                <div class="icon-bg bg-red"></div>
+                </i><span class="menu-title">Extras</span></a>
+                <ul class="submenu">
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'formas_pago'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/formasPago/admin">
+                            <i class="fa fa-credit-card fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Formas de pago</span>
+                        </a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'estatus_pedido'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/estatusPedidos/admin">
+                            <i class="fa fa-hourglass-start fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Estatus de pedidos</span>
+                        </a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'estatus_zapatos'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/estatusZapatos/admin">
+                            <i class="fa fa-cart-arrow-down fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Estatus de zapatos</span>
+                        </a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'perfiles_usuarios'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/perfilesUsuarios/admin">
+                            <i class="fa fa-users fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Perfiles de usuarios</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li><a href="#"><i class="fa fa-file-pdf-o fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Reportes</span></a>
@@ -54,3 +92,14 @@ data-position="right" class="navbar-default navbar-static-side">
         </ul>
     </div>
 </nav>
+
+<script type="text/javascript">
+    $('.submenu').each(function(){
+        if($(this).parent().hasClass('active')){
+            $(this).show();
+        }
+    });
+    $('.menu>a').click(function(){
+        $(".submenu").toggle();
+    });
+</script>

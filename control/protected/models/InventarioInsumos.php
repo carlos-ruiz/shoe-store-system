@@ -13,6 +13,8 @@
  */
 class InventarioInsumos extends CActiveRecord
 {
+	public $cantidad;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -31,7 +33,8 @@ class InventarioInsumos extends CActiveRecord
 		return array(
 			array('existencia, id_insumos', 'required'),
 			array('id_insumos', 'numerical', 'integerOnly'=>true),
-			array('existencia', 'numerical'),
+			array('existencia, cantidad', 'numerical'),
+			array('cantidad', 'required', 'on'=>'agregarInsumo'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, existencia, id_insumos', 'safe', 'on'=>'search'),
@@ -46,7 +49,7 @@ class InventarioInsumos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idInsumos' => array(self::BELONGS_TO, 'Insumos', 'id_insumos'),
+			'insumo' => array(self::BELONGS_TO, 'Insumos', 'id_insumos'),
 		);
 	}
 
@@ -98,5 +101,9 @@ class InventarioInsumos extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public function obtenerInsumos(){
+		return CHtml::listData(Insumos::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
 	}
 }

@@ -25,6 +25,10 @@
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/jquery.news-ticker.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/css/custom.css">
 
+    <!-- DATE TIME PICKERS-->
+    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datepicker/css/datepicker3.css"/>
+    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css"/>
+
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-1.10.2.min.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-migrate-1.2.1.min.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery-ui.js"></script>
@@ -128,7 +132,22 @@
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/charts-highchart-more.js"></script>
     <!--CORE JAVASCRIPT-->
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/main.js"></script>
-    <script>        (function (i, s, o, g, r, a, m) {
+
+    <!-- DateTime Pickers -->
+    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+
+    <script>
+        jQuery(document).ready(function() {
+            window.console.log('Si entra al ready');
+            // ComponentsPickers.init();
+            // $(".date-picker").datepicker({
+            //     language: 'es',
+            // });
+        });
+    </script>
+    <script>        
+    (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
             i[r] = i[r] || function () {
                 (i[r].q = i[r].q || []).push(arguments)
@@ -141,8 +160,6 @@
         })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
         ga('create', 'UA-145464-12', 'auto');
         ga('send', 'pageview');
-
-
 </script>
 </body>
 </html>

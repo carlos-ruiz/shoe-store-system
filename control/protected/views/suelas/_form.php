@@ -16,6 +16,7 @@
 )); ?>
 
 	<div class="form-body">
+		<hr/>
 		<div class="form-group <?php if($form->error($model,'nombre')!=''){ echo 'has-error'; }?>">
 			<?php echo $form->labelEx($model,'nombre', array('class'=>'control-label')); ?>
 			<div class="input-group">

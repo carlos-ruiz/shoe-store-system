@@ -95,4 +95,8 @@ class EstatusPedidos extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerEstatusPedidos(){
+		return CHtml::listData(EstatusPedidos::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
+	}
 }

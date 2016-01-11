@@ -45,7 +45,7 @@ class InventarioZapatosTerminados extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idZapatos' => array(self::BELONGS_TO, 'Zapatos', 'id_zapatos'),
+			'zapato' => array(self::BELONGS_TO, 'Zapatos', 'id_zapatos'),
 		);
 	}
 

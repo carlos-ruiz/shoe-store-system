@@ -64,7 +64,7 @@ class PedidosController extends Controller
 	public function actionCreate()
 	{
 		$model=new Pedidos;
-
+		$model->fecha_pedido = date('d-m-Y H:i:s');
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 

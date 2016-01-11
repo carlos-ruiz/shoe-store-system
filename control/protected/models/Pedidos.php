@@ -57,7 +57,7 @@ class Pedidos extends CActiveRecord
 		return array(
 			'pagos' => array(self::HAS_MANY, 'Pagos', 'id_pedidos'),
 			'cliente' => array(self::BELONGS_TO, 'Clientes', 'id_clientes'),
-			'estatisPedido' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
+			'estatusPedido' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
 			'formaPago' => array(self::BELONGS_TO, 'FormasPago', 'id_formas_pago'),
 			'pedidoZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos'),
 		);
@@ -70,12 +70,12 @@ class Pedidos extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'id_clientes' => 'Id Clientes',
-			'fecha_pedido' => 'Fecha Pedido',
-			'fecha_entrega' => 'Fecha Entrega',
-			'id_formas_pago' => 'Id Formas Pago',
+			'id_clientes' => 'Cliente',
+			'fecha_pedido' => 'Fecha de pedido',
+			'fecha_entrega' => 'Fecha de entrega',
+			'id_formas_pago' => 'Forma de pago',
 			'total' => 'Total',
-			'id_estatus_pedidos' => 'Id Estatus Pedidos',
+			'id_estatus_pedidos' => 'Estatus',
 		);
 	}
 
