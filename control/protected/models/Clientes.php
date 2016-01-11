@@ -141,7 +141,7 @@ class Clientes extends CActiveRecord
 		$clientes = Clientes::model()->findAll(array('order'=>'nombre'));
 		$listData = array();
 		foreach ($clientes as $cliente) {
-			$listData[$cliente->id] = $cliente->obtenerNombreCompleto();
+			$listData[$cliente->id] = $cliente->obtenerNombreCompleto().'('.$cliente->direccion->ciudad.')';
 		}
 		return $listData;
 	}

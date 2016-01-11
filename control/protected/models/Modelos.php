@@ -117,6 +117,15 @@ class Modelos extends CActiveRecord
 		return CHtml::listData(Modelos::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
 	}
 
+	public function obtenerSuelas($id_modelos){
+		$modeloSuelas=ModelosSuelas::model()->findAll("id_modelos=?", array($id_modelos));
+		$suelas = array();
+		foreach ($modeloSuelas as $modeloSuela) {
+			array_push($suelas, $modeloSuela->suela);
+		}
+		return CHtml::listData($suelas, 'id', 'nombre');
+	}
+
 	public function obtenerColores($id_modelos){
 		$modeloColores=ModelosColores::model()->findAll("id_modelos=?", array($id_modelos));
 		$colores = array();
@@ -130,7 +139,7 @@ class Modelos extends CActiveRecord
 		$modeloNumeros=ModelosNumeros::model()->findAll("id_modelos=?", array($id_modelos));
 		$numeros = array();
 		foreach ($modeloNumeros as $modeloNumero) {
-			array_push($numeros, $modeloNumero->numero);
+			array_push($numeros, $modeloNumero);
 		}
 		return CHtml::listData($numeros, 'id', 'numero');
 	}

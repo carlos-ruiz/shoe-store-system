@@ -30,13 +30,15 @@ $this->menu=array(
 			'name'=>'nombre',
 			'value'=>array($this, 'obtenerNombreCompleto')
 			),
-		// 'rfc',
-		// 'razon_social',
-		
-		// 'id_tipo_cliente',
-		'direccion.ciudad',
+		array(
+	        'name'=>'id_tipo_cliente',
+	        'value'=>'$data->tipoCliente->nombre',
+    	),
+		array(
+	        'name'=>'direccion',
+	        'value'=>'$data->direccion->ciudad',
+    	),
 		'telefono',
-		// 'celular',
 		'correo_electronico',
 		
 		array(

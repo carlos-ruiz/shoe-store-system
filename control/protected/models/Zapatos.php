@@ -19,6 +19,9 @@
  */
 class Zapatos extends CActiveRecord
 {
+	public $id_modelos;
+	public $id_colores;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -35,8 +38,8 @@ class Zapatos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('numero, precio, codigo_barras, id_modelos_colores, id_suelas', 'required'),
-			array('id_modelos_colores, id_suelas', 'numerical', 'integerOnly'=>true),
+			array('id_modelos, id_colores, numero, precio, codigo_barras, id_suelas', 'required'),
+			array('id_modelos, id_colores, id_modelos_colores, id_suelas', 'numerical', 'integerOnly'=>true),
 			array('numero, precio', 'numerical'),
 			array('codigo_barras', 'length', 'max'=>12),
 			// The following rule is used by search().
@@ -53,10 +56,10 @@ class Zapatos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'inventarioZapatosTerminadoses' => array(self::HAS_MANY, 'InventarioZapatosTerminados', 'id_zapatos'),
-			'pedidosZapatoses' => array(self::HAS_MANY, 'PedidosZapatos', 'id_zapatos'),
-			'idModelosColores' => array(self::BELONGS_TO, 'ModelosColores', 'id_modelos_colores'),
-			'idSuelas' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
+			'inventarioZapatosTerminados' => array(self::HAS_MANY, 'InventarioZapatosTerminados', 'id_zapatos'),
+			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_zapatos'),
+			'modeloColor' => array(self::BELONGS_TO, 'ModelosColores', 'id_modelos_colores'),
+			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
 		);
 	}
 
@@ -67,11 +70,13 @@ class Zapatos extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'numero' => 'Numero',
+			'numero' => 'Número',
 			'precio' => 'Precio',
-			'codigo_barras' => 'Codigo Barras',
+			'codigo_barras' => 'Código de barras',
 			'id_modelos_colores' => 'Id Modelos Colores',
-			'id_suelas' => 'Id Suelas',
+			'id_suelas' => 'Suela',
+			'id_colores' => 'Color',
+			'id_modelos' => 'Modelo',
 		);
 	}
 

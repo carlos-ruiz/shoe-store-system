@@ -15,4 +15,10 @@ $this->menu=array(
 
 <h1>Nuevo pedido</h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<?php 
+	$this->renderPartial('_form', 
+		array(
+			'model'=>$model,
+			'pedidoZapato'=>$pedidoZapato,
+		));
+?>

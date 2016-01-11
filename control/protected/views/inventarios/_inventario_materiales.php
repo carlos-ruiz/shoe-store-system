@@ -3,7 +3,7 @@
 </div>
 <br/>
 <div class="panel panel-red">
-<div class="panel-heading">Inventario de materiales</div>
+    <div class="panel-heading">Inventario de materiales</div>
     <div class="panel-body">
         <table class="table table-hover table-striped">
             <thead>

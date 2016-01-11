@@ -16,7 +16,7 @@ $this->menu=array(
 );
 ?>
 
-<h1>View Clientes #<?php echo $model->id; ?></h1>
+<h1>Cliente #<?php echo $model->id.' - '.$model->nombre.' '.$model->apellido_paterno; ?></h1>
 
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
@@ -27,8 +27,30 @@ $this->menu=array(
 		'apellido_materno',
 		'rfc',
 		'razon_social',
-		'id_tipo_cliente',
-		'id_direcciones',
+		array(
+	        'name'=>'id_tipo_cliente',
+	        'value'=>$model->tipoCliente->nombre,
+    	),
+		array(
+	        'name'=>'Calle',
+	        'value'=>$model->direccion->calle.' #'.$model->direccion->numero_ext.((isset($model->direccion->numero_int) && strlen($model->direccion->numero_int)>0)?(' INT '.$model->direccion->numero_int):''),
+    	),
+    	array(
+	        'name'=>'Colonia',
+	        'value'=>$model->direccion->colonia,
+    	),
+    	array(
+	        'name'=>'Ciudad',
+	        'value'=>$model->direccion->ciudad,
+    	),
+    	array(
+	        'name'=>'C&oacute;digo postal',
+	        'value'=>$model->direccion->codigo_postal,
+    	),
+    	array(
+	        'name'=>'Pa&iacute;s',
+	        'value'=>$model->direccion->pais,
+    	),
 		'telefono',
 		'celular',
 		'correo_electronico',

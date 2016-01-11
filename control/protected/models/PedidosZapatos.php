@@ -19,6 +19,11 @@
  */
 class PedidosZapatos extends CActiveRecord
 {
+	public $id_modelos;
+	public $id_colores;
+	public $id_suelas;
+	public $numero;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -70,6 +75,10 @@ class PedidosZapatos extends CActiveRecord
 			'cantidad_total' => 'Cantidad Total',
 			'id_estatus_zapatos' => 'Id Estatus Zapatos',
 			'completos' => 'Completos',
+			'id_modelos'=>'Modelo',
+			'id_colores'=>'Color',
+			'id_suelas'=>'Suela',
+			'numero'=>'Número',
 		);
 	}
 

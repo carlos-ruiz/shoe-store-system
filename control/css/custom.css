@@ -106,3 +106,20 @@ ul.submenu li.submenu-active {
 .navbar-static-side ul li a {
 	padding: 15px !important;
 }
+
+table.detail-view tr.odd {
+    background: #F4E5E6;
+}
+
+#content {
+	margin-bottom: 80px;
+}
+
+.btn-tin {
+	padding: 0px 5px !important;
+    margin-left: 5px;
+}
+
+.panel-ordenes {
+	font-size: 9pt;
+}

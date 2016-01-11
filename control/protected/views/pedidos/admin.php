@@ -25,14 +25,21 @@ $this->menu=array(
 	'filter'=>$model,
 	'columns'=>array(
 		'id',
-		'cliente.nombre',
+		array(
+	        'name'=>'id_clientes',
+	        'value'=>'$data->cliente->nombre',
+    	),
 		'fecha_pedido',
 		'fecha_entrega',
-		'formaPago.nombre',
+		array(
+	        'name'=>'id_formas_pago',
+	        'value'=>'$data->formaPago->nombre',
+    	),
+    	array(
+	        'name'=>'id_estatus_pedidos',
+	        'value'=>'$data->estatus->nombre',
+    	),
 		'total',
-		/*
-		'id_estatus_pedidos',
-		*/
 		array(
 			'class'=>'CButtonColumn',
 		),

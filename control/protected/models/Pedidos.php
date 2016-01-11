@@ -57,7 +57,7 @@ class Pedidos extends CActiveRecord
 		return array(
 			'pagos' => array(self::HAS_MANY, 'Pagos', 'id_pedidos'),
 			'cliente' => array(self::BELONGS_TO, 'Clientes', 'id_clientes'),
-			'estatusPedido' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
+			'estatus' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
 			'formaPago' => array(self::BELONGS_TO, 'FormasPago', 'id_formas_pago'),
 			'pedidoZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos'),
 		);

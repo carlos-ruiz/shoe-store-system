@@ -6,14 +6,6 @@ data-position="right" class="navbar-default navbar-static-side">
             <li class="<?php if($this->section == 'pedidos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/pedidos/admin"><i class="fa fa-list-alt fa-fw">
                 <div class="icon-bg bg-orange"></div>
                 </i><span class="menu-title">Pedidos</span></a>
-                <!-- <ul class="submenu">
-                    <li class="li-no-style">
-                        <a href="#"><i class="fa fa-book fa-fw">
-                            <div class="icon-bg bg-pink"></div>
-                            </i><span class="menu-title">Administrar</span>
-                        </a> 
-                    </li>
-                </ul> -->
             </li>
             <li class="<?php if($this->section == 'modelos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/modelos/admin"><i class="fa fa-book fa-fw">
                 <div class="icon-bg bg-pink"></div>
@@ -81,6 +73,14 @@ data-position="right" class="navbar-default navbar-static-side">
                                 <div class="icon-bg bg-red"></div>
                             </i>
                             <span class="menu-title">Perfiles de usuarios</span>
+                        </a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'zapatos'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/zapatos/admin">
+                            <i class="fa fa-puzzle-piece fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Configurar precios</span>
                         </a>
                     </li>
                 </ul>

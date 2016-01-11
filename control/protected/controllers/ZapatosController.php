@@ -1,8 +1,9 @@
 <?php
 
-class ClientesController extends Controller
+class ZapatosController extends Controller
 {
-	public $section = 'clientes';
+	public $section = 'extras';
+	public $subsection = 'zapatos';
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -16,6 +17,7 @@ class ClientesController extends Controller
 	{
 		return array(
 			'accessControl', // perform access control for CRUD operations
+			// 'postOnly + delete', // we only allow deletion via POST request
 		);
 	}
 
@@ -36,7 +38,7 @@ class ClientesController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
+				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -62,37 +64,25 @@ class ClientesController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model = new Clientes;
-		$direccion = new Direcciones;
+		$model=new Zapatos;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Clientes']))
+		if(isset($_POST['Zapatos']))
 		{
-			$transaction = Yii::app()->db->beginTransaction();
-			$model->attributes=$_POST['Clientes'];
-			if (isset($_POST['Direcciones'])) {
-				$direccion->attributes=$_POST['Direcciones'];
-			}
-			$model->id_direcciones = 0;
-			if($model->validate() & $direccion->validate()){
-				if($direccion->save()){
-					$model->id_direcciones = $direccion->id;
-					if ($model->save()) {
-						$transaction->commit();
-						$this->redirect(array('view','id'=>$model->id));
-					}
-				}
-			}else{
-				$transaction->rollback();
-			}
-
+			$model->attributes=$_POST['Zapatos'];
+			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($model->id_modelos, $model->id_colores));
+			$model->id_modelos_colores = $modeloColor->id;
+			$modeloNumero = ModelosNumeros::model()->findByPk($model->numero);
+			$model->numero = $modeloNumero->numero;
+			$model->codigo_barras = $model->id_modelos.$model->id_colores.'00000';
+			if($model->save())
+				$this->redirect(array('view','id'=>$model->id));
 		}
 
 		$this->render('create',array(
 			'model'=>$model,
-			'direccion'=>$direccion,
 		));
 	}
 
@@ -104,37 +94,27 @@ class ClientesController extends Controller
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
-		$direccion = $model->direccion;
+		$model->id_modelos = $model->modeloColor->modelo->id;
+		$model->id_colores = $model->modeloColor->color->id;
+		$modeloNumero = ModelosNumeros::model()->find('id_modelos=? AND numero=?', array($model->id_modelos, $model->numero));
+		$model->numero = $modeloNumero->id;
+
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Clientes']))
+		if(isset($_POST['Zapatos']))
 		{
-			// $model->attributes=$_POST['Clientes'];
-			// if($model->save())
-			// 	$this->redirect(array('view','id'=>$model->id));
-
-			$transaction = Yii::app()->db->beginTransaction();
-			$model->attributes=$_POST['Clientes'];
-			if (isset($_POST['Direcciones'])) {
-				$direccion->attributes=$_POST['Direcciones'];
-			}
-			if($model->validate() & $direccion->validate()){
-				if($direccion->save()){
-					$model->id_direcciones = $direccion->id;
-					if ($model->save()) {
-						$transaction->commit();
-						$this->redirect(array('view','id'=>$model->id));
-					}
-				}
-			}else{
-				$transaction->rollback();
-			}
+			$model->attributes=$_POST['Zapatos'];
+			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($model->id_modelos, $model->id_colores));
+			$model->id_modelos_colores = $modeloColor->id;
+			$modeloNumero = ModelosNumeros::model()->findByPk($model->numero);
+			$model->numero = $modeloNumero->numero;
+			if($model->save())
+				$this->redirect(array('view','id'=>$model->id));
 		}
 
 		$this->render('update',array(
 			'model'=>$model,
-			'direccion'=>$direccion,
 		));
 	}
 
@@ -157,7 +137,7 @@ class ClientesController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('Clientes');
+		$dataProvider=new CActiveDataProvider('Zapatos');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -168,11 +148,10 @@ class ClientesController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Clientes('search');
+		$model=new Zapatos('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Clientes'])){
-			$model->attributes=$_GET['Clientes'];
-		}
+		if(isset($_GET['Zapatos']))
+			$model->attributes=$_GET['Zapatos'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -183,12 +162,12 @@ class ClientesController extends Controller
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
-	 * @return Clientes the loaded model
+	 * @return Zapatos the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id)
 	{
-		$model=Clientes::model()->findByPk($id);
+		$model=Zapatos::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -196,19 +175,35 @@ class ClientesController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param Clientes $model the model to be validated
+	 * @param Zapatos $model the model to be validated
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='clientes-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='zapatos-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
 	}
 
-	public function obtenerNombreCompleto($data, $row)
+	public function actionSuelasPorModelo()
 	{
-		return $data->obtenerNombreCompleto();
+		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["Zapatos"]["id_modelos"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->suela->id}\">{$data->suela->nombre}</option>";
+	}
+
+	public function actionColoresPorModelo()
+	{
+		$list = ModelosColores::model()->findAll("id_modelos=?",array($_POST["Zapatos"]["id_modelos"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+	}
+
+	public function actionNumerosPorModelo()
+	{
+		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["Zapatos"]["id_modelos"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
 	}
 }

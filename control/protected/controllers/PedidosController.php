@@ -16,7 +16,7 @@ class PedidosController extends Controller
 	{
 		return array(
 			'accessControl', // perform access control for CRUD operations
-			'postOnly + delete', // we only allow deletion via POST request
+			// 'postOnly + delete', // we only allow deletion via POST request
 		);
 	}
 
@@ -37,7 +37,7 @@ class PedidosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
+				'actions'=>array('admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -65,18 +65,40 @@ class PedidosController extends Controller
 	{
 		$model=new Pedidos;
 		$model->fecha_pedido = date('d-m-Y H:i:s');
+		$pedidoZapato = new PedidosZapatos;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Pedidos']))
 		{
 			$model->attributes=$_POST['Pedidos'];
-			if($model->save())
+			if($model->save()){
+				if (isset($_POST['pedidoZapato'])) {
+					foreach ($_POST['pedidoZapato'] as $idZapato => $cantidad) {
+						$pedidoZapato = new PedidosZapatos;
+						$pedidoZapato->id_pedidos = $model->id;
+						$pedidoZapato->id_zapatos = $idZapato;
+						$pedidoZapato->cantidad_total = $cantidad;
+						$statusZapatoCreado = EstatusZapatos::model()->find('nombre=?', 'Creado');
+						$pedidoZapato->id_estatus_zapatos = $statusZapatoCreado->id;
+						$pedidoZapato->completos = 0;
+						$pedidoZapato->save();
+					}
+				}
+				if (isset($_POST['PedidosZapatosNuevo'])) {
+					foreach ($_POST['PedidosZapatosNuevo']['modelo'] as $i => $value) {
+						$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($_POST['PedidosZapatosNuevo']['modelo'][$i], $_POST['PedidosZapatosNuevo']['color'][$i]));
+						$zapato = new Zapatos;
+						$zapato->id_modelos_colores = $modeloColor->id;
+					}
+				}
 				$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('create',array(
 			'model'=>$model,
+			'pedidoZapato'=>$pedidoZapato,
 		));
 	}
 
@@ -170,5 +192,69 @@ class PedidosController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionSuelasPorModelo()
+	{
+		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->suela->id}\">{$data->suela->nombre}</option>";
+	}
+
+	public function actionColoresPorModelo()
+	{
+		$list = ModelosColores::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+	}
+
+	public function actionNumerosPorModelo()
+	{
+		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
+	}
+
+	public function actionAgregarOrden(){
+		if (isset($_POST)) {
+			$modelo = Modelos::model()->findByPk($_POST['id_modelos']);
+			$color = Colores::model()->findByPk($_POST['id_colores']);
+			$suela = Suelas::model()->findByPk($_POST['id_suelas']);
+			$modeloNumero = ModelosNumeros::model()->findByPk($_POST['numero']);
+			$cantidad = $_POST['cantidad'];
+			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($modelo->id, $color->id));
+			$zapato = Zapatos::model()->find('id_suelas=? AND id_modelos_colores=? AND numero=?', array($suela->id, $modeloColor->id, $modeloNumero->numero));
+			if (isset($zapato)) {
+				echo "
+				<tr>
+					<td>".$modelo->nombre."</td>
+					<td>".$color->color."</td>
+					<td>".$suela->nombre."</td>
+					<td>".$modeloNumero->numero."</td>
+					<td>".$zapato->precio."</td>
+					<td>".$cantidad."</td>
+					<td class='importe_total'>".($cantidad*$zapato->precio)."</td>
+					<input type='hidden' name='pedidoZapato[$zapato->id]' value='$cantidad'/>
+				</tr>";
+			}
+			else{
+				echo "
+				<tr>
+					<td>".$modelo->nombre."</td>
+					<input type='hidden' name='PedidosZapatosNuevo[modelo][".$_POST['row']."]' value='$modelo->id'/>
+					<td>".$color->color."</td>
+					<input type='hidden' name='PedidosZapatosNuevo[color][".$_POST['row']."]' value='$color->id'/>
+					<td>".$suela->nombre."</td>
+					<input type='hidden' name='PedidosZapatosNuevo[suela][".$_POST['row']."]' value='$suela->id'/>
+					<td>".$modeloNumero->numero."</td>
+					<input type='hidden' name='PedidosZapatosNuevo[numero][".$_POST['row']."]' value='$modeloNumero->numero'/>
+					<td class='precio_column_".$_POST['row']."'><input type='text' name='PedidosZapatosNuevo[precio][".$_POST['row']."]' /><div class='agregar_precio btn btn-red-stripped btn-tin' data-id='".$_POST['row']."'>Agregar</div></td>
+					<td class='cantidad_column_".$_POST['row']."'>".$cantidad."</td>
+					<input type='hidden' name='PedidosZapatosNuevo[cantidad][".$_POST['row']."]' value='$cantidad'/>
+					<td class='importe_total total_column_".$_POST['row']."'></td>
+				</tr>";
+			}
+		}
+
 	}
 }
