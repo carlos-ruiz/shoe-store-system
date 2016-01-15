@@ -16,35 +16,71 @@ $this->menu=array(
 <h1>Administración de precios</h1>
 
 <div class="text-right">
+	<?php echo CHtml::link('<i class="fa fa-plus"></i> Ver agrupados', array('zapatoprecios/admin'), array('class'=>'btn btn-red-stripped')); ?>
 	<?php echo CHtml::link('<i class="fa fa-plus"></i> Definir nuevo precio', array('zapatos/create'), array('class'=>'btn btn-red-stripped')); ?>
 </div>
 
-<?php $this->widget('zii.widgets.grid.CGridView', array(
-	'id'=>'zapatos-grid',
+<?php
+$grid_id = 'zapatos-grid';
+$this->widget('zii.widgets.grid.CGridView', array(
+	'id'=>$grid_id,
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
 	'columns'=>array(
 		'id',
 		array(
-	        'name'=>'id_modelos',
-	        'value'=>'$data->modeloColor->modelo->nombre',
+	        'name'=>'var_modelo',
+	        'value'=>'$data->modelo->nombre',
     	),
     	array(
-	        'name'=>'id_colores',
-	        'value'=>'$data->modeloColor->color->color',
+	        'name'=>'var_color',
+	        'value'=>'$data->color->color',
     	),
 		array(
-	        'name'=>'id_suelas',
+	        'name'=>'var_suela',
 	        'value'=>'$data->suela->nombre',
     	),
 		'numero',
-		array(
-	        'name'=>'precio',
-	        'value'=>'\'$\'.$data->precio',
-    	),
+		array('name'=>'precio',
+            'class'=>'EEditableColumn', 'editable_type'=>'editbox',
+            'action'=>array('/zapatos/actualizarPrecio'),
+        ),
+		// array(
+	 //        'name'=>'precio',
+	 //        'value'=>'\'$\'.$data->precio',
+  //   	),
 		'codigo_barras',
 		array(
 			'class'=>'CButtonColumn',
+			'buttons'=>array(
+				'view'=>array(
+					'visible'=>'false',
+				),
+				'update'=>array(
+					'visible'=>'false',
+				)
+			)
 		),
 	),
 )); ?>
+<script type="text/javascript">
+$(document).on("blur",".edit-cell", function(){
+	var field = $(this);
+	id = $(this).parent().attr('editable_id');
+	precio = parseFloat($(this).attr('value'));
+	if(isNaN(precio)){
+		alert('Debe escribir un valor numerico');
+		return;
+	}
+	$.post(
+		"<?php echo $this->createUrl('zapatos/actualizarPrecio/');?>",
+		{
+			id_zapato:id,
+			precio:precio
+		},
+		function(data){
+			field.val(data);
+		}
+	);
+});
+</script>

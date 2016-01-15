@@ -26,3 +26,11 @@ $this->menu=array(
 		'unidad_medida',
 	),
 )); ?>
+
+<?php if(!Yii::app()->user->isGuest) { ?>
+	<div class="row">
+		<div class="col-md-12 padding-top">
+			<?php echo CHtml::link('<i class="fa fa-plus"></i> Agregar material', array('materiales/create'), array('class'=>'link-button')); ?>
+		</div>
+	</div>
+<?php } ?>

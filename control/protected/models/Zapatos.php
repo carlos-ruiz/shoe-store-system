@@ -8,8 +8,9 @@
  * @property double $numero
  * @property double $precio
  * @property string $codigo_barras
- * @property integer $id_modelos_colores
  * @property integer $id_suelas
+ * @property integer $id_modelos
+ * @property integer $id_colores
  *
  * The followings are the available model relations:
  * @property InventarioZapatosTerminados[] $inventarioZapatosTerminadoses
@@ -19,8 +20,9 @@
  */
 class Zapatos extends CActiveRecord
 {
-	public $id_modelos;
-	public $id_colores;
+	public $var_suela;
+	public $var_modelo;
+	public $var_color;
 
 	/**
 	 * @return string the associated database table name
@@ -38,13 +40,14 @@ class Zapatos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_modelos, id_colores, numero, precio, codigo_barras, id_suelas', 'required'),
-			array('id_modelos, id_colores, id_modelos_colores, id_suelas', 'numerical', 'integerOnly'=>true),
+			array('numero, precio, codigo_barras, id_suelas', 'required'),
+			array('id_modelos', 'required', 'on'=>'catalog'),
+			array('id_modelos, id_colores, id_suelas', 'numerical', 'integerOnly'=>true),
 			array('numero, precio', 'numerical'),
 			array('codigo_barras', 'length', 'max'=>12),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, numero, precio, codigo_barras, id_modelos_colores, id_suelas', 'safe', 'on'=>'search'),
+			array('id, numero, precio, codigo_barras, id_suelas, var_suela, var_modelo, var_color', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,7 +61,8 @@ class Zapatos extends CActiveRecord
 		return array(
 			'inventarioZapatosTerminados' => array(self::HAS_MANY, 'InventarioZapatosTerminados', 'id_zapatos'),
 			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_zapatos'),
-			'modeloColor' => array(self::BELONGS_TO, 'ModelosColores', 'id_modelos_colores'),
+			'modelo' => array(self::BELONGS_TO, 'Modelos', 'id_modelos'),
+			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
 			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
 		);
 	}
@@ -73,10 +77,12 @@ class Zapatos extends CActiveRecord
 			'numero' => 'Número',
 			'precio' => 'Precio',
 			'codigo_barras' => 'Código de barras',
-			'id_modelos_colores' => 'Id Modelos Colores',
 			'id_suelas' => 'Suela',
 			'id_colores' => 'Color',
 			'id_modelos' => 'Modelo',
+			'var_suela' => 'Suela',
+			'var_modelo' => 'Modelo',
+			'var_color' => 'Color',
 		);
 	}
 
@@ -98,12 +104,15 @@ class Zapatos extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
+		$criteria->compare('t.id',$this->id);
 		$criteria->compare('numero',$this->numero);
 		$criteria->compare('precio',$this->precio);
 		$criteria->compare('codigo_barras',$this->codigo_barras,true);
-		$criteria->compare('id_modelos_colores',$this->id_modelos_colores);
 		$criteria->compare('id_suelas',$this->id_suelas);
+		$criteria->with = array('suela','modelo', 'color');
+		$criteria->compare('suela.nombre', $this->var_suela, true);
+		$criteria->compare('modelo.nombre', $this->var_modelo, true);
+		$criteria->compare('color.color', $this->var_color, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

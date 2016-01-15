@@ -33,7 +33,7 @@ class InventarioMateriales extends CActiveRecord
 		return array(
 			array('existencia, id_materiales', 'required'),
 			array('id_materiales', 'numerical', 'integerOnly'=>true),
-			array('existencia, cantidad_apartada, cantidad', 'numerical'),
+			array('existencia, cantidad_apartada, cantidad, ultimo_precio', 'numerical'),
 			array('cantidad', 'required', 'on'=>'agregarMaterial'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -64,6 +64,7 @@ class InventarioMateriales extends CActiveRecord
 			'cantidad_apartada' => 'Cantidad apartada',
 			'id_materiales' => 'Id Materiales',
 			'cantidad' => 'Cantidad',
+			'ultimo_precio' => 'Último precio',
 		);
 	}
 

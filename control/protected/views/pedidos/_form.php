@@ -57,6 +57,13 @@
 					<?php echo $form->error($model,'id_estatus_pedidos', array('class'=>'help-block')); ?>
 				</div>
 			</div>
+			<div class="form-group col-md-4 <?php if($form->error($model,'prioridad')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($model,'prioridad', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->checkBox($model,'prioridad',  array('class'=>'form-control', 'style'=>'width:15px')); ?>
+					<?php echo $form->error($model,'prioridad', array('class'=>'help-block')); ?>
+				</div>
+			</div>
 		</div>
 		<hr/>
 		<h3>Descripción de pedido</h3>
@@ -81,13 +88,6 @@
 					<?php echo $form->error($pedidoZapato,'id_colores', array('class'=>'help-block')); ?>
 				</div>
 			</div>
-			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'numero')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($pedidoZapato,'numero', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->dropDownList($pedidoZapato,'numero',Modelos::model()->obtenerNumeros(isset($pedidoZapato->id_modelos)?$pedidoZapato->id_modelos:0), $htmlOptions); ?>
-					<?php echo $form->error($pedidoZapato,'numero', array('class'=>'help-block')); ?>
-				</div>
-			</div>
 			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'id_suelas')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($pedidoZapato,'id_suelas', array('class'=>'control-label')); ?>
 				<div class="input-group">
@@ -97,58 +97,134 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'cantidad_total')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($pedidoZapato,'cantidad_total', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->textField($pedidoZapato,'cantidad_total',array('size'=>45,'maxlength'=>45, 'class'=>'form-control')); ?>
-					<?php echo $form->error($pedidoZapato,'cantidad_total', array('class'=>'help-block')); ?>
-				</div>
-			</div>
-		</div>
-		<div class="row">
 			<div class="form-group col-md-4">
 				<div class="btn btn-red-stripped" id="boton_agregar_orden">Agregar</div>
 			</div>
 		</div>
+		<?php
+		$zapatosDiferentes = array();
+		$datos = array();
+		$id_modelo = 0;
+		$id_color = 0;
+		$id_suela = 0;
+		$contador = 0;
+		foreach ($model->pedidosZapatos as $pedidoZapato) { 
+			if(
+				$pedidoZapato->zapato->modelo->id != $id_modelo ||
+				$pedidoZapato->zapato->color->id != $id_color ||
+				$pedidoZapato->zapato->suela->id != $id_suela
+			) {
+				$contador++;
+				$zapatosDiferentes[$contador]['id_modelo'] = $pedidoZapato->zapato->modelo->id;
+				$zapatosDiferentes[$contador]['modelo'] = $pedidoZapato->zapato->modelo->nombre;
+				$zapatosDiferentes[$contador]['id_color'] = $pedidoZapato->zapato->color->id;
+				$zapatosDiferentes[$contador]['color'] = $pedidoZapato->zapato->color->color;
+				$zapatosDiferentes[$contador]['id_suela'] = $pedidoZapato->zapato->suela->id;
+				$zapatosDiferentes[$contador]['suela'] = $pedidoZapato->zapato->suela->nombre;
+				$id_modelo = $pedidoZapato->zapato->modelo->id;
+				$id_suela = $pedidoZapato->zapato->suela->id;
+				$id_color = $pedidoZapato->zapato->color->id;
+			}
+			
+			$zapatosDiferentes[$contador][''.$pedidoZapato->zapato->numero] = $pedidoZapato->cantidad_total;
+		}
+		?>
 		<div class="row">
-				<div class="panel panel-red panel-ordenes">
-				    <div class="panel-heading">Ordenes</div>
-				    <div class="panel-body">
-				        <table class="table table-hover table-striped">
-				            <thead>
-				                <tr>
-				                    <th>Modelo</th>
-				                    <th>Color</th>
-				                    <th>Suela</th>
-				                   <!--  <?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
-				                    <th><?php if(fmod($i ,1)==0){ echo $i;} else{echo "-";} ?></th>
-				                    <?php } ?> -->
-				                    <th>Número</th>
-				                    <th>Precio unitario</th>
-				                    <th>Cantidad</th>
-				                    <th>Importe</th>
-				                </tr>
-				            </thead>
-				            <tbody id="ordenes_table">
-				                
-				            </tbody>
-				        </table>
-				    </div>
-
+			<div class="panel panel-red panel-ordenes">
+				<div class="panel-heading">Ordenes</div>
+				<div class="panel-body">
+					<table class="table table-hover table-striped ordenes-pedido-table">
+						<thead>
+							<tr>
+								<th>Modelo</th>
+								<th>Color</th>
+								<th>Suela</th>
+								<?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
+								<th><?php if(fmod($i ,1)==0){ echo $i;} else{echo "-";} ?></th>
+								<?php } ?>
+							</tr>
+						</thead>
+						<tbody id="ordenes_table">
+							<?php foreach ($zapatosDiferentes as $index => $row) { 
+								$time = microtime();
+								$time = str_replace(' ', '', $time);
+								$time = str_replace('.', '', $time);
+								$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($row['id_modelo']));
+								$numerosPosibles = array();
+								foreach ($modeloNumeros as $modeloNumero) {
+									array_push($numerosPosibles, $modeloNumero->numero);
+								}
+								?>
+								<tr id="row_<?= $time ?>">
+									<td class="modelo" data-id="<?= $row['id_modelo'] ?>">
+										<?= $row['modelo'] ?><input type="hidden" name="Pedido[modelo][<?= $time ?>]" value="<?= $row['id_modelo'] ?>">
+									</td>
+									<td class="color" data-id="<?= $row['id_color'] ?>">
+										<?= $row['color'] ?><input type="hidden" name="Pedido[color][<?= $time ?>]" value="<?= $row['id_color'] ?>">
+									</td>
+									<td class="suela" data-id="<?= $row['id_suela'] ?>">
+										<?= $row['suela'] ?><input type="hidden" name="Pedido[suela][<?= $time ?>]" value="<?= $row['id_suela'] ?>">
+									</td>
+								
+								<?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
+									<td data-numero="<?= $i; ?>">
+										<input class="input-cantidad" type="text" name="Pedido[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'";} ?>/>
+									</td>
+								<?php } ?>
+									<td>
+										<a data-row="<?= $time ?>" class="delete" title="Borrar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Borrar"></a>
+									</td>
+								</tr>
+							<?php }	?>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 
 		<hr/>
 		<div class="row">
 			<div class="col-md-8"></div>
+			<div class="form-group col-md-4">
+				<label class="control-label required" for="Pedidos_total">Subtotal ($)</label>
+				<div class="input-group">
+					<input size="60" maxlength="128" class="form-control" disabled="disabled" name="Aux[subtotal]" id="Pedidos_subtotal" type="text" value="0">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<?php
+			$descuentoCliente = 0;  
+			if(isset($model->cliente->descuento) && $model->cliente->descuento > 0) { $descuentoCliente = $model->cliente->descuento; }?>
+			<div class="col-md-8"></div>
+			<div class="form-group col-md-4">
+				<label class="control-label required" for="Pedidos_total">Descuento al cliente (%)</label>
+				<div class="input-group">
+					<input size="60" maxlength="128" class="form-control" disabled="disabled" name="Aux[descuento]" id="Cliente_descuento" type="text" value="<?= $descuentoCliente ?>">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8"></div>
+			<div class="form-group col-md-4 <?php if($form->error($model,'descuento')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($model,'descuento', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($model,'descuento',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($model,'descuento', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8"></div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'total')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'total', array('class'=>'control-label')); ?>
 				<div class="input-group">
-					<?php echo $form->textField($model,'total',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->textField($model,'total',array('size'=>60,'maxlength'=>128, 'class'=>'form-control', 'readonly'=>'readonly')); ?>
 					<?php echo $form->error($model,'total', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 		</div>
+		<div id="testTotal"></div>
 
 		<div class="form-group">
 			<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped')); ?>
@@ -160,11 +236,29 @@
 </div><!-- form -->
 
 <script type="text/javascript">
+	$(document).ready(function(){
+		total = parseFloat($('#Pedidos_total').val());
+		descuentoCliente = parseFloat($('#Cliente_descuento').val());
+		descuentoPedido = parseFloat($('#Pedidos_descuento').val());
+		subtotal = total;
+		console.log('descuentoCliente: '+descuentoCliente);
+		console.log('descuentoPedido: '+descuentoPedido);
+		console.log('subtotal: '+subtotal);
+		if(total > 0){
+			if(descuentoPedido > 0){
+				subtotal = subtotal/((100-descuentoPedido)/100);
+			}
+			if(descuentoCliente > 0){
+				subtotal = subtotal/((100-descuentoCliente)/100);
+			}
+		}
+		$('#Pedidos_subtotal').val(subtotal.toFixed(2));
+	});
+
 	jQuery(function($) {
 		jQuery('body').on('change','#PedidosZapatos_id_modelos',function(){
 			jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_colores").html(html)}});
 			jQuery.ajax({'url':'/controlbom/control/pedidos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas").html(html)}});
-			jQuery.ajax({'url':'/controlbom/control/pedidos/numerosPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_numero").html(html)}});
 			return false;
 		});
 	});
@@ -172,25 +266,20 @@
 		id_modelos = $('#PedidosZapatos_id_modelos').val();
 		id_colores = $('#PedidosZapatos_id_colores').val();
 		id_suelas = $('#PedidosZapatos_id_suelas').val();
-		numero = $('#PedidosZapatos_numero').val();
-		cantidad = $('#PedidosZapatos_cantidad_total').val();
 		rows = $('#ordenes_table tr').length;
 
-		if (id_modelos>0 && id_colores>0 && id_suelas>0 && numero>0 && cantidad>0) {
+		if (id_modelos>0 && id_colores>0 && id_suelas>0) {
 			$.post(
 				"<?php echo $this->createUrl('pedidos/agregarOrden/');?>",
 				{
 					id_modelos:id_modelos,
 					id_colores:id_colores,
 					id_suelas:id_suelas,
-					numero:numero,
-					cantidad:cantidad,
 					row:rows
 				},
 				function(data){
 					$("#ordenes_table").append(data);
 					limpiarCamposOrden();
-					activarBotones();
 					calcularTotal();
 				}
 			);
@@ -199,37 +288,92 @@
 		}
 		
 	});
+	var valorAnterior;
+	$(document).on("focus",".input-cantidad", function(){
+		valorAnterior = $(this).val();
+	});
+	$(document).on("change",".input-cantidad", function(){
+		id_modelos = $(this).parent().parent().find('.modelo').data('id');
+		id_suelas = $(this).parent().parent().find('.suela').data('id');
+		numero = $(this).parent().data('numero');
+		total = parseFloat($('#Pedidos_subtotal').val());
+		cantidad = $(this).val();
+		if(!/^([0-9])*$/.test(cantidad)){
+			alert('Debe especificar la cantidad de pares, debe ser un número');
+			cantidad = 0;
+			$(this).val(cantidad);
+		}
+		if($(this).val()==''){
+			$(this).val(0);
+		}
+		$("#ordenes_table :input").attr("disabled", "disabled");
+		$.post(
+			"<?php echo $this->createUrl('zapatoprecios/consultarprecio/');?>",
+			{
+				id_modelos:id_modelos,
+				numero:numero,
+				id_suelas:id_suelas
+			},
+			function(data){
+				precio = parseFloat(data);
+				total += (precio*cantidad);
+				if(/^([0-9])*$/.test(valorAnterior)){
+					total -= (valorAnterior*precio);
+				}
+				$('#Pedidos_subtotal').val(''+total.toFixed(2))
+				calcularTotal();
+				$("#ordenes_table :input").removeAttr("disabled");
+			}
+		);
+	});
+
+	$(document).on("change","#Pedidos_descuento", function(){
+		if($(this).val() < 0 || $(this).val() > 100){
+			alert('El descuento debe ser un número entre 0 y 100');
+			$(this).val('0');
+		}
+		calcularTotal();
+	});
+
+	$(document).on("click","a.delete", function(){
+		id_modelos = $(this).parent().parent().find('.modelo').data('id');
+		id_suelas = $(this).parent().parent().find('.suela').data('id');
+		total = parseFloat($('#Pedidos_subtotal').val());
+		row = $(this).data('row');
+		console.log('#ordenes_table #row_'+row+' :input');
+		jQuery.ajax({
+			'url':'/controlbom/control/zapatoprecios/totalRow',
+			'type':'POST',
+			'cache':false,
+			'data':$('#ordenes_table #row_'+row+' :input').serialize(),
+			'success':function(html){
+				$('#testTotal').text(html);
+				reduccion = parseFloat(html);
+				total -= reduccion;
+				$('#Pedidos_subtotal').val(''+total.toFixed(2));
+				calcularTotal();
+			}
+		});
+		$(this).parent().parent().remove();
+	});
 
 	function limpiarCamposOrden(){
 		$('#PedidosZapatos_id_modelos').val('');
-		$('#PedidosZapatos_id_colores').html('Seleccione una opción');
-		$('#PedidosZapatos_id_suelas').html('Seleccione una opción');
-		$('#PedidosZapatos_numero').html('Seleccione una opción');
-		$('#PedidosZapatos_cantidad_total').val('');
-	}
-
-	function activarBotones(){
-		$('.agregar_precio').click(function(){
-			id = $(this).data('id');
-			valor = $('.precio_column_'+id+' input[type=text]').val();
-			if (/^\d+(\.\d{1,2})?$/.test(valor)){
-				$('.total_column_'+id).text($('.cantidad_column_'+id).text()*valor);
-				calcularTotal();
-				// $('.precio_column_'+id).text(valor);
-			}
-			else{
-				// alert('El precio debe ser un número con máximo dos decimales');
-			}
-		});
+		$('#PedidosZapatos_id_colores').html('<option value="">Seleccione una opción</option>');
+		$('#PedidosZapatos_id_suelas').html('<option value="">Seleccione una opción</option>');
 	}
 
 	function calcularTotal(){
 		granTotal = 0;
-		$('.importe_total').each(function(){
-			granTotal += parseFloat($(this).text());
-		});
-		if(isNaN(granTotal))
-			granTotal=0;
-		$('#Pedidos_total').val(granTotal);
+		subtotal = $('#Pedidos_subtotal').val();
+		descuentoCliente = $('#Cliente_descuento').val();
+		descuentoPedido = parseFloat($('#Pedidos_descuento').val());
+		if(isNaN(descuentoPedido)){
+			descuentoPedido=0;
+			$('#Pedidos_descuento').val('0');
+		}
+		granTotal = subtotal * ((100-descuentoCliente)/100);
+		granTotal = subtotal * ((100-descuentoPedido)/100);
+		$('#Pedidos_total').attr("value", granTotal.toFixed(2));
 	}
 </script>

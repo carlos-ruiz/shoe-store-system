@@ -39,8 +39,9 @@ class Clientes extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('nombre, apellido_paterno, id_tipo_cliente, id_direcciones, telefono', 'required'),
+			array('nombre, apellido_paterno, id_direcciones, telefono', 'required'),
 			array('id_tipo_cliente, id_direcciones', 'numerical', 'integerOnly'=>true),
+			array('descuento', 'numerical'),
 			array('nombre, apellido_paterno, apellido_materno', 'length', 'max'=>256),
 			array('rfc', 'length', 'max'=>13),
 			array('razon_social', 'length', 'max'=>512),
@@ -83,6 +84,7 @@ class Clientes extends CActiveRecord
 			'telefono' => 'Teléfono',
 			'celular' => 'Celular',
 			'correo_electronico' => 'Correo electrónico',
+			'descuento'=>'Descuento (%)'
 		);
 	}
 

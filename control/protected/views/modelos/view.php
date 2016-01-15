@@ -55,3 +55,11 @@ $this->menu=array(
 <div class="row">
 	<a href="<?= $model->imagen; ?>"><img class="col-md-4 imagen-modelo" src="<?php echo $model->imagen;?>" /></a>
 </div>
+
+<?php if(!Yii::app()->user->isGuest) { ?>
+		<div class="row">
+			<div class="col-md-12 padding-top">
+				<?php echo CHtml::link('<i class="fa fa-plus"></i> Agregar modelo', array('modelos/create'), array('class'=>'link-button')); ?>
+			</div>
+		</div>
+<?php } ?>

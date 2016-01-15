@@ -38,7 +38,7 @@ class ZapatosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo'),
+				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo','actualizarPrecio'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -64,7 +64,16 @@ class ZapatosController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new Zapatos;
+		$model=new Zapatos('catalog');
+		$zapatoPrecios=new ZapatoPrecios;
+
+		//parche validacion
+		$model->numero = 0;
+		$model->precio = 0;
+		$model->codigo_barras = 'xxx';
+		$zapatoPrecios->id_modelos = 0;
+		$zapatoPrecios->id_suelas = 0;
+		//fin parche validacion
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -72,17 +81,79 @@ class ZapatosController extends Controller
 		if(isset($_POST['Zapatos']))
 		{
 			$model->attributes=$_POST['Zapatos'];
-			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($model->id_modelos, $model->id_colores));
-			$model->id_modelos_colores = $modeloColor->id;
-			$modeloNumero = ModelosNumeros::model()->findByPk($model->numero);
-			$model->numero = $modeloNumero->numero;
-			$model->codigo_barras = $model->id_modelos.$model->id_colores.'00000';
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$zapatoPrecios->attributes=$_POST['ZapatoPrecios'];
+
+			if($model->validate() & $zapatoPrecios->validate()){
+				$modeloColores = ModelosColores::model()->findAll('id_modelos=?', array($model->id_modelos));
+
+				foreach ($modeloColores as $modeloColor) {
+					$zapatosExistentes = Zapatos::model()->findAll('id_modelos=? AND id_colores=? AND id_suelas=?', array($modeloColor->id_modelos, $modeloColor->id_colores, $model->id_suelas));
+					if (isset($zapatosExistentes)) {
+						foreach ($zapatosExistentes as $zapatoExistente) {
+							if($zapatoExistente->numero >= 12 && $zapatoExistente->numero < 18){
+								$zapatoExistente->precio = $zapatoPrecios->precio_extrachico;
+							}
+							else if($zapatoExistente->numero >= 18 && $zapatoExistente->numero < 22){
+								$zapatoExistente->precio = $zapatoPrecios->precio_chico;
+							}
+							else if($zapatoExistente->numero >= 22 && $zapatoExistente->numero < 25){
+								$zapatoExistente->precio = $zapatoPrecios->precio_mediano;
+							}
+							else if($zapatoExistente->numero >= 25 && $zapatoExistente->numero < 32){
+								$zapatoExistente->precio = $zapatoPrecios->precio_grande;
+							}
+							$zapatoExistente->save();
+						}
+					}
+
+					$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($model->id_modelos));
+					foreach ($modeloNumeros as $modeloNumero) {
+						$numero = $modeloNumero->numero;
+						$zapatoExiste = Zapatos::model()->find('id_modelos=? AND id_colores=? AND id_suelas=? AND numero=?', array($modeloColor->id_modelos, $modeloColor->id_colores, $model->id_suelas, $numero));
+						if (!isset($zapatoExiste)) {
+							$nuevoZapato = new Zapatos;
+							$nuevoZapato->id_modelos = $modeloColor->id_modelos;
+							$nuevoZapato->id_colores = $modeloColor->id_colores;
+							$nuevoZapato->id_suelas = $model->id_suelas;
+							$nuevoZapato->numero = $numero;
+							$nuevoZapato->codigo_barras = $model->id_modelos.$modeloColor->color->id.$model->id_suelas.$numero;
+							if($numero >= 12 && $numero < 18){
+								$nuevoZapato->precio = $zapatoPrecios->precio_extrachico;
+							}
+							else if($numero >= 18 && $numero < 22){
+								$nuevoZapato->precio = $zapatoPrecios->precio_chico;
+							}
+							else if($numero >= 22 && $numero < 25){
+								$nuevoZapato->precio = $zapatoPrecios->precio_mediano;
+							}
+							else if($numero >= 25 && $numero < 32){
+								$nuevoZapato->precio = $zapatoPrecios->precio_grande;
+							}
+							$nuevoZapato->save();
+						}
+					}
+				}
+				$zapatoPreciosExistente = ZapatoPrecios::model()->find('id_modelos=? AND id_suelas=?', array($model->id_modelos, $model->id_suelas));
+				if (isset($zapatoPreciosExistente)) {
+					$zapatoPreciosExistente->precio_extrachico = $zapatoPrecios->precio_extrachico;
+					$zapatoPreciosExistente->precio_chico = $zapatoPrecios->precio_chico;
+					$zapatoPreciosExistente->precio_mediano = $zapatoPrecios->precio_mediano;
+					$zapatoPreciosExistente->precio_grande = $zapatoPrecios->precio_grande;
+					$zapatoPreciosExistente->save();
+				}
+				else{
+					$zapatoPrecios->id_modelos = $model->id_modelos;
+					$zapatoPrecios->id_suelas = $model->id_suelas;
+					$zapatoPrecios->save();
+				}
+				
+				$this->redirect(array('admin'));
+			}
 		}
 
 		$this->render('create',array(
 			'model'=>$model,
+			'zapatoPrecios'=>$zapatoPrecios,
 		));
 	}
 
@@ -150,8 +221,10 @@ class ZapatosController extends Controller
 	{
 		$model=new Zapatos('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Zapatos']))
+		if(isset($_GET['Zapatos'])){
+			echo "hola";
 			$model->attributes=$_GET['Zapatos'];
+		}
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -205,5 +278,16 @@ class ZapatosController extends Controller
 		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["Zapatos"]["id_modelos"]));
 		foreach($list as $data)
 			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
+	}
+
+	public function actionActualizarPrecio()
+	{
+		$id = $_POST["id_zapato"];
+        $precio = $_POST["precio"];
+
+        $zapato = Zapatos::model()->findByPk($id);
+        $zapato->precio = $precio;
+        $zapato->save();
+        echo $precio;
 	}
 }

@@ -31,13 +31,10 @@ $this->menu=array(
 			'value'=>array($this, 'obtenerNombreCompleto')
 			),
 		array(
-	        'name'=>'id_tipo_cliente',
-	        'value'=>'$data->tipoCliente->nombre',
-    	),
-		array(
 	        'name'=>'direccion',
 	        'value'=>'$data->direccion->ciudad',
     	),
+    	'descuento',
 		'telefono',
 		'correo_electronico',
 		

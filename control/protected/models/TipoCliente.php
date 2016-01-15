@@ -58,7 +58,7 @@ class TipoCliente extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'nombre' => 'Nombre',
-			'descuento_par' => 'Descuento por par',
+			'descuento_par' => 'Descuento %',
 		);
 	}
 

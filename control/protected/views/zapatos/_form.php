@@ -31,22 +31,6 @@
 					<?php echo $form->error($model,'id_modelos', array('class'=>'help-block')); ?>
 				</div>
 			</div>
-			<div class="form-group col-md-4 <?php if($form->error($model,'id_colores')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'id_colores', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->dropDownList($model,'id_colores',Modelos::model()->obtenerColores(isset($model->id_modelos)?$model->id_modelos:0), $htmlOptions); ?>
-					<?php echo $form->error($model,'id_colores', array('class'=>'help-block')); ?>
-				</div>
-			</div>
-			<div class="form-group col-md-4 <?php if($form->error($model,'numero')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'numero', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->dropDownList($model,'numero',Modelos::model()->obtenerNumeros(isset($model->id_modelos)?$model->id_modelos:0), $htmlOptions); ?>
-					<?php echo $form->error($model,'numero', array('class'=>'help-block')); ?>
-				</div>
-			</div>
-		</div>
-		<div class="row">
 			<div class="form-group col-md-4 <?php if($form->error($model,'id_suelas')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'id_suelas', array('class'=>'control-label')); ?>
 				<div class="input-group">
@@ -54,11 +38,34 @@
 					<?php echo $form->error($model,'id_suelas', array('class'=>'help-block')); ?>
 				</div>
 			</div>
-			<div class="form-group col-md-4 <?php if($form->error($model,'precio')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'precio', array('class'=>'control-label')); ?>
+		</div>
+		<div class="row">
+			<div class="form-group col-md-3 <?php if($form->error($zapatoPrecios,'precio_extrachico')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($zapatoPrecios,'precio_extrachico', array('class'=>'control-label')); ?>
 				<div class="input-group">
-					<?php echo $form->textField($model,'precio',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
-					<?php echo $form->error($model,'precio', array('class'=>'help-block')); ?>
+					<?php echo $form->textField($zapatoPrecios,'precio_extrachico',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($zapatoPrecios,'precio_extrachico', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+			<div class="form-group col-md-3 <?php if($form->error($zapatoPrecios,'precio_chico')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($zapatoPrecios,'precio_chico', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($zapatoPrecios,'precio_chico',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($zapatoPrecios,'precio_chico', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+			<div class="form-group col-md-3 <?php if($form->error($zapatoPrecios,'precio_mediano')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($zapatoPrecios,'precio_mediano', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($zapatoPrecios,'precio_mediano',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($zapatoPrecios,'precio_mediano', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+			<div class="form-group col-md-3 <?php if($form->error($zapatoPrecios,'precio_grande')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($zapatoPrecios,'precio_grande', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($zapatoPrecios,'precio_grande',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($zapatoPrecios,'precio_grande', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 		</div>

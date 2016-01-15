@@ -232,7 +232,12 @@ Licensed under the MIT license.
   // @param {number} width New width of the canvas, in pixels.
   // @param {number} width New height of the canvas, in pixels.
   Canvas.prototype.resize = function(width, height) {
-
+    if(width==null){
+      width = 10;
+    }
+    if (height==null) {
+      height = 10;
+    }
     if (width <= 0 || height <= 0) {
       throw new Error("Invalid dimensions for plot, width = " + width + ", height = " + height);
     }
@@ -822,7 +827,7 @@ Licensed under the MIT license.
       // since the rest of the code assumes that they exist.
       var i, axisOptions, axisCount, fontDefaults = {
         style: placeholder.css("font-style"),
-        size: Math.round(0.8 * (+placeholder.css("font-size").replace("px", "") || 13)),
+        size: Math.round(8 || 13),
         variant: placeholder.css("font-variant"),
         weight: placeholder.css("font-weight"),
         family: placeholder.css("font-family")

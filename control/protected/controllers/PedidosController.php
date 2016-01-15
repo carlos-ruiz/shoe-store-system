@@ -65,34 +65,77 @@ class PedidosController extends Controller
 	{
 		$model=new Pedidos;
 		$model->fecha_pedido = date('d-m-Y H:i:s');
+		$model->total = 0;
 		$pedidoZapato = new PedidosZapatos;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Pedidos']))
 		{
-			$model->attributes=$_POST['Pedidos'];
-			if($model->save()){
-				if (isset($_POST['pedidoZapato'])) {
-					foreach ($_POST['pedidoZapato'] as $idZapato => $cantidad) {
-						$pedidoZapato = new PedidosZapatos;
-						$pedidoZapato->id_pedidos = $model->id;
-						$pedidoZapato->id_zapatos = $idZapato;
-						$pedidoZapato->cantidad_total = $cantidad;
-						$statusZapatoCreado = EstatusZapatos::model()->find('nombre=?', 'Creado');
-						$pedidoZapato->id_estatus_zapatos = $statusZapatoCreado->id;
-						$pedidoZapato->completos = 0;
-						$pedidoZapato->save();
-					}
+			$transaction = Yii::app()->db->beginTransaction();
+			try{
+				$model->attributes=$_POST['Pedidos'];
+				$prioridad = $_POST['Pedidos']['prioridad'];
+				$model->prioridad = 'NORMAL';
+				if($prioridad == 1){
+					$model->prioridad = 'ALTA';
 				}
-				if (isset($_POST['PedidosZapatosNuevo'])) {
-					foreach ($_POST['PedidosZapatosNuevo']['modelo'] as $i => $value) {
-						$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($_POST['PedidosZapatosNuevo']['modelo'][$i], $_POST['PedidosZapatosNuevo']['color'][$i]));
-						$zapato = new Zapatos;
-						$zapato->id_modelos_colores = $modeloColor->id;
+				$date = str_replace('/', '-', $model->fecha_entrega);
+				$newDate = date("Y-m-d", strtotime($date));
+			
+				$model->fecha_entrega = $newDate;
+				$newDate = date("Y-m-d H:i:s", strtotime($model->fecha_pedido));
+				$model->fecha_pedido = $newDate;
+				$total = 0;
+				if($model->save()){
+					if (isset($_POST['Pedido'])) {
+						$datosPedido = $_POST['Pedido'];
+						foreach ($datosPedido['modelo'] as $id => $value) {
+							foreach ($datosPedido['numeros'][$id] as $numero => $cantidad) {
+								if (isset($cantidad) && $cantidad > 0) {
+									$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($datosPedido['modelo'][$id], $datosPedido['color'][$id]));
+									
+									$zapato = Zapatos::model()->find('numero=? AND id_suelas=? AND id_modelos=? AND id_colores=?', array($numero, $datosPedido['suela'][$id], $modeloColor->id_modelos, $modeloColor->id_colores));
+	
+									if (!isset($zapato)) {
+										$zapato = new Zapatos;
+										$zapato->numero = $numero;
+										$zapato->precio = 0;
+										$zapato->codigo_barras = 'mmccssnn';
+										$zapato->id_modelos = $modeloColor->id_modelos;
+										$zapato->id_colores = $modeloColor->id_colores;
+										$zapato->id_suelas = $datosPedido['suela'][$id];
+										$zapato->save();
+									}
+									$pedidoZapato = new PedidosZapatos;
+									$pedidoZapato->id_pedidos = $model->id;
+									$pedidoZapato->id_zapatos = $zapato->id;
+									$pedidoZapato->cantidad_total = $cantidad;
+									$estatusZapato = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
+									$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
+									$pedidoZapato->completos = 0;
+									$pedidoZapato->precio_unitario = $zapato->precio;
+									$pedidoZapato->save();
+									$total += $pedidoZapato->precio_unitario * $cantidad;
+								}
+							}
+						}
+						if($total > 0){
+							if(isset($model->cliente->descuento) && $model->cliente->descuento > 0){
+								$total = $total*(1-$model->cliente->descuento/100);
+							}
+							if(isset($model->descuento) && $model->descuento > 0){
+								$total = $total*(1-$model->descuento/100);
+							}
+							$model->total = $total;
+							$model->save();
+						}
 					}
+					$transaction->commit();
+					$this->redirect(array('view','id'=>$model->id));
 				}
-				$this->redirect(array('view','id'=>$model->id));
+			}catch(Exception $ex){
+				$transaction->rollback();
 			}
 		}
 
@@ -110,7 +153,7 @@ class PedidosController extends Controller
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
-
+		$pedidoZapato = new PedidosZapatos;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
@@ -123,6 +166,7 @@ class PedidosController extends Controller
 
 		$this->render('update',array(
 			'model'=>$model,
+			'pedidoZapato'=>$pedidoZapato,
 		));
 	}
 
@@ -215,46 +259,43 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
 	}
 
-	public function actionAgregarOrden(){
+	public function actionAgregarOrden()
+	{
 		if (isset($_POST)) {
 			$modelo = Modelos::model()->findByPk($_POST['id_modelos']);
 			$color = Colores::model()->findByPk($_POST['id_colores']);
 			$suela = Suelas::model()->findByPk($_POST['id_suelas']);
-			$modeloNumero = ModelosNumeros::model()->findByPk($_POST['numero']);
-			$cantidad = $_POST['cantidad'];
+			$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($modelo->id));
 			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($modelo->id, $color->id));
-			$zapato = Zapatos::model()->find('id_suelas=? AND id_modelos_colores=? AND numero=?', array($suela->id, $modeloColor->id, $modeloNumero->numero));
-			if (isset($zapato)) {
-				echo "
-				<tr>
-					<td>".$modelo->nombre."</td>
-					<td>".$color->color."</td>
-					<td>".$suela->nombre."</td>
-					<td>".$modeloNumero->numero."</td>
-					<td>".$zapato->precio."</td>
-					<td>".$cantidad."</td>
-					<td class='importe_total'>".($cantidad*$zapato->precio)."</td>
-					<input type='hidden' name='pedidoZapato[$zapato->id]' value='$cantidad'/>
-				</tr>";
+			$numerosPosibles = array();
+			foreach ($modeloNumeros as $modeloNumero) {
+				array_push($numerosPosibles, $modeloNumero->numero);
 			}
-			else{
-				echo "
-				<tr>
-					<td>".$modelo->nombre."</td>
-					<input type='hidden' name='PedidosZapatosNuevo[modelo][".$_POST['row']."]' value='$modelo->id'/>
-					<td>".$color->color."</td>
-					<input type='hidden' name='PedidosZapatosNuevo[color][".$_POST['row']."]' value='$color->id'/>
-					<td>".$suela->nombre."</td>
-					<input type='hidden' name='PedidosZapatosNuevo[suela][".$_POST['row']."]' value='$suela->id'/>
-					<td>".$modeloNumero->numero."</td>
-					<input type='hidden' name='PedidosZapatosNuevo[numero][".$_POST['row']."]' value='$modeloNumero->numero'/>
-					<td class='precio_column_".$_POST['row']."'><input type='text' name='PedidosZapatosNuevo[precio][".$_POST['row']."]' /><div class='agregar_precio btn btn-red-stripped btn-tin' data-id='".$_POST['row']."'>Agregar</div></td>
-					<td class='cantidad_column_".$_POST['row']."'>".$cantidad."</td>
-					<input type='hidden' name='PedidosZapatosNuevo[cantidad][".$_POST['row']."]' value='$cantidad'/>
-					<td class='importe_total total_column_".$_POST['row']."'></td>
-				</tr>";
+			$zapatosConPrecio = ZapatoPrecios::model()->findAll('id_modelos=? AND id_suelas=?', array($modelo->id, $suela->id));
+			if (!isset($zapatosConPrecio) || sizeof($zapatosConPrecio)<1) {
+				echo "<script>alert(\"No ha definido los precios del modelo $modelo->nombre con la suela $suela->nombre\");</script>";
+				return;
 			}
-		}
-
+			
+			$time = microtime();
+			$time = str_replace(' ', '', $time);
+			$time = str_replace('.', '', $time);
+			?>
+			<tr id="row_<?= $time ?>">
+				<td class="modelo" data-id="<?= $modelo->id ?>"><?= $modelo->nombre; ?><input type="hidden" name="Pedido[modelo][<?= $time ?>]" value="<?= $modelo->id ?>"></td>
+				<td class="color" data-id="<?= $color->id ?>"><?= $color->color; ?><input type="hidden" name="Pedido[color][<?= $time ?>]" value="<?= $color->id ?>"></td>
+				<td class="suela" data-id="<?= $suela->id ?>"><?= $suela->nombre; ?><input type="hidden" name="Pedido[suela][<?= $time ?>]" value="<?= $suela->id ?>"></td>
+			
+			<?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
+				<td data-numero="<?= $i; ?>">
+					<input class="input-cantidad" type="text" name="Pedido[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value=''";} ?>/>
+				</td>
+			<?php } ?>
+				<td>
+					<a data-row="<?= $time ?>" class="delete" title="Borrar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Borrar"></a>
+				</td>
+			</tr>
+<?php		}
 	}
+
 }

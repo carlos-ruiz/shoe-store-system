@@ -123,3 +123,20 @@ table.detail-view tr.odd {
 .panel-ordenes {
 	font-size: 9pt;
 }
+
+.ordenes-pedido-table th, .ordenes-pedido-table td{
+	text-align: center;
+	padding: 0px !important;
+}
+
+.padding-top {
+	padding-top: 1.5em;
+}
+
+.link-button {
+	border: solid 2px #E99299;
+	font-size: 11pt;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 10px
+}

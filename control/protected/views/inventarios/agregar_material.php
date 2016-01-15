@@ -33,6 +33,14 @@
 			</div>
 		</div>
 
+		<div class="form-group <?php if($form->error($model,'ultimo_precio')!=''){ echo 'has-error'; }?>">
+			<?php echo $form->labelEx($model,'ultimo_precio', array('class'=>'control-label')); ?>
+			<div class="input-group">
+				<?php echo $form->textField($model,'ultimo_precio',array('size'=>45,'maxlength'=>45, 'class'=>'form-control')); ?>
+				<?php echo $form->error($model,'ultimo_precio', array('class'=>'help-block')); ?>
+			</div>
+		</div>
+
 		<div class="form-group">
 			<?php echo CHtml::submitButton('Agregar', array('class'=>'btn btn-red-stripped')); ?>
 		</div>

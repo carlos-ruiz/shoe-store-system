@@ -10,6 +10,8 @@
  * @property integer $cantidad_total
  * @property integer $id_estatus_zapatos
  * @property integer $completos
+ * @property string $caracteristicas_especiales
+ * @property string $precio_unitario
  *
  * The followings are the available model relations:
  * @property Pedidos $idPedidos
@@ -42,9 +44,11 @@ class PedidosZapatos extends CActiveRecord
 		return array(
 			array('id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos', 'required'),
 			array('id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos', 'numerical', 'integerOnly'=>true),
+			array('precio_unitario', 'length', 'max'=>7),
+			array('caracteristicas_especiales', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos', 'safe', 'on'=>'search'),
+			array('id, id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos, caracteristicas_especiales, precio_unitario', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -56,9 +60,9 @@ class PedidosZapatos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idPedidos' => array(self::BELONGS_TO, 'Pedidos', 'id_pedidos'),
-			'idZapatos' => array(self::BELONGS_TO, 'Zapatos', 'id_zapatos'),
-			'idEstatusZapatos' => array(self::BELONGS_TO, 'EstatusZapatos', 'id_estatus_zapatos'),
+			'pedido' => array(self::BELONGS_TO, 'Pedidos', 'id_pedidos'),
+			'zapato' => array(self::BELONGS_TO, 'Zapatos', 'id_zapatos'),
+			'estatusZapato' => array(self::BELONGS_TO, 'EstatusZapatos', 'id_estatus_zapatos'),
 			'zapatoCortadors' => array(self::HAS_MANY, 'ZapatoCortador', 'id_pedidos_zapatos'),
 		);
 	}
@@ -79,6 +83,8 @@ class PedidosZapatos extends CActiveRecord
 			'id_colores'=>'Color',
 			'id_suelas'=>'Suela',
 			'numero'=>'Número',
+			'caracteristicas_especiales' => 'Características especiales',
+			'precio_unitario' => 'Precio unitario',
 		);
 	}
 
@@ -106,6 +112,8 @@ class PedidosZapatos extends CActiveRecord
 		$criteria->compare('cantidad_total',$this->cantidad_total);
 		$criteria->compare('id_estatus_zapatos',$this->id_estatus_zapatos);
 		$criteria->compare('completos',$this->completos);
+		$criteria->compare('caracteristicas_especiales',$this->caracteristicas_especiales,true);
+		$criteria->compare('precio_unitario',$this->precio_unitario,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

@@ -16,7 +16,8 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
-		'ext.fpdf.*'
+		'ext.fpdf.*',
+		'ext.eeditable.*',
 	),
 
 	'modules'=>array(

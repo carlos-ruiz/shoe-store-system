@@ -27,10 +27,7 @@ $this->menu=array(
 		'apellido_materno',
 		'rfc',
 		'razon_social',
-		array(
-	        'name'=>'id_tipo_cliente',
-	        'value'=>$model->tipoCliente->nombre,
-    	),
+		'descuento',
 		array(
 	        'name'=>'Calle',
 	        'value'=>$model->direccion->calle.' #'.$model->direccion->numero_ext.((isset($model->direccion->numero_int) && strlen($model->direccion->numero_int)>0)?(' INT '.$model->direccion->numero_int):''),

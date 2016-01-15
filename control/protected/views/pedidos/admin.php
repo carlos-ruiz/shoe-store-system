@@ -26,20 +26,25 @@ $this->menu=array(
 	'columns'=>array(
 		'id',
 		array(
-	        'name'=>'id_clientes',
-	        'value'=>'$data->cliente->nombre',
+	        'name'=>'var_cliente_nombre',
+	        'value'=>'$data->cliente->obtenerNombreCompleto()',
     	),
 		'fecha_pedido',
 		'fecha_entrega',
 		array(
-	        'name'=>'id_formas_pago',
+	        'name'=>'var_forma_pago',
 	        'value'=>'$data->formaPago->nombre',
     	),
     	array(
-	        'name'=>'id_estatus_pedidos',
+	        'name'=>'var_estatus',
 	        'value'=>'$data->estatus->nombre',
+	        // 'value'=>'$data->a.\' \'.$data->b.\' \'.$data->c',
     	),
-		'total',
+    	array(
+	        'name'=>'total',
+	        'value'=>'\'$\'.$data->total',
+    	),
+    	'prioridad',
 		array(
 			'class'=>'CButtonColumn',
 		),

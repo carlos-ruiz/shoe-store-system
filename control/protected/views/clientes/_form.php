@@ -42,11 +42,18 @@
 		</div>
 
 		<div class="row">
-			<div class="form-group col-md-4 <?php if($form->error($model,'id_tipo_cliente')!=''){ echo 'has-error'; }?>">
+			<!-- <div class="form-group col-md-4 <?php if($form->error($model,'id_tipo_cliente')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'id_tipo_cliente', array('class'=>'control-label')); ?>
 				<div class="input-group">
 					<?php echo $form->dropDownList($model,'id_tipo_cliente', TipoCliente::model()->obtenerTiposCliente(), array('class' => 'form-control',"empty"=>"Seleccione una opci&oacute;n")); ?>
 					<?php echo $form->error($model,'id_tipo_cliente', array('class'=>'help-block')); ?>
+				</div>
+			</div> -->
+			<div class="form-group col-md-4 <?php if($form->error($model,'descuento')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($model,'descuento', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($model,'descuento',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($model,'descuento', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'rfc')!=''){ echo 'has-error'; }?>">
