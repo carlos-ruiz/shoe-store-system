@@ -16,7 +16,7 @@ $this->menu=array(
 );
 ?>
 
-<h1>Update Pedidos <?php echo $model->id; ?></h1>
+<h1>Actualizar Pedido <?php echo $model->id; ?></h1>
 
 <?php $this->renderPartial('_form', 
 		array(

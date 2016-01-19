@@ -10,6 +10,8 @@
  * The followings are the available model relations:
  * @property ModelosSuelas[] $modelosSuelases
  * @property SuelasColores[] $suelasColores
+ * @property SuelasNumeros[] $suelasNumeroses
+ * @property ZapatoPrecios[] $zapatoPrecioses
  * @property Zapatos[] $zapatoses
  */
 class Suelas extends CActiveRecord
@@ -31,6 +33,7 @@ class Suelas extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('nombre', 'required'),
+			array('nombre', 'unique'),
 			array('nombre', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -46,9 +49,11 @@ class Suelas extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'modelosSuelases' => array(self::HAS_MANY, 'ModelosSuelas', 'id_suelas'),
+			'modeloSuela' => array(self::HAS_MANY, 'ModelosSuelas', 'id_suelas'),
 			'suelasColores' => array(self::HAS_MANY, 'SuelasColores', 'id_suelas'),
-			'zapatoses' => array(self::HAS_MANY, 'Zapatos', 'id_suelas'),
+			'zapatos' => array(self::HAS_MANY, 'Zapatos', 'id_suelas'),
+			'suelaNumeros' => array(self::HAS_MANY, 'SuelasNumeros', 'id_suelas'),
+			'zapatoPrecios' => array(self::HAS_MANY, 'ZapatoPrecios', 'id_suelas'),
 		);
 	}
 

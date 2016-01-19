@@ -1,25 +1,20 @@
 <?php
 
 /**
- * This is the model class for table "suelas_colores".
+ * This is the model class for table "modelos_suelas_numeros".
  *
- * The followings are the available columns in table 'suelas_colores':
- * @property integer $id
- * @property integer $id_suelas
- * @property integer $id_colores
- *
- * The followings are the available model relations:
- * @property Colores $idColores
- * @property Suelas $idSuelas
+ * The followings are the available columns in table 'modelos_suelas_numeros':
+ * @property integer $id_modelos_numeros
+ * @property integer $id_suelas_numeros
  */
-class SuelasColores extends CActiveRecord
+class ModelosSuelasNumeros extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'suelas_colores';
+		return 'modelos_suelas_numeros';
 	}
 
 	/**
@@ -30,11 +25,11 @@ class SuelasColores extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_suelas, id_colores', 'required'),
-			array('id_suelas, id_colores', 'numerical', 'integerOnly'=>true),
+			array('id_modelos_numeros, id_suelas_numeros', 'required'),
+			array('id_modelos_numeros, id_suelas_numeros', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_suelas, id_colores', 'safe', 'on'=>'search'),
+			array('id_modelos_numeros, id_suelas_numeros', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -46,8 +41,6 @@ class SuelasColores extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
-			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
 		);
 	}
 
@@ -57,9 +50,8 @@ class SuelasColores extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'id_suelas' => 'Id Suelas',
-			'id_colores' => 'Id Colores',
+			'id_modelos_numeros' => 'Id Modelos Numeros',
+			'id_suelas_numeros' => 'Id Suelas Numeros',
 		);
 	}
 
@@ -81,9 +73,8 @@ class SuelasColores extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
-		$criteria->compare('id_suelas',$this->id_suelas);
-		$criteria->compare('id_colores',$this->id_colores);
+		$criteria->compare('id_modelos_numeros',$this->id_modelos_numeros);
+		$criteria->compare('id_suelas_numeros',$this->id_suelas_numeros);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -94,7 +85,7 @@ class SuelasColores extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return SuelasColores the static model class
+	 * @return ModelosSuelasNumeros the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

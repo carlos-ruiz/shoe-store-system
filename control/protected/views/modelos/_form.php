@@ -79,7 +79,7 @@
 						array_push($numerosSeleccionados, $modeloNumero->numero);
 					}
 				?>
-				<?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
+				<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 				<div class="form-group col-md-4 align-right">
 					<label for="ModelosNumeros_numero_<?= $i; ?>"><?= $i; ?></label>
 					<div class="input-group inline-block">
@@ -104,18 +104,27 @@
 				?>
 				<?php foreach ($materiales as $material) { ?>
 				<div class="form-group">
-					<label for="ModelosMateriales_id_materiales_<?= $material->id ?>"><?= $material->nombre; ?></label>
+					<label for="ModelosMateriales_id_materiales_<?= $material->id ?>"><?= $material->nombre.' ('.$material->unidad_medida.')' ?></label>
 					<div class="input-group inline-block">
 						<input size="45" maxlength="45" name="ModelosMateriales[id_materiales][<?= $material->id; ?>]" id="ModelosMateriales_id_materiales_<?= $material->id ?>" value="1" type="checkbox" class="check_material" data-id="<?= $material->id; ?>" <?php if(in_array($material, $materialesSeleccionados)){echo "checked";} ?>>
 					</div>
 					<div id="inputs_<?= $material->id; ?>" style="display:none;">
+							<h5>Cantidades</h5>
 						<div class="col-md-6">
-							<label for="ModelosMateriales_cantidad_<?= $material->id ?>">Cantidad</label>
-							<input name="ModelosMateriales[cantidad][<?= $material->id; ?>]" class="form-control" id="ModelosMateriales_cantidad_<?= $material->id ?>" type="text" <?php if(isset($cantidadesMaterial[$material->id])){echo "value='".$cantidadesMaterial[$material->id]."'"; } ?>>
+							<label for="ModelosMateriales_cantidad_extrachico_<?= $material->id ?>">Extrachico</label>
+							<input name="ModelosMateriales[cantidades][<?= $material->id; ?>][cantidad_extrachico]" class="form-control" id="ModelosMateriales_cantidad_extrachico_<?= $material->id ?>" type="text" <?php if(isset($cantidadesMaterial[$material->id]['extrachico'])){echo "value='".$cantidadesMaterial[$material->id]['extrachico']."'"; } ?>>
 						</div>
 						<div class="col-md-6">
-							<label for="ModelosMateriales_unidad_medida_<?= $material->id ?>">Unidad/medida</label>
-							<input name="ModelosMateriales[unidad_medida][<?= $material->id; ?>]" class="form-control" id="ModelosMateriales_unidad_medida_<?= $material->id ?>" type="text" <?php if(isset($unidadesMedidaMaterial[$material->id])){echo "value='".$unidadesMedidaMaterial[$material->id]."'"; } ?>>
+							<label for="ModelosMateriales_cantidad_chico_<?= $material->id ?>">Chico</label>
+							<input name="ModelosMateriales[cantidades][<?= $material->id; ?>][cantidad_chico]" class="form-control" id="ModelosMateriales_cantidad_chico_<?= $material->id ?>" type="text" <?php if(isset($cantidadesMaterial[$material->id]['chico'])){echo "value='".$cantidadesMaterial[$material->id]['chico']."'"; } ?>>
+						</div>
+						<div class="col-md-6">
+							<label for="ModelosMateriales_cantidad_mediano_<?= $material->id ?>">Mediano</label>
+							<input name="ModelosMateriales[cantidades][<?= $material->id; ?>][cantidad_mediano]" class="form-control" id="ModelosMateriales_cantidad_mediano_<?= $material->id ?>" type="text" <?php if(isset($cantidadesMaterial[$material->id]['mediano'])){echo "value='".$cantidadesMaterial[$material->id]['mediano']."'"; } ?>>
+						</div>
+						<div class="col-md-6">
+							<label for="ModelosMateriales_cantidad_grande_<?= $material->id ?>">Grande</label>
+							<input name="ModelosMateriales[cantidades][<?= $material->id; ?>][cantidad_grande]" class="form-control" id="ModelosMateriales_cantidad_grande_<?= $material->id ?>" type="text" <?php if(isset($cantidadesMaterial[$material->id]['grande'])){echo "value='".$cantidadesMaterial[$material->id]['grande']."'"; } ?>>
 						</div>
 					</div>
 					<script type="text/javascript">

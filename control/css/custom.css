@@ -140,3 +140,18 @@ table.detail-view tr.odd {
     padding: 5px;
     border-radius: 10px
 }
+
+td.td-caracteristicas-especiales {
+	text-align: left !important;
+	color: red;
+	padding-left: 8px !important;
+}
+
+#ordenes_table .odd {
+	background: #F4E5E6;
+}
+
+.ordenes-pedido-table thead {
+	background: #EA7979;
+    color: white;
+}

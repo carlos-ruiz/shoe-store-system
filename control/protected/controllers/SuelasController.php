@@ -63,19 +63,33 @@ class SuelasController extends Controller
 	public function actionCreate()
 	{
 		$model=new Suelas;
-
+		$colores = Colores::model()->findAll();
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Suelas']))
 		{
 			$model->attributes=$_POST['Suelas'];
-			if($model->save())
+			if($model->save()){
+				foreach ($_POST['SuelasColores']['id_colores'] as $id => $value) {
+					$suelaColor = new SuelasColores;
+					$suelaColor->id_suelas = $model->id;
+					$suelaColor->id_colores = $id;
+					$suelaColor->save();
+				}
+				foreach ($_POST['SuelasNumeros']['numero'] as $numero => $value) {
+					$suelaNumero = new SuelasNumeros;
+					$suelaNumero->numero = $numero;
+					$suelaNumero->id_suelas = $model->id;
+					$suelaNumero->save();
+				}
 				$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('create',array(
 			'model'=>$model,
+			'colores'=>$colores,
 		));
 	}
 
@@ -87,19 +101,46 @@ class SuelasController extends Controller
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
-
+		$colores = Colores::model()->findAll();
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Suelas']))
 		{
 			$model->attributes=$_POST['Suelas'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$transaction = Yii::app()->db->beginTransaction();
+			try{
+				foreach ($model->suelasColores as $suelaColor) {
+					$suelaColor->delete();
+				}
+				foreach ($model->suelaNumeros as $suelaNumero) {
+					$suelaNumero->delete();
+				}
+				if($model->save()){
+					foreach ($_POST['SuelasColores']['id_colores'] as $id => $value) {
+						$suelaColor = new SuelasColores;
+						$suelaColor->id_suelas = $model->id;
+						$suelaColor->id_colores = $id;
+						$suelaColor->save();
+					}
+					foreach ($_POST['SuelasNumeros']['numero'] as $numero => $value) {
+						$suelaNumero = new SuelasNumeros;
+						$suelaNumero->numero = $numero;
+						$suelaNumero->id_suelas = $model->id;
+						$suelaNumero->save();
+					}
+					$transaction->commit();
+					$this->redirect(array('view','id'=>$model->id));
+				}
+			}catch(Exception $ex){
+				$transaction->rollback();
+			}
+
 		}
 
 		$this->render('update',array(
 			'model'=>$model,
+			'colores'=>$colores,
 		));
 	}
 

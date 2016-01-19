@@ -63,19 +63,29 @@ class MaterialesController extends Controller
 	public function actionCreate()
 	{
 		$model=new Materiales;
-
+		$colores = Colores::model()->findAll();
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Materiales']))
 		{
 			$model->attributes=$_POST['Materiales'];
-			if($model->save())
+			if($model->save()){
+				if (isset($_POST['MaterialesColores'])) {
+					foreach ($_POST['MaterialesColores']['id_colores'] as $idColor => $value) {
+						$materialColor = new MaterialesColores;
+						$materialColor->id_colores = $idColor;
+						$materialColor->id_materiales = $model->id;
+						$materialColor->save();
+					}
+				}
 				$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('create',array(
 			'model'=>$model,
+			'colores'=>$colores,
 		));
 	}
 
@@ -87,6 +97,7 @@ class MaterialesController extends Controller
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
+		$colores = Colores::model()->findAll();
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -94,12 +105,33 @@ class MaterialesController extends Controller
 		if(isset($_POST['Materiales']))
 		{
 			$model->attributes=$_POST['Materiales'];
-			if($model->save())
+			$ids_colores_actuales = array();
+			if (isset($_POST['MaterialesColores'])) {
+				foreach ($_POST['MaterialesColores']['id_colores'] as $id_color => $value) {
+					array_push($ids_colores_actuales, $id_color);
+				}
+			}
+			foreach ($model->colores as $modeloColor) {
+				if (!in_array($modeloColor->color->id, $ids_colores_actuales)) {
+					$modeloColor->delete();
+				}else{
+					$ids_colores_actuales = array_diff($ids_colores_actuales, array($modeloColor->color->id));
+				}
+			}
+			if($model->save()){
+				foreach ($ids_colores_actuales as $id_color) {
+					$materialColor = new MaterialesColores;
+					$materialColor->id_colores = $id_color;
+					$materialColor->id_materiales = $model->id;
+					$materialColor->save();
+				}
 				$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('update',array(
 			'model'=>$model,
+			'colores'=>$colores,
 		));
 	}
 

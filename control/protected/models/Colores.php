@@ -8,8 +8,12 @@
  * @property string $color
  *
  * The followings are the available model relations:
+ * @property Materiales[] $materiales
  * @property ModelosColores[] $modelosColores
+ * @property PedidosZapatos[] $pedidosZapatosSuela
+ * @property PedidosZapatos[] $pedidosZapatosOjillos
  * @property SuelasColores[] $suelasColores
+ * @property Zapatos[] $zapatoses
  */
 class Colores extends CActiveRecord
 {
@@ -30,6 +34,7 @@ class Colores extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('color', 'required'),
+			array('color', 'unique'),
 			array('color', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -45,8 +50,12 @@ class Colores extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'materiales' => array(self::MANY_MANY, 'Materiales', 'materiales_colores(id_colores, id_materiales)'),
 			'modelosColores' => array(self::HAS_MANY, 'ModelosColores', 'id_colores'),
+			'pedidosZapatosSuela' => array(self::HAS_MANY, 'PedidosZapatos', 'id_color_suela'),
+			'pedidosZapatosOjillos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_color_ojillos'),
 			'suelasColores' => array(self::HAS_MANY, 'SuelasColores', 'id_colores'),
+			'zapatoses' => array(self::HAS_MANY, 'Zapatos', 'id_colores'),
 		);
 	}
 

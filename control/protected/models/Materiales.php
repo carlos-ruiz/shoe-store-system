@@ -11,6 +11,7 @@
  * The followings are the available model relations:
  * @property ComprasMateriales[] $comprasMateriales
  * @property InventarioMateriales[] $inventarioMateriales
+ * @property Colores[] $colores
  * @property ModelosMateriales[] $modelosMateriales
  * @property PerdidasMateriales[] $perdidasMateriales
  */
@@ -51,6 +52,7 @@ class Materiales extends CActiveRecord
 		return array(
 			'comprasMateriales' => array(self::HAS_MANY, 'ComprasMateriales', 'id_materiales'),
 			'inventarioMateriales' => array(self::HAS_MANY, 'InventarioMateriales', 'id_materiales'),
+			'colores' => array(self::HAS_MANY, 'MaterialesColores', 'id_materiales'),
 			'modelosMateriales' => array(self::HAS_MANY, 'ModelosMateriales', 'id_materiales'),
 			'perdidasMateriales' => array(self::HAS_MANY, 'PerdidasMateriales', 'id_materiales'),
 		);
@@ -64,7 +66,7 @@ class Materiales extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'nombre' => 'Nombre',
-			'unidad_medida' => 'Unidad Medida',
+			'unidad_medida' => 'Unidad de medida',
 		);
 	}
 

@@ -1,30 +1,20 @@
 <?php
 
 /**
- * This is the model class for table "modelos_materiales".
+ * This is the model class for table "materiales_colores".
  *
- * The followings are the available columns in table 'modelos_materiales':
- * @property integer $id
- * @property integer $id_modelos
+ * The followings are the available columns in table 'materiales_colores':
  * @property integer $id_materiales
- * @property double $cantidad_extrachico
- * @property double $cantidad_chico
- * @property double $cantidad_mediano
- * @property double $cantidad_grande
- * @property string $unidad_medida
- *
- * The followings are the available model relations:
- * @property Materiales $idMateriales
- * @property Modelos $idModelos
+ * @property integer $id_colores
  */
-class ModelosMateriales extends CActiveRecord
+class MaterialesColores extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'modelos_materiales';
+		return 'materiales_colores';
 	}
 
 	/**
@@ -35,13 +25,11 @@ class ModelosMateriales extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_modelos, id_materiales, cantidad_extrachico, cantidad_chico, cantidad_mediano, cantidad_grande', 'required'),
-			array('id_modelos, id_materiales', 'numerical', 'integerOnly'=>true),
-			array('cantidad_extrachico, cantidad_chico, cantidad_mediano, cantidad_grande', 'numerical'),
-			array('unidad_medida', 'length', 'max'=>45),
+			array('id_materiales, id_colores', 'required'),
+			array('id_materiales, id_colores', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_modelos, id_materiales, cantidad_extrachico, cantidad_chico, cantidad_mediano, cantidad_grande, unidad_medida', 'safe', 'on'=>'search'),
+			array('id_materiales, id_colores', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -53,8 +41,8 @@ class ModelosMateriales extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
 			'material' => array(self::BELONGS_TO, 'Materiales', 'id_materiales'),
-			'modelo' => array(self::BELONGS_TO, 'Modelos', 'id_modelos'),
 		);
 	}
 
@@ -64,14 +52,8 @@ class ModelosMateriales extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'id_modelos' => 'Id Modelos',
 			'id_materiales' => 'Id Materiales',
-			'cantidad_extrachico' => 'Cantidad Extrachico',
-			'cantidad_chico' => 'Cantidad Chico',
-			'cantidad_mediano' => 'Cantidad Mediano',
-			'cantidad_grande' => 'Cantidad Grande',
-			'unidad_medida' => 'Unidad Medida',
+			'id_colores' => 'Id Colores',
 		);
 	}
 
@@ -93,14 +75,8 @@ class ModelosMateriales extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
-		$criteria->compare('id_modelos',$this->id_modelos);
 		$criteria->compare('id_materiales',$this->id_materiales);
-		$criteria->compare('cantidad_extrachico',$this->cantidad_extrachico);
-		$criteria->compare('cantidad_chico',$this->cantidad_chico);
-		$criteria->compare('cantidad_mediano',$this->cantidad_mediano);
-		$criteria->compare('cantidad_grande',$this->cantidad_grande);
-		$criteria->compare('unidad_medida',$this->unidad_medida,true);
+		$criteria->compare('id_colores',$this->id_colores);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -111,7 +87,7 @@ class ModelosMateriales extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return ModelosMateriales the static model class
+	 * @return MaterialesColores the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

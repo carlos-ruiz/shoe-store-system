@@ -34,6 +34,11 @@ $this->menu=array(
 			'name'=>'Fecha de entrega',
 			'value'=>date_format(date_create($model->fecha_entrega), 'd-m-Y'),
 		),
+		array(
+			'name'=>'Descuento al cliente (%)',
+			'value'=>$model->cliente->descuento,
+		),
+		'descuento',
 		'total',
 		'prioridad',
 		array(
@@ -59,7 +64,7 @@ $this->menu=array(
 							<th>Modelo</th>
 							<th>Color</th>
 							<th>Suela</th>
-							<?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
+							<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 							<th><?php if(fmod($i ,1)==0){ echo $i;} else{echo "-";} ?></th>
 							<?php } ?>
 						</tr>
@@ -72,37 +77,51 @@ $this->menu=array(
 							$id_color = 0;
 							$id_suela = 0;
 							$contador = 0;
+							$caracteristicas_especiales = '';
 							foreach ($model->pedidosZapatos as $pedidoZapato) { 
 								if(
 									$pedidoZapato->zapato->modelo->id != $id_modelo ||
 									$pedidoZapato->zapato->color->id != $id_color ||
-									$pedidoZapato->zapato->suela->id != $id_suela
+									$pedidoZapato->zapato->suela->id != $id_suela || 
+									$pedidoZapato->caracteristicas_especiales != $caracteristicas_especiales
 								) {
 									$contador++;
 									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->modelo->nombre;
 									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->color->color;
 									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->suela->nombre;
+									$zapatosDiferentes[$contador][] = $pedidoZapato->caracteristicas_especiales;
 									$id_modelo = $pedidoZapato->zapato->modelo->id;
 									$id_suela = $pedidoZapato->zapato->suela->id;
 									$id_color = $pedidoZapato->zapato->color->id;
+									$caracteristicas_especiales = $pedidoZapato->caracteristicas_especiales;
 								}
 								
 								$zapatosDiferentes[$contador][''.$pedidoZapato->zapato->numero] = $pedidoZapato->cantidad_total;
 							}
 						?>
+
 						<?php foreach ($zapatosDiferentes as $index => $row) { ?>
-							<tr>
+							<?php $rowOdd = (($index % 2)==0)?1:0; ?>
+
+							<tr class="<?= $rowOdd==1?'odd':'' ?>">
 								<td><?= $row[0] ?></td>
 								<td><?= $row[1] ?></td>
 								<td><?= $row[2] ?></td>
-								<?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
+								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 									<?php if(isset($row[''.$i])){ ?>
 										<td><b><?= $row[''.$i] ?></b></td>
 									<?php } else { ?>
-										<td>x</td>
+										<td></td>
 									<?php } ?>
 								<?php } ?>
 							</tr>
+							<?php if (isset($row[3])) { ?>
+								<tr class="<?= $rowOdd==1?'odd':'' ?>">
+									<td colspan="100" class="td-caracteristicas-especiales">
+										<?= $row[3] ?>
+									</td>
+								</tr>
+							<?php } ?>
 						<?php }	?>
 					</tbody>
 				</table>

@@ -37,7 +37,7 @@ class PedidosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden'),
+				'actions'=>array('admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -65,7 +65,7 @@ class PedidosController extends Controller
 	{
 		$model=new Pedidos;
 		$model->fecha_pedido = date('d-m-Y H:i:s');
-		$model->total = 0;
+		$model->total = 0.0;
 		$pedidoZapato = new PedidosZapatos;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -115,6 +115,9 @@ class PedidosController extends Controller
 									$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
 									$pedidoZapato->completos = 0;
 									$pedidoZapato->precio_unitario = $zapato->precio;
+									if(isset($datosPedido['especiales'][$id])){
+										$pedidoZapato->caracteristicas_especiales = $datosPedido['especiales'][$id];
+									}
 									$pedidoZapato->save();
 									$total += $pedidoZapato->precio_unitario * $cantidad;
 								}
@@ -159,9 +162,79 @@ class PedidosController extends Controller
 
 		if(isset($_POST['Pedidos']))
 		{
-			$model->attributes=$_POST['Pedidos'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$transaction = Yii::app()->db->beginTransaction();
+			try{
+				$model->attributes=$_POST['Pedidos'];
+
+				foreach ($model->pedidosZapatos as $pedidoZapato) {
+					$pedidoZapato->delete();
+				}
+
+				$prioridad = $_POST['Pedidos']['prioridad'];
+				$model->prioridad = 'NORMAL';
+				if($prioridad == 1){
+					$model->prioridad = 'ALTA';
+				}
+				$date = str_replace('/', '-', $model->fecha_entrega);
+				$newDate = date("Y-m-d", strtotime($date));
+			
+				$model->fecha_entrega = $newDate;
+				$newDate = date("Y-m-d H:i:s", strtotime($model->fecha_pedido));
+				$model->fecha_pedido = $newDate;
+				$total = 0;
+				if($model->save()){
+					if (isset($_POST['Pedido'])) {
+						$datosPedido = $_POST['Pedido'];
+						foreach ($datosPedido['modelo'] as $id => $value) {
+							foreach ($datosPedido['numeros'][$id] as $numero => $cantidad) {
+								if (isset($cantidad) && $cantidad > 0) {
+									$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($datosPedido['modelo'][$id], $datosPedido['color'][$id]));
+									
+									$zapato = Zapatos::model()->find('numero=? AND id_suelas=? AND id_modelos=? AND id_colores=?', array($numero, $datosPedido['suela'][$id], $modeloColor->id_modelos, $modeloColor->id_colores));
+	
+									if (!isset($zapato)) {
+										$zapato = new Zapatos;
+										$zapato->numero = $numero;
+										$zapato->precio = 0;
+										$zapato->codigo_barras = 'mmccssnn';
+										$zapato->id_modelos = $modeloColor->id_modelos;
+										$zapato->id_colores = $modeloColor->id_colores;
+										$zapato->id_suelas = $datosPedido['suela'][$id];
+										$zapato->save();
+									}
+									$pedidoZapato = new PedidosZapatos;
+									$pedidoZapato->id_pedidos = $model->id;
+									$pedidoZapato->id_zapatos = $zapato->id;
+									$pedidoZapato->cantidad_total = $cantidad;
+									$estatusZapato = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
+									$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
+									$pedidoZapato->completos = 0;
+									$pedidoZapato->precio_unitario = $zapato->precio;
+									if(isset($datosPedido['especiales'][$id])){
+										$pedidoZapato->caracteristicas_especiales = $datosPedido['especiales'][$id];
+									}
+									$pedidoZapato->save();
+									$total += $pedidoZapato->precio_unitario * $cantidad;
+								}
+							}
+						}
+						if($total > 0){
+							if(isset($model->cliente->descuento) && $model->cliente->descuento > 0){
+								$total = $total*(1-$model->cliente->descuento/100);
+							}
+							if(isset($model->descuento) && $model->descuento > 0){
+								$total = $total*(1-$model->descuento/100);
+							}
+							$model->total = $total;
+							$model->save();
+						}
+					}
+					$transaction->commit();
+					$this->redirect(array('view','id'=>$model->id));
+				}
+			}catch(Exception $ex){
+				$transaction->rollback();
+			}
 		}
 
 		$this->render('update',array(
@@ -177,11 +250,23 @@ class PedidosController extends Controller
 	 */
 	public function actionDelete($id)
 	{
-		$this->loadModel($id)->delete();
+		$model = $this->loadModel($id);
+		$transaction = Yii::app()->db->beginTransaction();
+		try{
+			foreach ($model->pedidosZapatos as $pedidoZapato) {
+				$pedidoZapato->delete();
+			}
+			$model->delete();
+			$transaction->commit();
 
-		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-		if(!isset($_GET['ajax']))
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+			if(!isset($_GET['ajax'])){
+				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+			}
+		}catch(Exception $ex){
+			$transaction->rollback();
+		}
+
 	}
 
 	/**
@@ -286,7 +371,7 @@ class PedidosController extends Controller
 				<td class="color" data-id="<?= $color->id ?>"><?= $color->color; ?><input type="hidden" name="Pedido[color][<?= $time ?>]" value="<?= $color->id ?>"></td>
 				<td class="suela" data-id="<?= $suela->id ?>"><?= $suela->nombre; ?><input type="hidden" name="Pedido[suela][<?= $time ?>]" value="<?= $suela->id ?>"></td>
 			
-			<?php for ($i=15; $i < 32 ; $i = $i + 0.5) { ?>
+			<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 				<td data-numero="<?= $i; ?>">
 					<input class="input-cantidad" type="text" name="Pedido[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value=''";} ?>/>
 				</td>
@@ -295,7 +380,23 @@ class PedidosController extends Controller
 					<a data-row="<?= $time ?>" class="delete" title="Borrar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Borrar"></a>
 				</td>
 			</tr>
+
+			<?php if (isset($_POST['especial']) && strlen($_POST['especial']) > 0) { ?>
+				<tr>
+					<td>
+						<?= $_POST['especial'] ?>
+						<input type="hidden" name="Pedido[especiales][<?= $time ?>]" value="<?= $_POST['especial'] ?>">
+					</td>
+				</tr>
+			<?php } ?>
 <?php		}
+	}
+
+	public function actionDescuentoPorCliente()
+	{
+		$id_clientes = $_POST['Pedidos']['id_clientes'];
+		$cliente = Clientes::model()->findByPk($id_clientes);
+		echo $cliente->descuento;
 	}
 
 }

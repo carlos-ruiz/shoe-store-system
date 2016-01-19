@@ -35,6 +35,7 @@ class Modelos extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('nombre', 'required'),
+			array('nombre', 'unique'),
 			array('nombre', 'length', 'max'=>128),
 			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => false, 'on' => 'insert'),
 			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => true, 'on' => 'update'),

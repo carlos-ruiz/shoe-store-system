@@ -66,7 +66,7 @@ class Pedidos extends CActiveRecord
 			'cliente' => array(self::BELONGS_TO, 'Clientes', 'id_clientes'),
 			'estatus' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
 			'formaPago' => array(self::BELONGS_TO, 'FormasPago', 'id_formas_pago'),
-			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos'),
+			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos', 'order'=>'caracteristicas_especiales ASC'),
 		);
 	}
 
@@ -81,7 +81,7 @@ class Pedidos extends CActiveRecord
 			'fecha_pedido' => 'Fecha de pedido',
 			'fecha_entrega' => 'Fecha de entrega',
 			'id_formas_pago' => 'Forma de pago',
-			'total' => 'Total',
+			'total' => 'Total ($)',
 			'id_estatus_pedidos' => 'Estatus del pedidos',
 			'prioridad' => 'Prioridad',
 			'descuento' => 'Descuento(%)',
@@ -122,6 +122,7 @@ class Pedidos extends CActiveRecord
 		$criteria->compare('cliente.nombre', $this->var_cliente_nombre, true);
 		$criteria->compare('estatus.nombre', $this->var_estatus, true);
 		$criteria->compare('formaPago.nombre', $this->var_forma_pago, true);
+		$criteria->order='estatus.id ASC, fecha_entrega ASC';
 		// $criteria->compare('cliente.apellido_paterno', $this->clienteNombre, true);
 
 		return new CActiveDataProvider($this, array(

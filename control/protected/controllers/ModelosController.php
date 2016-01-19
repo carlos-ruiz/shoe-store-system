@@ -88,6 +88,8 @@ class ModelosController extends Controller
 
 		if(isset($_POST['Modelos']))
 		{
+			// print_r($_POST);
+			// return;
 			$transaction = Yii::app()->db->beginTransaction();
 			try{
 				$model->attributes=$_POST['Modelos'];
@@ -131,11 +133,15 @@ class ModelosController extends Controller
 
 					if (isset($_POST['ModelosMateriales'])) {
 						foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value) {
+							$material = Materiales::model()->findByPk($id);
 							$modeloMaterial = new ModelosMateriales;
 							$modeloMaterial->id_modelos = $model->id;
 							$modeloMaterial->id_materiales = $id;
-							$modeloMaterial->cantidad = $_POST['ModelosMateriales']['cantidad'][$id];
-							$modeloMaterial->unidad_medida = $_POST['ModelosMateriales']['unidad_medida'][$id];
+							$modeloMaterial->cantidad_extrachico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_extrachico'];
+							$modeloMaterial->cantidad_chico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_chico'];
+							$modeloMaterial->cantidad_mediano = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_mediano'];
+							$modeloMaterial->cantidad_grande = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_grande'];
+							$modeloMaterial->unidad_medida = $material->unidad_medida;
 							$modeloMaterial->save();
 						}
 					}

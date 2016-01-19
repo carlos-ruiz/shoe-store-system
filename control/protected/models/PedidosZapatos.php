@@ -12,10 +12,14 @@
  * @property integer $completos
  * @property string $caracteristicas_especiales
  * @property string $precio_unitario
+ * @property integer $id_color_suela
+ * @property integer $id_color_ojillos
  *
  * The followings are the available model relations:
  * @property Pedidos $idPedidos
  * @property Zapatos $idZapatos
+ * @property Colores $idColorSuela
+ * @property Colores $idColorOjillos
  * @property EstatusZapatos $idEstatusZapatos
  * @property ZapatoCortador[] $zapatoCortadors
  */
@@ -42,13 +46,13 @@ class PedidosZapatos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos', 'required'),
-			array('id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos', 'numerical', 'integerOnly'=>true),
+			array('id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos, precio_unitario, id_color_suela, id_color_ojillos', 'required'),
+			array('id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos, id_color_suela, id_color_ojillos', 'numerical', 'integerOnly'=>true),
 			array('precio_unitario', 'length', 'max'=>7),
 			array('caracteristicas_especiales', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos, caracteristicas_especiales, precio_unitario', 'safe', 'on'=>'search'),
+			array('id, id_pedidos, id_zapatos, cantidad_total, id_estatus_zapatos, completos, caracteristicas_especiales, precio_unitario, id_color_suela, id_color_ojillos', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -63,6 +67,8 @@ class PedidosZapatos extends CActiveRecord
 			'pedido' => array(self::BELONGS_TO, 'Pedidos', 'id_pedidos'),
 			'zapato' => array(self::BELONGS_TO, 'Zapatos', 'id_zapatos'),
 			'estatusZapato' => array(self::BELONGS_TO, 'EstatusZapatos', 'id_estatus_zapatos'),
+			'colorSuela' => array(self::BELONGS_TO, 'Colores', 'id_color_suela'),
+			'colorOjillos' => array(self::BELONGS_TO, 'Colores', 'id_color_ojillos'),
 			'zapatoCortadors' => array(self::HAS_MANY, 'ZapatoCortador', 'id_pedidos_zapatos'),
 		);
 	}
@@ -85,6 +91,9 @@ class PedidosZapatos extends CActiveRecord
 			'numero'=>'Número',
 			'caracteristicas_especiales' => 'Características especiales',
 			'precio_unitario' => 'Precio unitario',
+			'id_color_suela' => 'Color de suela',
+			'id_color_ojillos' => 'Color de ojillos',
+		);
 		);
 	}
 
@@ -114,6 +123,8 @@ class PedidosZapatos extends CActiveRecord
 		$criteria->compare('completos',$this->completos);
 		$criteria->compare('caracteristicas_especiales',$this->caracteristicas_especiales,true);
 		$criteria->compare('precio_unitario',$this->precio_unitario,true);
+		$criteria->compare('id_color_suela',$this->id_color_suela);
+		$criteria->compare('id_color_ojillos',$this->id_color_ojillos);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

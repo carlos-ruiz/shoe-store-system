@@ -47,7 +47,14 @@ $this->menu=array(
 		<h3>Materiales</h3>
 		<ul>
 			<?php foreach ($materiales as $material) { ?>
-				<li><?= $material->material->nombre.': '.$material->cantidad.' '.$material->unidad_medida; ?></li>
+				<li><?= $material->material->nombre ?>
+					<ul>
+						<li>Extrachico: <?= $material->cantidad_extrachico.' '.$material->unidad_medida ?></li>
+						<li>Chico: <?= $material->cantidad_chico.' '.$material->unidad_medida ?></li>
+						<li>Mediano: <?= $material->cantidad_mediano.' '.$material->unidad_medida ?></li>
+						<li>Grande: <?= $material->cantidad_grande.' '.$material->unidad_medida ?></li>
+					</ul>
+				</li>
 			<?php } ?>
 		</ul>
 	</div>
