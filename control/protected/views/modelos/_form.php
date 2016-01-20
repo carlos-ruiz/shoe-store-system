@@ -5,6 +5,12 @@
 ?>
 
 <div class="form">
+	<?php if(isset($mensaje_error)){ ?>
+		<div class="alert alert-danger alert-dismissable">
+		    <button type="button" data-dismiss="alert" aria-hidden="true" class="close">×</button>
+		    <strong>Error!</strong> <?= $mensaje_error ?>
+		</div>
+	<?php } ?>
 
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'modelos-form',
@@ -98,7 +104,7 @@
 
 					foreach ($model->modelosMateriales as $modeloMaterial) {
 						array_push($materialesSeleccionados, $modeloMaterial->material);
-						$cantidadesMaterial[$modeloMaterial->material->id] = $modeloMaterial->cantidad;
+						$cantidadesMaterial[$modeloMaterial->material->id] = array('extrachico'=>$modeloMaterial->cantidad_extrachico, 'chico'=>$modeloMaterial->cantidad_chico, 'mediano'=>$modeloMaterial->cantidad_mediano, 'grande'=>$modeloMaterial->cantidad_grande);
 						$unidadesMedidaMaterial[$modeloMaterial->material->id] = $modeloMaterial->unidad_medida;
 					}
 				?>

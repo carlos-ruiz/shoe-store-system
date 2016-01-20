@@ -52,17 +52,9 @@ class ModelosController extends Controller
 	public function actionView($id)
 	{
 		$model = $this->loadModel($id);
-		$modeloSuelas = ModelosSuelas::model()->findAll('id_modelos=:modelo', array('modelo'=>$id));
-		$modeloColores = ModelosColores::model()->findAll('id_modelos=:modelo', array('modelo'=>$id));
-		$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=:modelo', array('modelo'=>$id));
-		$modeloMateriales = ModelosMateriales::model()->findAll('id_modelos=:modelo', array('modelo'=>$id));
 
 		$this->render('view',array(
 			'model'=>$model,
-			'suelas'=>$modeloSuelas,
-			'colores'=>$modeloColores,
-			'numeros'=>$modeloNumeros,
-			'materiales'=>$modeloMateriales,
 		));
 	}
 
@@ -76,7 +68,7 @@ class ModelosController extends Controller
 		$colores = Colores::model()->findAll();
 		$suelas = Suelas::model()->findAll();
 		$materiales = Materiales::model()->findAll();
-
+		$mensaje_error = null;
 		$folderImagesPath = Yii::getPathOfAlias('webroot').'/images/modelos/';
 		if(!is_dir($folderImagesPath)) {
 			mkdir($folderImagesPath);
@@ -104,50 +96,73 @@ class ModelosController extends Controller
 					$model->imagen = Yii::app()->request->baseUrl."/images/modelos/".$fileName;
 				}
 				if($model->save()){
+					$todo_bien = true;
+					$error_suelas = true;
 					if(isset($_POST['ModelosSuelas'])){
 						foreach ($_POST['ModelosSuelas']['id_suelas'] as $id => $value) {
 							$modeloSuela = new ModelosSuelas;
 							$modeloSuela->id_modelos = $model->id;
 							$modeloSuela->id_suelas = $id;
 							$modeloSuela->save();
+							$error_suelas = false;
 						}
 					}
+					if($error_suelas){
+						$mensaje_error = '<br/> - Debe elegir al menos un tipo de suela.';
+						$todo_bien = false;
+					}
 
+					$error_colores = true;
 					if(isset($_POST['ModelosColores'])){
 						foreach ($_POST['ModelosColores']['id_colores'] as $id => $value) {
 							$modeloColor = new ModelosColores;
 							$modeloColor->id_modelos = $model->id;
 							$modeloColor->id_colores = $id;
 							$modeloColor->save();
+							$error_colores = false;
 						}
 					}
+					if ($error_colores) {
+						$mensaje_error .= '<br/> - Debe elegir al menos un color.';
+						$todo_bien = false;
+					}
 
+					$error_numeros = true;
 					if(isset($_POST['ModelosNumeros'])){
 						foreach ($_POST['ModelosNumeros']['numero'] as $numero => $value) {
 							$modeloNumero = new ModelosNumeros;
 							$modeloNumero->id_modelos = $model->id;
 							$modeloNumero->numero = $numero;
 							$modeloNumero->save();
+							$error_numeros = false;
 						}
+					}
+					if ($error_numeros) {
+						$mensaje_error .= '<br/> - Debe elegir al menos un número.';
+						$todo_bien = false;
 					}
 
 					if (isset($_POST['ModelosMateriales'])) {
-						foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value) {
-							$material = Materiales::model()->findByPk($id);
-							$modeloMaterial = new ModelosMateriales;
-							$modeloMaterial->id_modelos = $model->id;
-							$modeloMaterial->id_materiales = $id;
-							$modeloMaterial->cantidad_extrachico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_extrachico'];
-							$modeloMaterial->cantidad_chico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_chico'];
-							$modeloMaterial->cantidad_mediano = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_mediano'];
-							$modeloMaterial->cantidad_grande = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_grande'];
-							$modeloMaterial->unidad_medida = $material->unidad_medida;
-							$modeloMaterial->save();
-						}
+						if (isset($_POST['ModelosMateriales']['id_materiales'])) {
+							foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value) {
+								$material = Materiales::model()->findByPk($id);
+								$modeloMaterial = new ModelosMateriales;
+								$modeloMaterial->id_modelos = $model->id;
+								$modeloMaterial->id_materiales = $id;
+								$modeloMaterial->cantidad_extrachico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_extrachico'];
+								$modeloMaterial->cantidad_chico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_chico'];
+								$modeloMaterial->cantidad_mediano = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_mediano'];
+								$modeloMaterial->cantidad_grande = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_grande'];
+								$modeloMaterial->unidad_medida = $material->unidad_medida;
+								$modeloMaterial->save();
+							}
+						}	
 					}
 
-					$transaction->commit();
-					$this->redirect(array('view','id'=>$model->id));
+					if ($todo_bien) {
+						$transaction->commit();
+						$this->redirect(array('view','id'=>$model->id));
+					}
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
@@ -159,6 +174,7 @@ class ModelosController extends Controller
 			'colores'=>$colores, 
 			'suelas'=>$suelas,
 			'materiales'=>$materiales,
+			'mensaje_error'=>$mensaje_error,
 		));
 	}
 
@@ -173,6 +189,7 @@ class ModelosController extends Controller
 		$colores = Colores::model()->findAll();
 		$suelas = Suelas::model()->findAll();
 		$materiales = Materiales::model()->findAll();
+		$mensaje_error = null;
 		$folderImagesPath = Yii::getPathOfAlias('webroot').'/images/modelos/';
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -181,17 +198,62 @@ class ModelosController extends Controller
 		{
 			$transaction = Yii::app()->db->beginTransaction();
 			try{
+				$todo_bien = true;
+				$ids_suelas_actuales = array();
+				if(isset($_POST['ModelosSuelas'])){
+					foreach ($_POST['ModelosSuelas']['id_suelas'] as $id_suela => $value){
+						array_push($ids_suelas_actuales, $id_suela);
+					}
+				}
+				if (sizeof($ids_suelas_actuales) < 1) {
+					$mensaje_error = '<br/> - Debe elegir al menos un tipo de suela.';
+					$todo_bien = false;
+				}
 				foreach ($model->modelosSuelas as $modeloSuela) {
-					$modeloSuela->delete();
+					if (!in_array($modeloSuela->suela->id, $ids_suelas_actuales)) {
+						$modeloSuela->delete();
+					}else{
+						$ids_suelas_actuales = array_diff($ids_suelas_actuales, array($modeloSuela->suela->id));
+					}
+				}
+
+				$ids_colores_actuales = array();
+				if(isset($_POST['ModelosColores'])){
+					foreach ($_POST['ModelosColores']['id_colores'] as $id_color => $value){
+						array_push($ids_colores_actuales, $id_color);
+					}
+				}
+				if (sizeof($ids_colores_actuales) < 1) {
+					$mensaje_error = '<br/> - Debe elegir al menos un color.';
+					$todo_bien = false;
 				}
 				foreach ($model->modelosColores as $modeloColor) {
-					$modeloColor->delete();
+					if (!in_array($modeloColor->color->id, $ids_colores_actuales)) {
+						$modeloColor->delete();
+					}else{
+						$ids_colores_actuales = array_diff($ids_colores_actuales, array($modeloColor->color->id));
+					}
+				}
+
+				$numeros_actuales = array();
+				if(isset($_POST['ModelosNumeros'])){
+					foreach ($_POST['ModelosNumeros']['numero'] as $numero => $value){
+						array_push($numeros_actuales, $numero);
+					}
+				}
+				if (sizeof($numeros_actuales) < 1) {
+					$mensaje_error = '<br/> - Debe elegir al menos un número.';
+					$todo_bien = false;
+				}
+				foreach ($model->modelosNumeros as $modeloNumero) {
+					if (!in_array($modeloNumero->numero, $numeros_actuales)) {
+						$modeloNumero->delete();
+					}else{
+						$numeros_actuales = array_diff($numeros_actuales, array($modeloNumero->numero));
+					}
 				}
 				foreach ($model->modelosMateriales as $modeloMaterial) {
 					$modeloMaterial->delete();
-				}
-				foreach ($model->modelosNumeros as $modeloNumero) {
-					$modeloNumero->delete();
 				}
 
 				$model->attributes=$_POST['Modelos'];
@@ -205,48 +267,47 @@ class ModelosController extends Controller
 					$uploadedFile->saveAs($folderImagesPath.$fileName);
 					$model->imagen = Yii::app()->request->baseUrl."/images/modelos/".$fileName;
 				}
-
-				if($model->save()){
-					if(isset($_POST['ModelosSuelas'])){
-						foreach ($_POST['ModelosSuelas']['id_suelas'] as $id => $value) {
+				if($todo_bien){
+					if($model->save()){
+						foreach ($ids_suelas_actuales as $id) {
 							$modeloSuela = new ModelosSuelas;
 							$modeloSuela->id_modelos = $model->id;
 							$modeloSuela->id_suelas = $id;
 							$modeloSuela->save();
 						}
-					}
 
-					if(isset($_POST['ModelosColores'])){
-						foreach ($_POST['ModelosColores']['id_colores'] as $id => $value) {
+						foreach ($ids_colores_actuales as $id) {
 							$modeloColor = new ModelosColores;
 							$modeloColor->id_modelos = $model->id;
 							$modeloColor->id_colores = $id;
 							$modeloColor->save();
 						}
-					}
 
-					if(isset($_POST['ModelosNumeros'])){
-						foreach ($_POST['ModelosNumeros']['numero'] as $numero => $value) {
+						foreach ($numeros_actuales as $numero) {
 							$modeloNumero = new ModelosNumeros;
 							$modeloNumero->id_modelos = $model->id;
 							$modeloNumero->numero = $numero;
 							$modeloNumero->save();
 						}
-					}
 
-					if (isset($_POST['ModelosMateriales'])) {
-						foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value) {
-							$modeloMaterial = new ModelosMateriales;
-							$modeloMaterial->id_modelos = $model->id;
-							$modeloMaterial->id_materiales = $id;
-							$modeloMaterial->cantidad = $_POST['ModelosMateriales']['cantidad'][$id];
-							$modeloMaterial->unidad_medida = $_POST['ModelosMateriales']['unidad_medida'][$id];
-							$modeloMaterial->save();
+						if (isset($_POST['ModelosMateriales'])) {
+							if (isset($_POST['ModelosMateriales']['id_materiales'])) {
+								foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value) {
+									$modeloMaterial = new ModelosMateriales;
+									$modeloMaterial->id_modelos = $model->id;
+									$modeloMaterial->id_materiales = $id;
+									$modeloMaterial->cantidad_extrachico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_extrachico'];
+									$modeloMaterial->cantidad_chico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_chico'];
+									$modeloMaterial->cantidad_mediano = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_mediano'];
+									$modeloMaterial->cantidad_grande = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_grande'];
+									$modeloMaterial->save();
+								}
+							}
 						}
-					}
 
-					$transaction->commit();
-					$this->redirect(array('view','id'=>$model->id));
+						$transaction->commit();
+						$this->redirect(array('view','id'=>$model->id));
+					}
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
@@ -258,6 +319,7 @@ class ModelosController extends Controller
 			'colores'=>$colores, 
 			'suelas'=>$suelas,
 			'materiales'=>$materiales,
+			'mensaje_error'=>$mensaje_error,
 		));
 	}
 

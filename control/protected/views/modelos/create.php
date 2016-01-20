@@ -20,4 +20,5 @@ $this->menu=array(
 	'colores'=>$colores, 
 	'suelas'=>$suelas,
 	'materiales'=>$materiales,
+	'mensaje_error'=>$mensaje_error,
 	)); ?>

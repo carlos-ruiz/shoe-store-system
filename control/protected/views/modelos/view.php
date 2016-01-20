@@ -22,7 +22,7 @@ $this->menu=array(
 	<div class="col-md-3">
 		<h3>Suelas</h3>
 		<ul>
-			<?php foreach ($suelas as $suela) { ?>
+			<?php foreach ($model->modelosSuelas as $suela) { ?>
 				<li><?= $suela->suela->nombre; ?></li>
 			<?php } ?>
 		</ul>
@@ -30,7 +30,7 @@ $this->menu=array(
 	<div class="col-md-3">
 		<h3>Colores</h3>
 		<ul>
-			<?php foreach ($colores as $color) { ?>
+			<?php foreach ($model->modelosColores as $color) { ?>
 				<li><?= $color->color->color; ?></li>
 			<?php } ?>
 		</ul>
@@ -38,7 +38,7 @@ $this->menu=array(
 	<div class="col-md-3">
 		<h3>Números</h3>
 		<ul>
-			<?php foreach ($numeros as $numero) { ?>
+			<?php foreach ($model->modelosNumeros as $numero) { ?>
 				<li><?= $numero->numero; ?></li>
 			<?php } ?>
 		</ul>
@@ -46,7 +46,7 @@ $this->menu=array(
 	<div class="col-md-3">
 		<h3>Materiales</h3>
 		<ul>
-			<?php foreach ($materiales as $material) { ?>
+			<?php foreach ($model->modelosMateriales as $material) { ?>
 				<li><?= $material->material->nombre ?>
 					<ul>
 						<li>Extrachico: <?= $material->cantidad_extrachico.' '.$material->unidad_medida ?></li>

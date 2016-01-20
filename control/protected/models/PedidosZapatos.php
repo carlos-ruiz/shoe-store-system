@@ -94,7 +94,6 @@ class PedidosZapatos extends CActiveRecord
 			'id_color_suela' => 'Color de suela',
 			'id_color_ojillos' => 'Color de ojillos',
 		);
-		);
 	}
 
 	/**
