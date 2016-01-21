@@ -16,8 +16,14 @@ $this->menu=array(
 );
 ?>
 
-<h1>Modelo #<?php echo $model->id.' - '.$model->nombre; ?></h1>
-
+<div class="row">
+	<div class="col-md-4">
+		<h1>Modelo #<?php echo $model->id.' - '.$model->nombre; ?></h1>
+	</div>
+	<div class="col-md-6">
+		<a href="<?= $model->imagen; ?>"><img class="col-md-3 imagen-modelo" src="<?php echo $model->imagen;?>" width="100" /></a>
+	</div>
+</div>
 <div class="modelo-informacion row">
 	<div class="col-md-3">
 		<h3>Suelas</h3>
@@ -37,11 +43,11 @@ $this->menu=array(
 	</div>
 	<div class="col-md-3">
 		<h3>Números</h3>
-		<ul>
+		<!-- <ul> -->
 			<?php foreach ($model->modelosNumeros as $numero) { ?>
-				<li><?= $numero->numero; ?></li>
+				<div class="col-md-4"><?= $numero->numero; ?></div>
 			<?php } ?>
-		</ul>
+		<!-- </ul> -->
 	</div>
 	<div class="col-md-3">
 		<h3>Materiales</h3>
@@ -58,9 +64,6 @@ $this->menu=array(
 			<?php } ?>
 		</ul>
 	</div>
-</div>
-<div class="row">
-	<a href="<?= $model->imagen; ?>"><img class="col-md-4 imagen-modelo" src="<?php echo $model->imagen;?>" /></a>
 </div>
 
 <?php if(!Yii::app()->user->isGuest) { ?>

@@ -8,11 +8,11 @@
  * @property string $nombre
  *
  * The followings are the available model relations:
- * @property ModelosSuelas[] $modelosSuelases
+ * @property ModelosSuelas[] $modelosSuelas
  * @property SuelasColores[] $suelasColores
- * @property SuelasNumeros[] $suelasNumeroses
- * @property ZapatoPrecios[] $zapatoPrecioses
- * @property Zapatos[] $zapatoses
+ * @property SuelasNumeros[] $suelasNumeros
+ * @property ZapatoPrecios[] $zapatoPrecios
+ * @property Tacones[] $tacones
  */
 class Suelas extends CActiveRecord
 {
@@ -51,9 +51,9 @@ class Suelas extends CActiveRecord
 		return array(
 			'modeloSuela' => array(self::HAS_MANY, 'ModelosSuelas', 'id_suelas'),
 			'suelasColores' => array(self::HAS_MANY, 'SuelasColores', 'id_suelas'),
-			'zapatos' => array(self::HAS_MANY, 'Zapatos', 'id_suelas'),
 			'suelaNumeros' => array(self::HAS_MANY, 'SuelasNumeros', 'id_suelas'),
 			'zapatoPrecios' => array(self::HAS_MANY, 'ZapatoPrecios', 'id_suelas'),
+			'tacones' => array(self::MANY_MANY, 'Tacones', 'suelas_tacones(id_suelas, id_tacones)'),
 		);
 	}
 

@@ -29,6 +29,7 @@ class PerfilesUsuarios extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('nombre', 'required'),
+			array('nombre', 'unique'),
 			array('nombre', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.

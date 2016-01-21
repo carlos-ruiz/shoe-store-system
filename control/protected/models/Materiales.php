@@ -34,6 +34,7 @@ class Materiales extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('nombre, unidad_medida', 'required'),
+			array('nombre', 'unique'),
 			array('nombre', 'length', 'max'=>128),
 			array('unidad_medida', 'length', 'max'=>45),
 			// The following rule is used by search().

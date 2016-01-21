@@ -32,6 +32,7 @@ class Insumos extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('nombre, unidad_medida', 'required'),
+			array('nombre', 'unique'),
 			array('cantidad', 'numerical'),
 			array('nombre', 'length', 'max'=>128),
 			array('unidad_medida', 'length', 'max'=>45),

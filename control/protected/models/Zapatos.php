@@ -6,17 +6,22 @@
  * The followings are the available columns in table 'zapatos':
  * @property integer $id
  * @property double $numero
- * @property double $precio
+ * @property string $precio
  * @property string $codigo_barras
- * @property integer $id_suelas
  * @property integer $id_modelos
  * @property integer $id_colores
+ * @property integer $id_suelas_colores
+ * @property integer $id_agujetas_colores
+ * @property integer $id_ojillos_colores
  *
  * The followings are the available model relations:
  * @property InventarioZapatosTerminados[] $inventarioZapatosTerminadoses
  * @property PedidosZapatos[] $pedidosZapatoses
- * @property ModelosColores $idModelosColores
- * @property Suelas $idSuelas
+ * @property ModelosColores $idModelosColoresAgujetasColores $idAgujetasColores
+ * @property Suelas $idSuelasColores $idColores
+ * @property Modelos $idModelos
+ * @property OjillosColores $idOjillosColores
+ * @property SuelasColores $idSuelasColores
  */
 class Zapatos extends CActiveRecord
 {
@@ -40,14 +45,15 @@ class Zapatos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('numero, precio, codigo_barras, id_suelas', 'required'),
+			array('numero, precio, codigo_barras, id_modelos, id_colores, id_suelas_colores, id_agujetas_colores, id_ojillos_colores', 'required'),
 			array('id_modelos', 'required', 'on'=>'catalog'),
-			array('id_modelos, id_colores, id_suelas', 'numerical', 'integerOnly'=>true),
+			array('id_modelos, id_colores, id_suelas_colores, id_agujetas_colores, id_ojillos_colores', 'numerical', 'integerOnly'=>true),
 			array('numero, precio', 'numerical'),
+			array('precio', 'length', 'max'=>7),
 			array('codigo_barras', 'length', 'max'=>12),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, numero, precio, codigo_barras, id_suelas, var_suela, var_modelo, var_color', 'safe', 'on'=>'search'),
+			array('id, numero, precio, codigo_barras, var_suela, var_modelo, var_color', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -63,7 +69,9 @@ class Zapatos extends CActiveRecord
 			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_zapatos'),
 			'modelo' => array(self::BELONGS_TO, 'Modelos', 'id_modelos'),
 			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
-			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
+			'suelaColor' => array(self::BELONGS_TO, 'SuelasColores', 'id_suelas_colores'),
+			'agujetaColor' => array(self::BELONGS_TO, 'AgujetasColores', 'id_agujetas_colores'),
+			'ojilloColor' => array(self::BELONGS_TO, 'OjillosColores', 'id_ojillos_colores'),
 		);
 	}
 
@@ -83,6 +91,8 @@ class Zapatos extends CActiveRecord
 			'var_suela' => 'Suela',
 			'var_modelo' => 'Modelo',
 			'var_color' => 'Color',
+			'id_agujetas_colores' => 'Agujetas',
+			'id_ojillos_colores' => 'Ojillos',
 		);
 	}
 
@@ -106,11 +116,13 @@ class Zapatos extends CActiveRecord
 
 		$criteria->compare('t.id',$this->id);
 		$criteria->compare('numero',$this->numero);
-		$criteria->compare('precio',$this->precio);
+		$criteria->compare('precio',$this->precio, true);
 		$criteria->compare('codigo_barras',$this->codigo_barras,true);
-		$criteria->compare('id_suelas',$this->id_suelas);
-		$criteria->with = array('suela','modelo', 'color');
-		$criteria->compare('suela.nombre', $this->var_suela, true);
+		$criteria->compare('id_suelas_colores',$this->id_suelas_colores);
+		$criteria->compare('id_ojillos_colores',$this->id_ojillos_colores);
+		$criteria->compare('id_agujetas_colores',$this->id_agujetas_colores);
+		$criteria->with = array('modelo', 'color');
+		// $criteria->compare('suela.nombre', $this->var_suela, true);
 		$criteria->compare('modelo.nombre', $this->var_modelo, true);
 		$criteria->compare('color.color', $this->var_color, true);
 

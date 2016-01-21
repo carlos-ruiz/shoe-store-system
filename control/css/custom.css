@@ -45,7 +45,7 @@
     background: #F4E5E6;
 }
 
-.form-body hr {
+hr {
 	border: solid 1px #999;
 	margin-top: 0;
 }
@@ -151,7 +151,18 @@ td.td-caracteristicas-especiales {
 	background: #F4E5E6;
 }
 
+#ordenes_table select {
+	padding: 0;
+	font-size: 9pt;
+	height: 20px;
+}
+
 .ordenes-pedido-table thead {
 	background: #EA7979;
     color: white;
+}
+
+#table_configurar_numeros .input-cantidad {
+	width: 100% !important;
+	height: 20px;
 }

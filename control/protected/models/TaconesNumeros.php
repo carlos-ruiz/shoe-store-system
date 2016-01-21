@@ -1,27 +1,25 @@
 <?php
 
 /**
- * This is the model class for table "zapato_cortador".
+ * This is the model class for table "tacones_numeros".
  *
- * The followings are the available columns in table 'zapato_cortador':
+ * The followings are the available columns in table 'tacones_numeros':
  * @property integer $id
- * @property string $fecha
- * @property integer $cantidad_cortes
- * @property integer $id_pedidos_zapatos
- * @property integer $id_usuarios
+ * @property double $numero
+ * @property integer $id_tacones
  *
  * The followings are the available model relations:
- * @property PedidosZapatos $idPedidosZapatos
- * @property Usuarios $idUsuarios
+ * @property SuelasNumeros[] $suelasNumeroses
+ * @property Tacones $idTacones
  */
-class ZapatoCortador extends CActiveRecord
+class TaconesNumeros extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'zapato_cortador';
+		return 'tacones_numeros';
 	}
 
 	/**
@@ -32,11 +30,12 @@ class ZapatoCortador extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('fecha, cantidad_cortes, id_pedidos_zapatos, id_usuarios', 'required'),
-			array('cantidad_cortes, id_pedidos_zapatos, id_usuarios', 'numerical', 'integerOnly'=>true),
+			array('numero, id_tacones', 'required'),
+			array('id_tacones', 'numerical', 'integerOnly'=>true),
+			array('numero', 'numerical'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, fecha, cantidad_cortes, id_pedidos_zapatos, id_usuarios', 'safe', 'on'=>'search'),
+			array('id, numero, id_tacones', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -48,8 +47,8 @@ class ZapatoCortador extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idPedidosZapatos' => array(self::BELONGS_TO, 'PedidosZapatos', 'id_pedidos_zapatos'),
-			'idUsuarios' => array(self::BELONGS_TO, 'Usuarios', 'id_usuarios'),
+			'suelasNumeroses' => array(self::MANY_MANY, 'SuelasNumeros', 'suelas_tacones_numeros(id_tacones_numeros, id_suelas_numeros)'),
+			'idTacones' => array(self::BELONGS_TO, 'Tacones', 'id_tacones'),
 		);
 	}
 
@@ -60,10 +59,8 @@ class ZapatoCortador extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'fecha' => 'Fecha',
-			'cantidad_cortes' => 'Cantidad Cortes',
-			'id_pedidos_zapatos' => 'Id Pedidos Zapatos',
-			'id_usuarios' => 'Id Usuarios',
+			'numero' => 'Numero',
+			'id_tacones' => 'Id Tacones',
 		);
 	}
 
@@ -86,10 +83,8 @@ class ZapatoCortador extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id);
-		$criteria->compare('fecha',$this->fecha,true);
-		$criteria->compare('cantidad_cortes',$this->cantidad_cortes);
-		$criteria->compare('id_pedidos_zapatos',$this->id_pedidos_zapatos);
-		$criteria->compare('id_usuarios',$this->id_usuarios);
+		$criteria->compare('numero',$this->numero);
+		$criteria->compare('id_tacones',$this->id_tacones);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -100,7 +95,7 @@ class ZapatoCortador extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return ZapatoCortador the static model class
+	 * @return TaconesNumeros the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

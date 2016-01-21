@@ -59,6 +59,14 @@ data-position="right" class="navbar-default navbar-static-side">
                             <span class="menu-title">Estatus de pedidos</span>
                         </a>
                     </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'estatus_pagos'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/estatusPagos/admin">
+                            <i class="fa fa-money fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Estatus de pagos</span>
+                        </a>
+                    </li>
                     <li class="<?php if(isset($this->subsection) && $this->subsection == 'estatus_zapatos'){ echo 'submenu-active'; } ?>">
                         <a href="<?= Yii::app()->request->baseUrl; ?>/estatusZapatos/admin">
                             <i class="fa fa-cart-arrow-down fa-fw">
@@ -77,10 +85,18 @@ data-position="right" class="navbar-default navbar-static-side">
                     </li>
                     <li class="<?php if(isset($this->subsection) && $this->subsection == 'zapatos'){ echo 'submenu-active'; } ?>">
                         <a href="<?= Yii::app()->request->baseUrl; ?>/zapatos/admin">
-                            <i class="fa fa-puzzle-piece fa-fw">
+                            <i class="fa fa-usd fa-fw">
                                 <div class="icon-bg bg-red"></div>
                             </i>
                             <span class="menu-title">Configurar precios</span>
+                        </a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'numeros_suelas_modelos'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/modelossuelasnumeros/admin">
+                            <i class="fa fa-sort-numeric-asc fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Configurar números</span>
                         </a>
                     </li>
                 </ul>

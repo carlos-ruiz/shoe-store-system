@@ -1,23 +1,25 @@
 <?php
 
 /**
- * This is the model class for table "estatus_pedidos".
+ * This is the model class for table "tacones".
  *
- * The followings are the available columns in table 'estatus_pedidos':
+ * The followings are the available columns in table 'tacones':
  * @property integer $id
  * @property string $nombre
  *
  * The followings are the available model relations:
- * @property Pedidos[] $pedidoses
+ * @property Suelas[] $suelases
+ * @property TaconesColores[] $taconesColores
+ * @property TaconesNumeros[] $taconesNumeroses
  */
-class EstatusPedidos extends CActiveRecord
+class Tacones extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'estatus_pedidos';
+		return 'tacones';
 	}
 
 	/**
@@ -30,7 +32,7 @@ class EstatusPedidos extends CActiveRecord
 		return array(
 			array('nombre', 'required'),
 			array('nombre', 'unique'),
-			array('nombre', 'length', 'max'=>45),
+			array('nombre', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, nombre', 'safe', 'on'=>'search'),
@@ -45,7 +47,9 @@ class EstatusPedidos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'pedidoses' => array(self::HAS_MANY, 'Pedidos', 'id_estatus_pedidos'),
+			'suelases' => array(self::MANY_MANY, 'Suelas', 'suelas_tacones(id_tacones, id_suelas)'),
+			'taconesColores' => array(self::HAS_MANY, 'TaconesColores', 'id_tacones'),
+			'taconesNumeroses' => array(self::HAS_MANY, 'TaconesNumeros', 'id_tacones'),
 		);
 	}
 
@@ -90,14 +94,10 @@ class EstatusPedidos extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return EstatusPedidos the static model class
+	 * @return Tacones the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
-	}
-
-	public function obtenerEstatusPedidos(){
-		return CHtml::listData(EstatusPedidos::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
 	}
 }

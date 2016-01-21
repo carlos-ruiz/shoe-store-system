@@ -1,23 +1,23 @@
 <?php
 
 /**
- * This is the model class for table "estatus_pedidos".
+ * This is the model class for table "agujetas".
  *
- * The followings are the available columns in table 'estatus_pedidos':
+ * The followings are the available columns in table 'agujetas':
  * @property integer $id
  * @property string $nombre
  *
  * The followings are the available model relations:
- * @property Pedidos[] $pedidoses
+ * @property AgujetasColores[] $agujetasColores
  */
-class EstatusPedidos extends CActiveRecord
+class Agujetas extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'estatus_pedidos';
+		return 'agujetas';
 	}
 
 	/**
@@ -45,7 +45,7 @@ class EstatusPedidos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'pedidoses' => array(self::HAS_MANY, 'Pedidos', 'id_estatus_pedidos'),
+			'agujetasColores' => array(self::HAS_MANY, 'AgujetasColores', 'id_agujetas'),
 		);
 	}
 
@@ -90,14 +90,10 @@ class EstatusPedidos extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return EstatusPedidos the static model class
+	 * @return Agujetas the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
-	}
-
-	public function obtenerEstatusPedidos(){
-		return CHtml::listData(EstatusPedidos::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
 	}
 }

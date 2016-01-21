@@ -46,8 +46,8 @@ class SuelasNumeros extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'modelosNumeroses' => array(self::MANY_MANY, 'ModelosNumeros', 'modelos_suelas_numeros(id_suelas_numeros, id_modelos_numeros)'),
-			'idSuelas' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
+			'modelosNumeros' => array(self::MANY_MANY, 'ModelosNumeros', 'modelos_suelas_numeros(id_suelas_numeros, id_modelos_numeros)'),
+			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
 		);
 	}
 

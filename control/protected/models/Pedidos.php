@@ -13,13 +13,15 @@
  * @property integer $id_estatus_pedidos
  * @property string $prioridad
  * @property integer $descuento
+ * @property integer $estatus_pagos_id
  *
  * The followings are the available model relations:
- * @property Pagos[] $pagoses
- * @property Clientes $idClientes
- * @property EstatusPedidos $idEstatusPedidos
- * @property FormasPago $idFormasPago
- * @property PedidosZapatos[] $pedidosZapatoses
+ * @property Pagos[] $pagos
+ * @property Clientes $cliente
+ * @property EstatusPagos $estatusPago
+ * @property EstatusPedidos $estatusPedido
+ * @property FormasPago $formaPago
+ * @property PedidosZapatos[] $pedidosZapatos
  */
 class Pedidos extends CActiveRecord
 {
@@ -42,15 +44,15 @@ class Pedidos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_clientes, fecha_pedido, id_formas_pago, total, id_estatus_pedidos', 'required'),
-			array('id_clientes, id_formas_pago, id_estatus_pedidos, descuento', 'numerical', 'integerOnly'=>true),
+			array('id_clientes, fecha_pedido, id_formas_pago, total, id_estatus_pedidos, estatus_pagos_id', 'required'),
+			array('id_clientes, id_formas_pago, id_estatus_pedidos, descuento, estatus_pagos_id', 'numerical', 'integerOnly'=>true),
 			array('total', 'safe'),
 			array('total', 'length', 'max'=>10),
 			array('prioridad', 'length', 'max'=>45),
 			array('fecha_entrega', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_clientes, fecha_pedido, fecha_entrega, id_formas_pago, total, id_estatus_pedidos, prioridad, descuento, var_cliente_nombre, var_estatus, var_forma_pago', 'safe', 'on'=>'search'),
+			array('id, id_clientes, fecha_pedido, fecha_entrega, id_formas_pago, total, id_estatus_pedidos, prioridad, descuento, var_cliente_nombre, var_estatus, var_forma_pago, estatus_pagos_id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -67,6 +69,7 @@ class Pedidos extends CActiveRecord
 			'estatus' => array(self::BELONGS_TO, 'EstatusPedidos', 'id_estatus_pedidos'),
 			'formaPago' => array(self::BELONGS_TO, 'FormasPago', 'id_formas_pago'),
 			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos', 'order'=>'caracteristicas_especiales ASC'),
+			'estatusPago' => array(self::BELONGS_TO, 'EstatusPagos', 'estatus_pagos_id'),
 		);
 	}
 
@@ -88,6 +91,7 @@ class Pedidos extends CActiveRecord
 			'var_cliente_nombre' => 'Cliente',
 			'var_estatus' => 'Estatus',
 			'var_forma_pago' => 'Forma de pago',
+			'estatus_pagos_id' => 'Estatus de pago',
 		);
 	}
 
@@ -123,7 +127,7 @@ class Pedidos extends CActiveRecord
 		$criteria->compare('estatus.nombre', $this->var_estatus, true);
 		$criteria->compare('formaPago.nombre', $this->var_forma_pago, true);
 		$criteria->order='estatus.id ASC, fecha_entrega ASC';
-		// $criteria->compare('cliente.apellido_paterno', $this->clienteNombre, true);
+		$criteria->compare('estatus_pagos_id',$this->estatus_pagos_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
