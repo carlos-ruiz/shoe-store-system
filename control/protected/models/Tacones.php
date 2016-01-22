@@ -47,9 +47,9 @@ class Tacones extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'suelases' => array(self::MANY_MANY, 'Suelas', 'suelas_tacones(id_tacones, id_suelas)'),
+			'suelas' => array(self::MANY_MANY, 'Suelas', 'suelas_tacones(id_tacones, id_suelas)'),
 			'taconesColores' => array(self::HAS_MANY, 'TaconesColores', 'id_tacones'),
-			'taconesNumeroses' => array(self::HAS_MANY, 'TaconesNumeros', 'id_tacones'),
+			'taconesNumeros' => array(self::HAS_MANY, 'TaconesNumeros', 'id_tacones'),
 		);
 	}
 

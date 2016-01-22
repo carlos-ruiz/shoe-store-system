@@ -47,9 +47,9 @@ class AgujetasColores extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idAgujetas' => array(self::BELONGS_TO, 'Agujetas', 'id_agujetas'),
-			'idColores' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
-			'zapatoses' => array(self::HAS_MANY, 'Zapatos', 'id_agujetas_colores'),
+			'agujeta' => array(self::BELONGS_TO, 'Agujetas', 'id_agujetas'),
+			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
+			'zapatos' => array(self::HAS_MANY, 'Zapatos', 'id_agujetas_colores'),
 		);
 	}
 

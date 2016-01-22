@@ -68,26 +68,26 @@ class ZapatosController extends Controller
 		$zapatoPrecios=new ZapatoPrecios;
 
 		//parche validacion
-		$model->numero = 0;
-		$model->precio = 0;
-		$model->codigo_barras = 'xxx';
-		$zapatoPrecios->id_modelos = 0;
-		$zapatoPrecios->id_suelas = 0;
+		// $model->numero = 0;
+		// $model->precio = 0;
+		// $model->codigo_barras = 'xxx';
+		// $zapatoPrecios->id_modelos = 0;
+		// $zapatoPrecios->id_suelas = 0;
 		//fin parche validacion
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Zapatos']))
+		if(isset($_POST['ZapatoPrecios']))
 		{
-			$model->attributes=$_POST['Zapatos'];
+			// $model->attributes=$_POST['Zapatos'];
 			$zapatoPrecios->attributes=$_POST['ZapatoPrecios'];
 
-			if($model->validate() & $zapatoPrecios->validate()){
-				$modeloColores = ModelosColores::model()->findAll('id_modelos=?', array($model->id_modelos));
+			if($zapatoPrecios->validate()){
+				$modeloColores = ModelosColores::model()->findAll('id_modelos=?', array($zapatoPrecios->id_modelos));
 
 				foreach ($modeloColores as $modeloColor) {
-					$zapatosExistentes = Zapatos::model()->findAll('id_modelos=? AND id_colores=? AND id_suelas=?', array($modeloColor->id_modelos, $modeloColor->id_colores, $model->id_suelas));
+					$zapatosExistentes = Zapatos::model()->with(array('suelaColor.suela'=>array('alias'=>'suela')))->findAll('t.id_modelos=? AND t.id_colores=? AND suela.id=?', array($modeloColor->id_modelos, $modeloColor->id_colores, $zapatoPrecios->id_suelas));
 					if (isset($zapatosExistentes)) {
 						foreach ($zapatosExistentes as $zapatoExistente) {
 							if($zapatoExistente->numero >= 12 && $zapatoExistente->numero < 18){
@@ -106,34 +106,39 @@ class ZapatosController extends Controller
 						}
 					}
 
-					$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($model->id_modelos));
+					$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($zapatoPrecios->id_modelos));
 					foreach ($modeloNumeros as $modeloNumero) {
 						$numero = $modeloNumero->numero;
-						$zapatoExiste = Zapatos::model()->find('id_modelos=? AND id_colores=? AND id_suelas=? AND numero=?', array($modeloColor->id_modelos, $modeloColor->id_colores, $model->id_suelas, $numero));
+						$zapatoExiste = Zapatos::model()->with(array('suelaColor.suela'=>array('alias'=>'suela')))->find('t.id_modelos=? AND t.id_colores=? AND suela.id=? AND numero=?', array($modeloColor->id_modelos, $modeloColor->id_colores, $zapatoPrecios->id_suelas, $numero));
 						if (!isset($zapatoExiste)) {
-							$nuevoZapato = new Zapatos;
-							$nuevoZapato->id_modelos = $modeloColor->id_modelos;
-							$nuevoZapato->id_colores = $modeloColor->id_colores;
-							$nuevoZapato->id_suelas = $model->id_suelas;
-							$nuevoZapato->numero = $numero;
-							$nuevoZapato->codigo_barras = $model->id_modelos.$modeloColor->color->id.$model->id_suelas.$numero;
-							if($numero >= 12 && $numero < 18){
-								$nuevoZapato->precio = $zapatoPrecios->precio_extrachico;
+							$suelaColores = SuelasColores::model()->findAll('id_suelas=?', array($zapatoPrecios->id_suelas));
+							foreach ($suelaColores as $suelaColor) {
+								$nuevoZapato = new Zapatos;
+								$nuevoZapato->id_modelos = $modeloColor->id_modelos;
+								$nuevoZapato->id_colores = $modeloColor->id_colores;
+								$nuevoZapato->id_suelas_colores = $suelaColor->id;
+								$nuevoZapato->numero = $numero;
+								$nuevoZapato->codigo_barras = $zapatoPrecios->id_modelos.$modeloColor->color->id.$zapatoPrecios->id_suelas.$numero;
+								if($numero >= 12 && $numero < 18){
+									$nuevoZapato->precio = $zapatoPrecios->precio_extrachico;
+								}
+								else if($numero >= 18 && $numero < 22){
+									$nuevoZapato->precio = $zapatoPrecios->precio_chico;
+								}
+								else if($numero >= 22 && $numero < 25){
+									$nuevoZapato->precio = $zapatoPrecios->precio_mediano;
+								}
+								else if($numero >= 25 && $numero < 32){
+									$nuevoZapato->precio = $zapatoPrecios->precio_grande;
+								}
+								if ($nuevoZapato->validate()) {
+									$nuevoZapato->save();
+								}
 							}
-							else if($numero >= 18 && $numero < 22){
-								$nuevoZapato->precio = $zapatoPrecios->precio_chico;
-							}
-							else if($numero >= 22 && $numero < 25){
-								$nuevoZapato->precio = $zapatoPrecios->precio_mediano;
-							}
-							else if($numero >= 25 && $numero < 32){
-								$nuevoZapato->precio = $zapatoPrecios->precio_grande;
-							}
-							$nuevoZapato->save();
 						}
 					}
 				}
-				$zapatoPreciosExistente = ZapatoPrecios::model()->find('id_modelos=? AND id_suelas=?', array($model->id_modelos, $model->id_suelas));
+				$zapatoPreciosExistente = ZapatoPrecios::model()->find('id_modelos=? AND id_suelas=?', array($zapatoPrecios->id_modelos, $zapatoPrecios->id_suelas));
 				if (isset($zapatoPreciosExistente)) {
 					$zapatoPreciosExistente->precio_extrachico = $zapatoPrecios->precio_extrachico;
 					$zapatoPreciosExistente->precio_chico = $zapatoPrecios->precio_chico;
@@ -142,8 +147,8 @@ class ZapatosController extends Controller
 					$zapatoPreciosExistente->save();
 				}
 				else{
-					$zapatoPrecios->id_modelos = $model->id_modelos;
-					$zapatoPrecios->id_suelas = $model->id_suelas;
+					// $zapatoPrecios->id_modelos = $model->id_modelos;
+					// $zapatoPrecios->id_suelas = $model->id_suelas;
 					$zapatoPrecios->save();
 				}
 				
@@ -261,21 +266,21 @@ class ZapatosController extends Controller
 
 	public function actionSuelasPorModelo()
 	{
-		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["Zapatos"]["id_modelos"]));
+		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["ZapatoPrecios"]["id_modelos"]));
 		foreach($list as $data)
 			echo "<option value=\"{$data->suela->id}\">{$data->suela->nombre}</option>";
 	}
 
 	public function actionColoresPorModelo()
 	{
-		$list = ModelosColores::model()->findAll("id_modelos=?",array($_POST["Zapatos"]["id_modelos"]));
+		$list = ModelosColores::model()->findAll("id_modelos=?",array($_POST["ZapatoPrecios"]["id_modelos"]));
 		foreach($list as $data)
 			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
 	}
 
 	public function actionNumerosPorModelo()
 	{
-		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["Zapatos"]["id_modelos"]));
+		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["ZapatoPrecios"]["id_modelos"]));
 		foreach($list as $data)
 			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
 	}

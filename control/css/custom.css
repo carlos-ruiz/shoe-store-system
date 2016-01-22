@@ -166,3 +166,15 @@ td.td-caracteristicas-especiales {
 	width: 100% !important;
 	height: 20px;
 }
+
+.button-column a img {
+	width: 13px;
+}
+
+.button-column a {
+	padding: 2px;
+}
+
+.button-column a:hover {
+	border: solid 1px #999999;
+}

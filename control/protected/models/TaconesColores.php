@@ -46,8 +46,8 @@ class TaconesColores extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idColores' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
-			'idTacones' => array(self::BELONGS_TO, 'Tacones', 'id_tacones'),
+			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
+			'tacon' => array(self::BELONGS_TO, 'Tacones', 'id_tacones'),
 		);
 	}
 

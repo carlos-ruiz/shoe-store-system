@@ -28,6 +28,7 @@ class Zapatos extends CActiveRecord
 	public $var_suela;
 	public $var_modelo;
 	public $var_color;
+	public $id_suelas;
 
 	/**
 	 * @return string the associated database table name
@@ -45,9 +46,9 @@ class Zapatos extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('numero, precio, codigo_barras, id_modelos, id_colores, id_suelas_colores, id_agujetas_colores, id_ojillos_colores', 'required'),
+			array('numero, precio, codigo_barras, id_modelos, id_colores, id_suelas_colores', 'required'),
 			array('id_modelos', 'required', 'on'=>'catalog'),
-			array('id_modelos, id_colores, id_suelas_colores, id_agujetas_colores, id_ojillos_colores', 'numerical', 'integerOnly'=>true),
+			array('id_modelos, id_colores, id_suelas_colores, id_agujetas_colores, id_ojillos_colores, id_suelas', 'numerical', 'integerOnly'=>true),
 			array('numero, precio', 'numerical'),
 			array('precio', 'length', 'max'=>7),
 			array('codigo_barras', 'length', 'max'=>12),

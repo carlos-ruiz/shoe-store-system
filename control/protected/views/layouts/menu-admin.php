@@ -19,6 +19,18 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-violet"></div>
                 </i><span class="menu-title">Suelas</span></a>
             </li>
+            <li class="<?php if($this->section == 'tacones'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/tacones/admin"><i class="fa fa-database fa-fw">
+                <div class="icon-bg bg-violet"></div>
+                </i><span class="menu-title">Tacones</span></a>
+            </li>
+            <li class="<?php if($this->section == 'agujetas'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/agujetas/admin"><i class="fa fa-random fa-fw">
+                <div class="icon-bg bg-violet"></div>
+                </i><span class="menu-title">Agujetas</span></a>
+            </li>
+            <li class="<?php if($this->section == 'ojillos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/ojillos/admin"><i class="fa fa-circle-o fa-fw">
+                <div class="icon-bg bg-violet"></div>
+                </i><span class="menu-title">Ojillos</span></a>
+            </li>
             <li class="<?php if($this->section == 'clientes'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/clientes/admin"><i class="fa fa-users fa-fw">
                 <div class="icon-bg bg-blue"></div>
                 </i><span class="menu-title">Clientes</span></a>

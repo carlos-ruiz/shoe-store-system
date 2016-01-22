@@ -18,8 +18,8 @@
 	<div class="form-body">
 		<hr/>
 		<div class="row">
-			<div class="form-group col-md-4 <?php if($form->error($model,'id_modelos')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'id_modelos', array('class'=>'control-label')); ?>
+			<div class="form-group col-md-4 <?php if($form->error($zapatoPrecios,'id_modelos')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($zapatoPrecios,'id_modelos', array('class'=>'control-label')); ?>
 				<div class="input-group">
 					<?php
 						$htmlOptions = array(
@@ -27,15 +27,15 @@
 							"empty"=>"Seleccione una opci&oacute;n",
 						);
 					?>
-					<?php echo $form->dropDownList($model,'id_modelos',Modelos::model()->obtenerModelos(), $htmlOptions); ?>
-					<?php echo $form->error($model,'id_modelos', array('class'=>'help-block')); ?>
+					<?php echo $form->dropDownList($zapatoPrecios,'id_modelos',Modelos::model()->obtenerModelos(), $htmlOptions); ?>
+					<?php echo $form->error($zapatoPrecios,'id_modelos', array('class'=>'help-block')); ?>
 				</div>
 			</div>
-			<div class="form-group col-md-4 <?php if($form->error($model,'id_suelas')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'id_suelas', array('class'=>'control-label')); ?>
+			<div class="form-group col-md-4 <?php if($form->error($zapatoPrecios,'id_suelas')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($zapatoPrecios,'id_suelas', array('class'=>'control-label')); ?>
 				<div class="input-group">
-					<?php echo $form->dropDownList($model,'id_suelas',Modelos::model()->obtenerSuelas(isset($model->id_modelos)?$model->id_modelos:0), $htmlOptions); ?>
-					<?php echo $form->error($model,'id_suelas', array('class'=>'help-block')); ?>
+					<?php echo $form->dropDownList($zapatoPrecios,'id_suelas',Modelos::model()->obtenerSuelas(isset($zapatoPrecios->id_modelos)?$zapatoPrecios->id_modelos:0), $htmlOptions); ?>
+					<?php echo $form->error($zapatoPrecios,'id_suelas', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 		</div>
@@ -70,7 +70,7 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::submitButton('Guardar', array('class'=>'btn btn-red-stripped')); ?>
 		</div>
 	</div>
 
@@ -80,10 +80,8 @@
 
 <script type="text/javascript">
 	jQuery(function($) {
-		jQuery('body').on('change','#Zapatos_id_modelos',function(){
-			jQuery.ajax({'url':'/controlbom/control/zapatos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#Zapatos_id_colores").html(html)}});
-			jQuery.ajax({'url':'/controlbom/control/zapatos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#Zapatos_id_suelas").html(html)}});
-			jQuery.ajax({'url':'/controlbom/control/zapatos/numerosPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#Zapatos_numero").html(html)}});
+		jQuery('body').on('change','#ZapatoPrecios_id_modelos',function(){
+			jQuery.ajax({'url':'/controlbom/control/zapatos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#ZapatoPrecios_id_suelas").html(html)}});
 			return false;
 		});
 	});
