@@ -23,6 +23,7 @@ class PedidosZapatos extends CActiveRecord
 	public $id_modelos;
 	public $id_colores;
 	public $id_suelas;
+	public $id_suelas_color;
 	public $numero;
 
 	/**
@@ -80,6 +81,7 @@ class PedidosZapatos extends CActiveRecord
 			'id_modelos'=>'Modelo',
 			'id_colores'=>'Color',
 			'id_suelas'=>'Suela',
+			'id_suelas_color'=>'Color de suela',
 			'numero'=>'Número',
 			'caracteristicas_especiales' => 'Características especiales',
 			'precio_unitario' => 'Precio unitario',

@@ -119,6 +119,23 @@ class SiteController extends Controller
 
 	public function init()
 	{
+		$this->crearPerfilesUsuario();
+		$this->crearEstatusDePedido();
+		$this->crearEstatusDePagos();
+		if(Usuarios::model()->find('usuario=?', array('admin')) == null){
+			$perfilAdministrador = PerfilesUsuarios::model()->find('nombre=?', array('Administrador'));
+			$usuario = new Usuarios;
+			$usuario->usuario = 'admin';
+			$usuario->contrasenia = base64_encode('admin');
+			$usuario->id_perfiles_usuarios = $perfilAdministrador->id;
+			$usuario->creacion = date('Y-m-d H:i:s');
+			$usuario->ultima_modificacion = '2000-01-01 00:00:00';
+			$usuario->save();
+		}
+	}
+
+	public function crearPerfilesUsuario()
+	{
 		if(PerfilesUsuarios::model()->count()==0){
 			$perfil = new PerfilesUsuarios;
 			$perfil->nombre="Administrador";
@@ -133,17 +150,38 @@ class SiteController extends Controller
 			$perfil->nombre="Ensuelador";
 			$perfil->save();
 		}
+	}
 
+	public function crearEstatusDePedido()
+	{
+		if(EstatusPedidos::model()->count()==0){
+			$estatus = new EstatusPedidos;
+			$estatus->nombre="Pendiente";
+			$estatus->save();
+			$estatus = new EstatusPedidos;
+			$estatus->nombre="En proceso";
+			$estatus->save();
+			$estatus = new EstatusPedidos;
+			$estatus->nombre="Terminado";
+			$estatus->save();
+			$estatus = new EstatusPedidos;
+			$estatus->nombre="Entregado";
+			$estatus->save();
+		}
+	}
 
-		if(Usuarios::model()->find('usuario=?', array('admin')) == null){
-			$perfilAdministrador = PerfilesUsuarios::model()->find('nombre=?', array('Administrador'));
-			$usuario = new Usuarios;
-			$usuario->usuario = 'admin';
-			$usuario->contrasenia = base64_encode('admin');
-			$usuario->id_perfiles_usuarios = $perfilAdministrador->id;
-			$usuario->creacion = date('Y-m-d H:i:s');
-			$usuario->ultima_modificacion = '2000-01-01 00:00:00';
-			$usuario->save();
+	public function crearEstatusDePagos()
+	{
+		if(EstatusPagos::model()->count()==0){
+			$estatus = new EstatusPagos;
+			$estatus->nombre="Pendiente de pago";
+			$estatus->save();
+			$estatus = new EstatusPagos;
+			$estatus->nombre="Pago parcial";
+			$estatus->save();
+			$estatus = new EstatusPagos;
+			$estatus->nombre="Pagado";
+			$estatus->save();
 		}
 	}
 }

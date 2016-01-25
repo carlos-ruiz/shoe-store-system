@@ -111,8 +111,9 @@ class TaconesController extends Controller
 		if(isset($_POST['Tacones']))
 		{
 			$model->attributes=$_POST['Tacones'];
-			if($model->save())
+			if($model->save()){
 				$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('update',array(

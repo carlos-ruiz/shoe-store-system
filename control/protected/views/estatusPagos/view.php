@@ -16,7 +16,7 @@ $this->menu=array(
 );
 ?>
 
-<h1>View EstatusPagos #<?php echo $model->id; ?></h1>
+<h1>Estatus de pago #<?php echo $model->id.' - '.$model->nombre; ?></h1>
 
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
@@ -25,3 +25,11 @@ $this->menu=array(
 		'nombre',
 	),
 )); ?>
+
+<?php if(!Yii::app()->user->isGuest) { ?>
+	<div class="row">
+		<div class="col-md-12 padding-top">
+			<?php echo CHtml::link('<i class="fa fa-plus"></i> Agregar estatus', array('estatuspagos/create'), array('class'=>'link-button')); ?>
+		</div>
+	</div>
+<?php } ?>

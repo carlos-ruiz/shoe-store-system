@@ -161,7 +161,7 @@ class ZapatoPreciosController extends Controller
 		$id_suelas = $_POST['id_suelas'];
 		$numero = $_POST['numero'];
 
-		$zapato = Zapatos::model()->find('id_modelos=? AND id_suelas=? AND numero=?', array($id_modelos, $id_suelas, $numero));
+		$zapato = Zapatos::model()->with(array('suelaColor.suela'=>array('alias'=>'suela')))->find('id_modelos=? AND suela.id=? AND numero=?', array($id_modelos, $id_suelas, $numero));
 
 		echo $zapato->precio;
 	}
@@ -178,7 +178,7 @@ class ZapatoPreciosController extends Controller
 		$totalRow = 0;
 		foreach ($_POST['Pedido']['numeros'][$clave] as $numero => $cantidad) {
 			if (isset($cantidad) && $cantidad > 0) {
-				$zapato = Zapatos::model()->find('id_modelos=? AND id_suelas=? AND numero=?', array($id_modelos, $id_suelas, $numero));
+				$zapato = Zapatos::model()->with(array('suelaColor.suela'=>array('alias'=>'suela')))->find('id_modelos=? AND suela.id=? AND numero=?', array($id_modelos, $id_suelas, $numero));
 				if (isset($zapato)) {
 					$totalRow += ($cantidad * $zapato->precio);
 				}

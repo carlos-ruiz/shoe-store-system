@@ -106,19 +106,37 @@
 			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'id_suelas')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($pedidoZapato,'id_suelas', array('class'=>'control-label')); ?>
 				<div class="input-group">
-					<?php echo $form->dropDownList($pedidoZapato,'id_suelas',Modelos::model()->obtenerSuelas(isset($pedidoZapato->id_modelos)?$pedidoZapato->id_modelos:0), $htmlOptions); ?>
+					<?php
+						$htmlOptionsAjax = array(
+									"ajax"=>array(
+										"url"=>$this->createUrl("pedidos/coloresPorSuela"),
+										"type"=>"POST",
+										"update"=>"#PedidosZapatos_id_suelas_color"
+									),
+									"class" => "form-control input-medium select2me",
+									"empty"=>"Seleccione una opci&oacute;n",
+								);
+					?>
+					<?php echo $form->dropDownList($pedidoZapato,'id_suelas',Modelos::model()->obtenerSuelas(isset($pedidoZapato->id_modelos)?$pedidoZapato->id_modelos:0), $htmlOptionsAjax); ?>
 					<?php echo $form->error($pedidoZapato,'id_suelas', array('class'=>'help-block')); ?>
 				</div>
 			</div>
+			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'id_suelas_color')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($pedidoZapato,'id_suelas_color', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->dropDownList($pedidoZapato,'id_suelas_color',SuelasColores::model()->obtenerColoresPorSuela(isset($pedidoZapato->id_suelas)?$pedidoZapato->id_suelas:0), $htmlOptions); ?>
+					<?php echo $form->error($pedidoZapato,'id_suelas_color', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="form-group col-md-3 ">
 				<label class="control-label" for="Pedidos_es_especial">¿Es especial?</label>
 				<div class="input-group">
 					<input class="form-control" style="width:15px" name="Pedidos[es_especial]" id="Pedidos_es_especial" value="1" type="checkbox">
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col-md-12 <?php if($form->error($pedidoZapato,'caracteristicas_especiales')!=''){ echo 'has-error'; }?>" id="especial_input">
+			<div class="form-group col-md-9 <?php if($form->error($pedidoZapato,'caracteristicas_especiales')!=''){ echo 'has-error'; }?>" id="especial_input">
 				<?php echo $form->labelEx($pedidoZapato,'caracteristicas_especiales', array('class'=>'control-label')); ?>
 				<div class="input-group">
 					<?php echo $form->textArea($pedidoZapato,'caracteristicas_especiales',array('rows'=>5, 'cols'=>150, 'class'=>'form-control')); ?>
@@ -172,6 +190,7 @@
 								<th>Modelo</th>
 								<th>Color</th>
 								<th>Suela</th>
+								<th>Color Suela</th>
 								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 								<th><?php if(fmod($i ,1)==0){ echo $i;} else{echo "-";} ?></th>
 								<?php } ?>
@@ -268,6 +287,16 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-md-8"></div>
+			<div class="form-group col-md-4 <?php if($form->error($model,'pagado')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($model,'pagado', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($model,'pagado',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($model,'pagado', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+		</div>
 
 		<div class="form-group">
 			<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped')); ?>
@@ -307,25 +336,35 @@
 	jQuery(function($) {
 		jQuery('body').on('change','#PedidosZapatos_id_modelos',function(){
 			jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_colores").html(html)}});
-			jQuery.ajax({'url':'/controlbom/control/pedidos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas").html(html)}});
+			jQuery.ajax({'url':'/controlbom/control/pedidos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+					jQuery("#PedidosZapatos_id_suelas").html(html);
+					actualizarColoresSuelas();
+				}
+			});
 			return false;
 		});
 	});
+
+	function actualizarColoresSuelas(){
+		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html)}});
+	}
 	$('#boton_agregar_orden').click(function(){
 		id_modelos = $('#PedidosZapatos_id_modelos').val();
 		id_colores = $('#PedidosZapatos_id_colores').val();
 		id_suelas = $('#PedidosZapatos_id_suelas').val();
+		id_color_suela = $('#PedidosZapatos_id_suelas_color').val();
 		rows = $('#ordenes_table tr').length;
 		caracteristicas_especiales = $('#PedidosZapatos_caracteristicas_especiales').val();
 
 
-		if (id_modelos>0 && id_colores>0 && id_suelas>0) {
+		if (id_modelos>0 && id_colores>0 && id_suelas>0 && id_color_suela>0) {
 			$.post(
 				"<?php echo $this->createUrl('pedidos/agregarOrden/');?>",
 				{
 					id_modelos:id_modelos,
 					id_colores:id_colores,
 					id_suelas:id_suelas,
+					id_color_suela:id_color_suela,
 					row:rows,
 					especial:caracteristicas_especiales
 				},
@@ -417,6 +456,7 @@
 		$('#PedidosZapatos_id_modelos').val('');
 		$('#PedidosZapatos_id_colores').html('<option value="">Seleccione una opción</option>');
 		$('#PedidosZapatos_id_suelas').html('<option value="">Seleccione una opción</option>');
+		$('#PedidosZapatos_id_suelas_color').html('<option value="">Seleccione una opción</option>');
 		$('#Pedidos_es_especial').attr('checked', false);
 		$('#PedidosZapatos_caracteristicas_especiales').val('');
 		$('#especial_input').hide(500);

@@ -13,6 +13,6 @@ $this->menu=array(
 );
 ?>
 
-<h1>Create EstatusPagos</h1>
+<h1>Nuevo estatus de pago</h1>
 
 <?php $this->renderPartial('_form', array('model'=>$model)); ?>

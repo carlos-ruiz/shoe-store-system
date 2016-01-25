@@ -16,6 +16,12 @@
 )); ?>
 
 	<div class="form-body">
+		<?php if(isset($mensaje_error)){ ?>
+			<div class="alert alert-danger alert-dismissable">
+			    <button type="button" data-dismiss="alert" aria-hidden="true" class="close">×</button>
+			    <strong>Error!</strong> <?= $mensaje_error ?>
+			</div>
+		<?php } ?>
 		<hr/>
 		<div class="row">
 			<div class="form-group col-md-4 <?php if($form->error($model,'nombre')!=''){ echo 'has-error'; }?>">

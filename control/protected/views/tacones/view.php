@@ -16,12 +16,31 @@ $this->menu=array(
 );
 ?>
 
-<h1>Tacon #<?php echo $model->id.' - '.$model->nombre; ?></h1>
+<h1>Tacón #<?php echo $model->id.' - '.$model->nombre; ?></h1>
 
-<?php $this->widget('zii.widgets.CDetailView', array(
-	'data'=>$model,
-	'attributes'=>array(
-		'id',
-		'nombre',
-	),
-)); ?>
+<div class="row">
+	<div class="col-md-4">
+		<h3>Colores</h3>
+		<ul>
+			<?php foreach ($model->taconesColores as $taconColor) { ?>
+				<li><?= $taconColor->color->color ?></li>
+			<?php } ?>
+		</ul>
+	</div>
+	<div class="col-md-4">
+		<h3>Números</h3>
+		<ul>
+			<?php foreach ($model->taconesNumeros as $taconNumero) { ?>
+				<li><?= $taconNumero->numero ?></li>
+			<?php } ?>
+		</ul>
+	</div>
+</div>
+
+<?php if(!Yii::app()->user->isGuest) { ?>
+	<div class="row">
+		<div class="col-md-12 padding-top">
+			<?php echo CHtml::link('<i class="fa fa-plus"></i> Agregar tacón', array('tacones/create'), array('class'=>'link-button')); ?>
+		</div>
+	</div>
+<?php } ?>

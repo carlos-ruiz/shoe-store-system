@@ -64,13 +64,23 @@ class SuelasController extends Controller
 	{
 		$model=new Suelas;
 		$colores = Colores::model()->findAll();
+		$mensaje_error = null;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Suelas']))
 		{
 			$model->attributes=$_POST['Suelas'];
-			if($model->save()){
+			$todo_bien = true;
+			if (!isset($_POST['SuelasColores']['id_colores'])) {
+				$todo_bien = false;
+				$mensaje_error = '<br/> - Debe elegir al menos un color de suela.';
+			}
+			if (!isset($_POST['SuelasNumeros']['numero'])) {
+				$todo_bien = false;
+				$mensaje_error .= '<br/> - Debe elegir al menos un número de suela.';
+			}
+			if($todo_bien && $model->save()){
 				foreach ($_POST['SuelasColores']['id_colores'] as $id => $value) {
 					$suelaColor = new SuelasColores;
 					$suelaColor->id_suelas = $model->id;
@@ -90,6 +100,7 @@ class SuelasController extends Controller
 		$this->render('create',array(
 			'model'=>$model,
 			'colores'=>$colores,
+			'mensaje_error'=>$mensaje_error,
 		));
 	}
 
@@ -102,45 +113,78 @@ class SuelasController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$colores = Colores::model()->findAll();
+		$mensaje_error = null;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Suelas']))
 		{
+			$todo_bien = true;
 			$model->attributes=$_POST['Suelas'];
 			$transaction = Yii::app()->db->beginTransaction();
 			try{
-				foreach ($model->suelasColores as $suelaColor) {
-					$suelaColor->delete();
-				}
-				foreach ($model->suelaNumeros as $suelaNumero) {
-					$suelaNumero->delete();
-				}
-				if($model->save()){
+				$ids_colores_actuales = array();
+				if (isset($_POST['SuelasColores']['id_colores'])) {
 					foreach ($_POST['SuelasColores']['id_colores'] as $id => $value) {
-						$suelaColor = new SuelasColores;
-						$suelaColor->id_suelas = $model->id;
-						$suelaColor->id_colores = $id;
-						$suelaColor->save();
+						array_push($ids_colores_actuales, $id);
 					}
+				}
+				if (sizeof($ids_colores_actuales)<1) {
+					$todo_bien = false;
+					$mensaje_error = '<br/> - Dede elegir al menos un color de suela.';
+				}
+				$numeros_actuales = array();
+				if (isset($_POST['SuelasNumeros']['numero'])) {
 					foreach ($_POST['SuelasNumeros']['numero'] as $numero => $value) {
-						$suelaNumero = new SuelasNumeros;
-						$suelaNumero->numero = $numero;
-						$suelaNumero->id_suelas = $model->id;
-						$suelaNumero->save();
+						array_push($numeros_actuales, $numero);
 					}
-					$transaction->commit();
-					$this->redirect(array('view','id'=>$model->id));
+				}
+				if (sizeof($numeros_actuales)<1) {
+					$todo_bien = false;
+					$mensaje_error .= '<br/> - Dede elegir al menos un número de suela.';
+				}
+				if($todo_bien){
+					foreach ($model->suelasColores as $suelaColor) {
+						if(!in_array($suelaColor->color->id, $ids_colores_actuales)){
+							$suelaColor->delete();
+						}else{
+							$ids_colores_actuales = array_diff($ids_colores_actuales, array($suelaColor->color->id));
+						}
+					}
+					foreach ($model->suelaNumeros as $suelaNumero) {
+						if(!in_array($suelaNumero->numero, $numeros_actuales)){
+							$suelaNumero->delete();
+						}
+						else{
+							$numeros_actuales = array_diff($numeros_actuales, array($suelaNumero->numero));
+						}
+					}
+					if($model->save()){
+						foreach ($ids_colores_actuales as $id) {
+							$suelaColor = new SuelasColores;
+							$suelaColor->id_suelas = $model->id;
+							$suelaColor->id_colores = $id;
+							$suelaColor->save();
+						}
+						foreach ($numeros_actuales as $numero) {
+							$suelaNumero = new SuelasNumeros;
+							$suelaNumero->numero = $numero;
+							$suelaNumero->id_suelas = $model->id;
+							$suelaNumero->save();
+						}
+						$transaction->commit();
+						$this->redirect(array('view','id'=>$model->id));
+					}
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
 			}
-
 		}
 
 		$this->render('update',array(
 			'model'=>$model,
 			'colores'=>$colores,
+			'mensaje_error'=>$mensaje_error,
 		));
 	}
 

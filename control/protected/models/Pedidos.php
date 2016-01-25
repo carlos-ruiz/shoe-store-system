@@ -27,7 +27,9 @@ class Pedidos extends CActiveRecord
 {
 	public $var_cliente_nombre;
 	public $var_estatus;
+	public $var_estatus_pago;
 	public $var_forma_pago;
+	public $pagado;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -46,13 +48,13 @@ class Pedidos extends CActiveRecord
 		return array(
 			array('id_clientes, fecha_pedido, id_formas_pago, total, id_estatus_pedidos, estatus_pagos_id', 'required'),
 			array('id_clientes, id_formas_pago, id_estatus_pedidos, descuento, estatus_pagos_id', 'numerical', 'integerOnly'=>true),
-			array('total', 'safe'),
+			array('pagado', 'numerical'),
 			array('total', 'length', 'max'=>10),
 			array('prioridad', 'length', 'max'=>45),
-			array('fecha_entrega', 'safe'),
+			array('fecha_entrega, total', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_clientes, fecha_pedido, fecha_entrega, id_formas_pago, total, id_estatus_pedidos, prioridad, descuento, var_cliente_nombre, var_estatus, var_forma_pago, estatus_pagos_id', 'safe', 'on'=>'search'),
+			array('id, id_clientes, fecha_pedido, fecha_entrega, id_formas_pago, total, id_estatus_pedidos, prioridad, descuento, var_cliente_nombre, var_estatus, var_estatus_pago, var_forma_pago, estatus_pagos_id, pagado', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -90,8 +92,10 @@ class Pedidos extends CActiveRecord
 			'descuento' => 'Descuento(%)',
 			'var_cliente_nombre' => 'Cliente',
 			'var_estatus' => 'Estatus',
+			'var_estatus_pago' => 'Estatus de pago',
 			'var_forma_pago' => 'Forma de pago',
 			'estatus_pagos_id' => 'Estatus de pago',
+			'pagado' => 'Su pago',
 		);
 	}
 
@@ -122,9 +126,10 @@ class Pedidos extends CActiveRecord
 		$criteria->compare('id_estatus_pedidos',$this->id_estatus_pedidos);
 		$criteria->compare('prioridad',$this->prioridad,true);
 		$criteria->compare('descuento',$this->descuento);
-		$criteria->with = array('cliente', 'estatus', 'formaPago');
+		$criteria->with = array('cliente', 'estatus', 'formaPago', 'estatusPago');
 		$criteria->compare('cliente.nombre', $this->var_cliente_nombre, true);
 		$criteria->compare('estatus.nombre', $this->var_estatus, true);
+		$criteria->compare('estatusPago.nombre', $this->var_estatus_pago, true);
 		$criteria->compare('formaPago.nombre', $this->var_forma_pago, true);
 		$criteria->order='estatus.id ASC, fecha_entrega ASC';
 		$criteria->compare('estatus_pagos_id',$this->estatus_pagos_id);

@@ -13,7 +13,7 @@ $this->menu=array(
 );
 ?>
 
-<h1>Create Tacones</h1>
+<h1>Nuevo tacón</h1>
 
 <?php $this->renderPartial('_form', 
 	array(

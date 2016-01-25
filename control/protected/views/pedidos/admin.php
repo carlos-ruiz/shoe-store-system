@@ -38,11 +38,18 @@ $this->menu=array(
     	array(
 	        'name'=>'var_estatus',
 	        'value'=>'$data->estatus->nombre',
-	        // 'value'=>'$data->a.\' \'.$data->b.\' \'.$data->c',
+    	),
+    	array(
+	        'name'=>'var_estatus_pago',
+	        'value'=>'$data->estatusPago->nombre',
     	),
     	array(
 	        'name'=>'total',
 	        'value'=>'\'$\'.$data->total',
+    	),
+    	array(
+	        'header'=>'Adeudo',
+	        'value'=>array($this, 'calcularAdeudo'),
     	),
     	'prioridad',
 		array(

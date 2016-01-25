@@ -67,14 +67,6 @@ class ZapatosController extends Controller
 		$model=new Zapatos('catalog');
 		$zapatoPrecios=new ZapatoPrecios;
 
-		//parche validacion
-		// $model->numero = 0;
-		// $model->precio = 0;
-		// $model->codigo_barras = 'xxx';
-		// $zapatoPrecios->id_modelos = 0;
-		// $zapatoPrecios->id_suelas = 0;
-		//fin parche validacion
-
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
@@ -118,7 +110,7 @@ class ZapatosController extends Controller
 								$nuevoZapato->id_colores = $modeloColor->id_colores;
 								$nuevoZapato->id_suelas_colores = $suelaColor->id;
 								$nuevoZapato->numero = $numero;
-								$nuevoZapato->codigo_barras = $zapatoPrecios->id_modelos.$modeloColor->color->id.$zapatoPrecios->id_suelas.$numero;
+								$nuevoZapato->codigo_barras = printf('%03d',$zapatoPrecios->id_modelos).printf('%03d', $suelacolor->id).printf('%03d',$modeloColor->id_colores).printf('%03d', $numero);
 								if($numero >= 12 && $numero < 18){
 									$nuevoZapato->precio = $zapatoPrecios->precio_extrachico;
 								}
@@ -147,8 +139,6 @@ class ZapatosController extends Controller
 					$zapatoPreciosExistente->save();
 				}
 				else{
-					// $zapatoPrecios->id_modelos = $model->id_modelos;
-					// $zapatoPrecios->id_suelas = $model->id_suelas;
 					$zapatoPrecios->save();
 				}
 				

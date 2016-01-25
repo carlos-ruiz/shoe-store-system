@@ -37,7 +37,7 @@ class PedidosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente'),
+				'actions'=>array('admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -76,6 +76,7 @@ class PedidosController extends Controller
 			try{
 				$model->attributes=$_POST['Pedidos'];
 				$prioridad = $_POST['Pedidos']['prioridad'];
+				$formaDePagoSeleccionada = $model->id_formas_pago;
 				$model->prioridad = 'NORMAL';
 				if($prioridad == 1){
 					$model->prioridad = 'ALTA';
@@ -87,6 +88,26 @@ class PedidosController extends Controller
 				$newDate = date("Y-m-d H:i:s", strtotime($model->fecha_pedido));
 				$model->fecha_pedido = $newDate;
 				$total = 0;
+				$pagado = 0;
+				if(isset($_POST['Pedidos']['pagado'])){
+					$pagado = $_POST['Pedidos']['pagado'];
+					if($pagado > 0 && $pagado < $_POST['Pedidos']['total']){
+						$formaDePago = FormasPago::model()->find('nombre=? AND activo=1', array('Crédito'));
+						if (isset($formaDePago)) {
+							$model->id_formas_pago = $formaDePago->id;
+						}
+						$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pago parcial'));
+					}
+					else if ($pagado <= 0) {
+						$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pendiente de pago'));	
+					}
+					else{
+						$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pagado'));
+					}
+				}else{
+					$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pendiente de pago'));
+				}
+				$model->estatus_pagos_id = $estatusDePago->id;
 				if($model->save()){
 					if (isset($_POST['Pedido'])) {
 						$datosPedido = $_POST['Pedido'];
@@ -95,16 +116,16 @@ class PedidosController extends Controller
 								if (isset($cantidad) && $cantidad > 0) {
 									$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($datosPedido['modelo'][$id], $datosPedido['color'][$id]));
 									
-									$zapato = Zapatos::model()->find('numero=? AND id_suelas=? AND id_modelos=? AND id_colores=?', array($numero, $datosPedido['suela'][$id], $modeloColor->id_modelos, $modeloColor->id_colores));
+									$zapato = Zapatos::model()->find('numero=? AND id_suelas_colores=? AND id_modelos=? AND id_colores=?', array($numero, $datosPedido['suelacolor'][$id], $modeloColor->id_modelos, $modeloColor->id_colores));
 	
 									if (!isset($zapato)) {
 										$zapato = new Zapatos;
 										$zapato->numero = $numero;
 										$zapato->precio = 0;
-										$zapato->codigo_barras = 'mmccssnn';
+										$zapato->codigo_barras = printf('%03d',$modeloColor->id_modelos).printf('%03d', $datosPedido['suelacolor'][$id]).printf('%03d',$modeloColor->id_colores).printf('%03d', $numero);
 										$zapato->id_modelos = $modeloColor->id_modelos;
 										$zapato->id_colores = $modeloColor->id_colores;
-										$zapato->id_suelas = $datosPedido['suela'][$id];
+										$zapato->id_suelas_colores = $datosPedido['suelacolor'][$id];
 										$zapato->save();
 									}
 									$pedidoZapato = new PedidosZapatos;
@@ -131,6 +152,20 @@ class PedidosController extends Controller
 								$total = $total*(1-$model->descuento/100);
 							}
 							$model->total = $total;
+							if($pagado > 0){
+								$pago = new Pagos;
+								$pago->fecha = date('d-m-Y H:i:s');
+								$pago->descripcion = 'Pago inicial';
+								$pago->id_pedidos = $model->id;
+								$pago->id_formas_pago = $formaDePagoSeleccionada;
+								$pago->importe = $pagado;
+								if ($pagado > $model->total) {
+									$pago->importe = $model->total;
+									$cambio = $pagado - $model->total;
+									echo "<script>alert('$cambio');</script>";
+								}
+								$pago->save();
+							}
 							$model->save();
 						}
 					}
@@ -326,8 +361,14 @@ class PedidosController extends Controller
 	public function actionSuelasPorModelo()
 	{
 		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
-		foreach($list as $data)
-			echo "<option value=\"{$data->suela->id}\">{$data->suela->nombre}</option>";
+		foreach($list as $i => $data){
+			if ($i==0) {
+				echo "<option value=\"{$data->suela->id}\" selected>{$data->suela->nombre}</option>";
+			}
+			else{
+				echo "<option value=\"{$data->suela->id}\">{$data->suela->nombre}</option>";
+			}
+		}
 	}
 
 	public function actionColoresPorModelo()
@@ -344,12 +385,20 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
 	}
 
+	public function actionColoresPorSuela()
+	{
+		$list = SuelasColores::model()->findAll("id_suelas=?",array($_POST["PedidosZapatos"]["id_suelas"]));
+		foreach($list as $data)
+			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+	}
+
 	public function actionAgregarOrden()
 	{
 		if (isset($_POST)) {
 			$modelo = Modelos::model()->findByPk($_POST['id_modelos']);
 			$color = Colores::model()->findByPk($_POST['id_colores']);
 			$suela = Suelas::model()->findByPk($_POST['id_suelas']);
+			$suelaColor = SuelasColores::model()->find('id_suelas=? AND id_colores=?', array($suela->id, $_POST['id_color_suela']));
 			$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($modelo->id));
 			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($modelo->id, $color->id));
 			$numerosPosibles = array();
@@ -370,6 +419,7 @@ class PedidosController extends Controller
 				<td class="modelo" data-id="<?= $modelo->id ?>"><?= $modelo->nombre; ?><input type="hidden" name="Pedido[modelo][<?= $time ?>]" value="<?= $modelo->id ?>"></td>
 				<td class="color" data-id="<?= $color->id ?>"><?= $color->color; ?><input type="hidden" name="Pedido[color][<?= $time ?>]" value="<?= $color->id ?>"></td>
 				<td class="suela" data-id="<?= $suela->id ?>"><?= $suela->nombre; ?><input type="hidden" name="Pedido[suela][<?= $time ?>]" value="<?= $suela->id ?>"></td>
+				<td class="colorsuela" data-id="<?= $suelaColor->id ?>"><?= $suelaColor->color->color; ?><input type="hidden" name="Pedido[suelacolor][<?= $time ?>]" value="<?= $suelaColor->id ?>"></td>
 			
 			<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 				<td data-numero="<?= $i; ?>">
@@ -397,6 +447,19 @@ class PedidosController extends Controller
 		$id_clientes = $_POST['Pedidos']['id_clientes'];
 		$cliente = Clientes::model()->findByPk($id_clientes);
 		echo $cliente->descuento;
+	}
+
+	public function calcularAdeudo($data, $row)
+	{
+		$adeudo = $data->total;
+		$pagos = Pagos::model()->find('id_pedidos=?', array($data->id));
+		if (isset($pagos)) {
+			foreach ($pagos as $pago) {
+				$adeudo = $adeudo - $pagos->importe;
+			}
+		}
+
+		return $adeudo;
 	}
 
 }

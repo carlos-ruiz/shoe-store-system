@@ -23,7 +23,7 @@ $this->menu=array(
 	'attributes'=>array(
 		'id',
 		array(
-			'name'=>'Cliente',
+			'label'=>'Cliente',
 			'value'=>$model->cliente->obtenerNombreCompleto().' ('.$model->cliente->direccion->ciudad.')',
 		),
 		array(
@@ -31,23 +31,27 @@ $this->menu=array(
 			'value'=>date_format(date_create($model->fecha_pedido), 'd-m-Y H:i:s'),
 		),
 		array(
-			'name'=>'Fecha de entrega',
+			'label'=>'Fecha de entrega',
 			'value'=>date_format(date_create($model->fecha_entrega), 'd-m-Y'),
 		),
 		array(
-			'name'=>'Descuento al cliente (%)',
+			'label'=>'Descuento al cliente (%)',
 			'value'=>$model->cliente->descuento,
 		),
 		'descuento',
 		'total',
 		'prioridad',
 		array(
-			'name'=>'Forma de pago',
+			'label'=>'Forma de pago',
 			'value'=>$model->formaPago->nombre,
 		),
 		array(
-			'name'=>'Estatus del pedido',
+			'label'=>'Estatus del pedido',
 			'value'=>$model->estatus->nombre,
+		),
+		array(
+			'label'=>'Estatus del pago',
+			'value'=>$model->estatusPago->nombre,
 		),
 	),
 )); ?>
@@ -64,6 +68,7 @@ $this->menu=array(
 							<th>Modelo</th>
 							<th>Color</th>
 							<th>Suela</th>
+							<th>Color de suela</th>
 							<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 							<th><?php if(fmod($i ,1)==0){ echo $i;} else{echo "-";} ?></th>
 							<?php } ?>
@@ -76,22 +81,26 @@ $this->menu=array(
 							$id_modelo = 0;
 							$id_color = 0;
 							$id_suela = 0;
+							$id_color_suela = 0;
 							$contador = 0;
 							$caracteristicas_especiales = '';
 							foreach ($model->pedidosZapatos as $pedidoZapato) { 
 								if(
 									$pedidoZapato->zapato->modelo->id != $id_modelo ||
 									$pedidoZapato->zapato->color->id != $id_color ||
-									$pedidoZapato->zapato->suela->id != $id_suela || 
+									$pedidoZapato->zapato->suelaColor->suela->id != $id_suela || 
+									$pedidoZapato->zapato->suelaColor->color->id != $id_color_suela || 
 									$pedidoZapato->caracteristicas_especiales != $caracteristicas_especiales
 								) {
 									$contador++;
 									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->modelo->nombre;
 									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->color->color;
-									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->suela->nombre;
+									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->suelaColor->suela->nombre;
+									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->suelaColor->color->color;
 									$zapatosDiferentes[$contador][] = $pedidoZapato->caracteristicas_especiales;
 									$id_modelo = $pedidoZapato->zapato->modelo->id;
-									$id_suela = $pedidoZapato->zapato->suela->id;
+									$id_suela = $pedidoZapato->zapato->suelaColor->suela->id;
+									$id_color_suela = $pedidoZapato->zapato->suelaColor->color->id;
 									$id_color = $pedidoZapato->zapato->color->id;
 									$caracteristicas_especiales = $pedidoZapato->caracteristicas_especiales;
 								}
@@ -107,6 +116,7 @@ $this->menu=array(
 								<td><?= $row[0] ?></td>
 								<td><?= $row[1] ?></td>
 								<td><?= $row[2] ?></td>
+								<td><?= $row[3] ?></td>
 								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 									<?php if(isset($row[''.$i])){ ?>
 										<td><b><?= $row[''.$i] ?></b></td>
@@ -115,10 +125,10 @@ $this->menu=array(
 									<?php } ?>
 								<?php } ?>
 							</tr>
-							<?php if (isset($row[3])) { ?>
+							<?php if (isset($row[4])) { ?>
 								<tr class="<?= $rowOdd==1?'odd':'' ?>">
 									<td colspan="100" class="td-caracteristicas-especiales">
-										<?= $row[3] ?>
+										<?= $row[4] ?>
 									</td>
 								</tr>
 							<?php } ?>
