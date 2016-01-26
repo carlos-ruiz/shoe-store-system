@@ -16,7 +16,7 @@ class PedidosController extends Controller
 	{
 		return array(
 			'accessControl', // perform access control for CRUD operations
-			// 'postOnly + delete', // we only allow deletion via POST request
+			'postOnly + delete', // we only allow deletion via POST request
 		);
 	}
 
@@ -32,12 +32,12 @@ class PedidosController extends Controller
 				'actions'=>array('index','view'),
 				'users'=>array('*'),
 			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
-				'users'=>array('@'),
-			),
+			// array('allow', // allow authenticated user to perform 'create' and 'update' actions
+			// 	'actions'=>array('create','update'),
+			// 	'users'=>array('@'),
+			// ),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'actualizarInventarios'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -210,6 +210,7 @@ class PedidosController extends Controller
 				if($prioridad == 1){
 					$model->prioridad = 'ALTA';
 				}
+				$formaDePagoSeleccionada = $model->id_formas_pago;
 				$date = str_replace('/', '-', $model->fecha_entrega);
 				$newDate = date("Y-m-d", strtotime($date));
 			
@@ -217,6 +218,7 @@ class PedidosController extends Controller
 				$newDate = date("Y-m-d H:i:s", strtotime($model->fecha_pedido));
 				$model->fecha_pedido = $newDate;
 				$total = 0;
+				
 				if($model->save()){
 					if (isset($_POST['Pedido'])) {
 						$datosPedido = $_POST['Pedido'];
@@ -225,16 +227,16 @@ class PedidosController extends Controller
 								if (isset($cantidad) && $cantidad > 0) {
 									$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($datosPedido['modelo'][$id], $datosPedido['color'][$id]));
 									
-									$zapato = Zapatos::model()->find('numero=? AND id_suelas=? AND id_modelos=? AND id_colores=?', array($numero, $datosPedido['suela'][$id], $modeloColor->id_modelos, $modeloColor->id_colores));
+									$zapato = Zapatos::model()->find('numero=? AND id_suelas_colores=? AND id_modelos=? AND id_colores=?', array($numero, $datosPedido['suelacolor'][$id], $modeloColor->id_modelos, $modeloColor->id_colores));
 	
 									if (!isset($zapato)) {
 										$zapato = new Zapatos;
 										$zapato->numero = $numero;
 										$zapato->precio = 0;
-										$zapato->codigo_barras = 'mmccssnn';
+										$zapato->codigo_barras = printf('%03d',$modeloColor->id_modelos).printf('%03d', $datosPedido['suelacolor'][$id]).printf('%03d',$modeloColor->id_colores).printf('%03d', $numero);
 										$zapato->id_modelos = $modeloColor->id_modelos;
 										$zapato->id_colores = $modeloColor->id_colores;
-										$zapato->id_suelas = $datosPedido['suela'][$id];
+										$zapato->id_suelas_colores = $datosPedido['suelacolor'][$id];
 										$zapato->save();
 									}
 									$pedidoZapato = new PedidosZapatos;
@@ -262,6 +264,48 @@ class PedidosController extends Controller
 							}
 							$model->total = $total;
 							$model->save();
+
+							$pagado = 0;
+							if (isset($_POST['Pedidos']['pagado'])) {
+								$pagado = $_POST['Pedidos']['pagado'];
+								if ($pagado > 0){
+									if($pagado >= $model->obtenerAdeudo()) {
+										$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pagado'));
+									}
+									else{
+										$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pago parcial'));
+										$formaDePago = FormasPago::model()->find('nombre=? AND activo=1', array('Crédito'));
+										$model->id_formas_pago = $formaDePago->id;
+									}
+									$model->estatus_pagos_id = $estatusDePago->id;
+									$model->save();
+									$pago = new Pagos;
+									$pago->fecha = date('d-m-Y H:i:s');
+									$pago->descripcion = 'Pago adicional';
+									$pago->id_pedidos = $model->id;
+									$pago->id_formas_pago = $formaDePagoSeleccionada;
+									$pago->importe = $pagado;
+									if ($pagado > $model->total) {
+										$pago->importe = $model->total;
+										$cambio = $pagado - $model->total;
+										echo "<script>alert('$cambio');</script>";
+									}
+									$pago->save();
+
+								}
+							}
+							if($model->obtenerAdeudo() < 0){
+								$pagoCambio = new Pagos;
+								$pagoCambio->fecha = date('d-m-Y H:i:s');
+								$pagoCambio->descripcion = 'Cambio';
+								$pagoCambio->id_pedidos = $model->id;
+								$pagoCambio->id_formas_pago = $formaDePagoSeleccionada;
+								$pagoCambio->importe = $model->obtenerAdeudo();
+								$pagoCambio->save();
+								$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pagado'));
+								$model->estatus_pagos_id = $estatusDePago->id;
+								$model->save();
+							}
 						}
 					}
 					$transaction->commit();
@@ -269,6 +313,8 @@ class PedidosController extends Controller
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
+				print_r($ex);
+				return;
 			}
 		}
 
@@ -452,14 +498,19 @@ class PedidosController extends Controller
 	public function calcularAdeudo($data, $row)
 	{
 		$adeudo = $data->total;
-		$pagos = Pagos::model()->find('id_pedidos=?', array($data->id));
-		if (isset($pagos)) {
+		$pagos = Pagos::model()->findAll('id_pedidos=?', array($data->id));
+		if (isset($pagos) && sizeof($pagos) > 0) {
 			foreach ($pagos as $pago) {
-				$adeudo = $adeudo - $pagos->importe;
+				$adeudo = $adeudo - $pago->importe;
 			}
 		}
+		return '$'.number_format($adeudo, 2, '.', '');
+	}
 
-		return $adeudo;
+	public function actionActualizarInventarios($id_pedidos)
+	{
+		$pedido = $this->loadModel($id_pedidos);
+		// Aqui se va a hacer todo el descuento de materiales, suelas, etc.
 	}
 
 }

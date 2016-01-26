@@ -154,13 +154,15 @@
 		$id_modelo = 0;
 		$id_color = 0;
 		$id_suela = 0;
+		$id_color_suela = 0;
 		$contador = 0;
 		$caracteristicas_especiales = '';
 		foreach ($model->pedidosZapatos as $pedidoZapato) { 
 			if(
 				$pedidoZapato->zapato->modelo->id != $id_modelo ||
 				$pedidoZapato->zapato->color->id != $id_color ||
-				$pedidoZapato->zapato->suela->id != $id_suela || 
+				$pedidoZapato->zapato->suelaColor->suela->id != $id_suela || 
+				$pedidoZapato->zapato->suelaColor->color->id != $id_color_suela || 
 				$pedidoZapato->caracteristicas_especiales != $caracteristicas_especiales
 			) {
 				$contador++;
@@ -168,11 +170,14 @@
 				$zapatosDiferentes[$contador]['modelo'] = $pedidoZapato->zapato->modelo->nombre;
 				$zapatosDiferentes[$contador]['id_color'] = $pedidoZapato->zapato->color->id;
 				$zapatosDiferentes[$contador]['color'] = $pedidoZapato->zapato->color->color;
-				$zapatosDiferentes[$contador]['id_suela'] = $pedidoZapato->zapato->suela->id;
-				$zapatosDiferentes[$contador]['suela'] = $pedidoZapato->zapato->suela->nombre;
+				$zapatosDiferentes[$contador]['id_suela'] = $pedidoZapato->zapato->suelaColor->id_suelas;
+				$zapatosDiferentes[$contador]['suela'] = $pedidoZapato->zapato->suelaColor->suela->nombre;
+				$zapatosDiferentes[$contador]['id_suelacolor'] = $pedidoZapato->zapato->suelaColor->id;
+				$zapatosDiferentes[$contador]['colorsuela'] = $pedidoZapato->zapato->suelaColor->color->color;
 				$zapatosDiferentes[$contador]['especial'] = $pedidoZapato->caracteristicas_especiales;
 				$id_modelo = $pedidoZapato->zapato->modelo->id;
-				$id_suela = $pedidoZapato->zapato->suela->id;
+				$id_suela = $pedidoZapato->zapato->suelaColor->id_suelas;
+				$id_color_suela = $pedidoZapato->zapato->suelaColor->id_colores;
 				$id_color = $pedidoZapato->zapato->color->id;
 				$caracteristicas_especiales = $pedidoZapato->caracteristicas_especiales;
 			}
@@ -217,6 +222,9 @@
 									</td>
 									<td class="suela" data-id="<?= $row['id_suela'] ?>">
 										<?= $row['suela'] ?><input type="hidden" name="Pedido[suela][<?= $time ?>]" value="<?= $row['id_suela'] ?>">
+									</td>
+									<td class="colorsuela" data-id="<?= $row['id_suelacolor'] ?>">
+										<?= $row['colorsuela'] ?><input type="hidden" name="Pedido[suelacolor][<?= $time ?>]" value="<?= $row['id_suelacolor'] ?>">
 									</td>
 								
 								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
@@ -287,6 +295,17 @@
 				</div>
 			</div>
 		</div>
+		<?php if (!$model->isNewRecord) { ?>
+		<div class="row">
+			<div class="col-md-8"></div>
+			<div class="form-group col-md-4 ">
+				<label class="control-label" for="PedidosTemp_pago_anterior">Monto pagado ($)</label>
+				<div class="input-group">
+					<input size="60" maxlength="128" class="form-control" readonly="readonly" name="PedidosTemp[pago_anterior]" id="PedidosTemp_pago_anterior" type="text" value="<?= number_format($model->obtenerMontoPagado(), 2, '.', '') ?>">
+				</div>
+			</div>
+		</div>
+		<?php } ?>
 		<div class="row">
 			<div class="col-md-8"></div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'pagado')!=''){ echo 'has-error'; }?>">
@@ -294,6 +313,15 @@
 				<div class="input-group">
 					<?php echo $form->textField($model,'pagado',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
 					<?php echo $form->error($model,'pagado', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8"></div>
+			<div class="form-group col-md-4 ">
+				<label class="control-label" for="PedidosTemp_pago_pendiente">Monto pendiente ($)</label>
+				<div class="input-group">
+					<input size="60" maxlength="128" class="form-control" readonly="readonly" name="PedidosTemp[pago_pendiente]" id="PedidosTemp_pago_pendiente" type="text" value="<?= number_format(($model->total - $model->obtenerMontoPagado()), 2, '.', '') ?>">
 				</div>
 			</div>
 		</div>
@@ -335,7 +363,7 @@
 
 	jQuery(function($) {
 		jQuery('body').on('change','#PedidosZapatos_id_modelos',function(){
-			jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_colores").html(html)}});
+			jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_colores").html(html);}});
 			jQuery.ajax({'url':'/controlbom/control/pedidos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 					jQuery("#PedidosZapatos_id_suelas").html(html);
 					actualizarColoresSuelas();
@@ -346,8 +374,9 @@
 	});
 
 	function actualizarColoresSuelas(){
-		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html)}});
+		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html);}});
 	}
+
 	$('#boton_agregar_orden').click(function(){
 		id_modelos = $('#PedidosZapatos_id_modelos').val();
 		id_colores = $('#PedidosZapatos_id_colores').val();
@@ -372,6 +401,7 @@
 					$("#ordenes_table").append(data);
 					limpiarCamposOrden();
 					calcularTotal();
+					calcularMontoPendiente();
 				}
 			);
 		}else{
@@ -394,10 +424,10 @@
 			cantidad = 0;
 			$(this).val(cantidad);
 		}
-		if($(this).val()==''){
+		if($(this).val()===''){
 			$(this).val(0);
 		}
-		$("#ordenes_table :input").attr("disabled", "disabled");
+		$(".panel-ordenes").block({message:'Espere...'});
 		$.post(
 			"<?php echo $this->createUrl('zapatoprecios/consultarprecio/');?>",
 			{
@@ -411,19 +441,24 @@
 				if(/^([0-9])*$/.test(valorAnterior)){
 					total -= (valorAnterior*precio);
 				}
-				$('#Pedidos_subtotal').val(''+total.toFixed(2))
+				$('#Pedidos_subtotal').val(''+total.toFixed(2));
 				calcularTotal();
-				$("#ordenes_table :input").removeAttr("disabled");
+				calcularMontoPendiente();
+				$(".panel-ordenes").unblock();
 			}
 		);
 	});
 
+	$(document).on("change","#Pedidos_pagado", function(){
+		calcularMontoPendiente();
+	});
 	$(document).on("change","#Pedidos_descuento", function(){
 		if($(this).val() < 0 || $(this).val() > 100){
 			alert('El descuento debe ser un número entre 0 y 100');
 			$(this).val('0');
 		}
 		calcularTotal();
+		calcularMontoPendiente();
 	});
 
 	$(document).on("click","a.delete", function(){
@@ -441,6 +476,7 @@
 				total -= reduccion;
 				$('#Pedidos_subtotal').val(''+total.toFixed(2));
 				calcularTotal();
+				calcularMontoPendiente();
 			}
 		});
 		idTrEspecial = $(this).parent().parent().attr('id');
@@ -474,5 +510,22 @@
 		granTotal = granTotal * ((100-descuentoCliente)/100);
 		granTotal = granTotal * ((100-descuentoPedido)/100);
 		$('#Pedidos_total').attr("value", granTotal.toFixed(2));
+	}
+
+	function calcularMontoPendiente(){
+		total = parseFloat($('#Pedidos_total').val());
+		if(isNaN(total)){
+			total = 0;
+		}
+		pagado = parseFloat($('#PedidosTemp_pago_anterior').val());
+		if(isNaN(pagado)){
+			pagado = 0;
+		}
+		pagoActual = parseFloat($('#Pedidos_pagado').val());
+		if(isNaN(pagoActual)){
+			pagoActual = 0;
+		}
+		pendiente = total-pagado-pagoActual;
+		$('#PedidosTemp_pago_pendiente').val(pendiente.toFixed(2));
 	}
 </script>

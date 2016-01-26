@@ -149,4 +149,26 @@ class Pedidos extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerAdeudo()
+	{
+		$adeudo = $this->total;
+		$pagos = Pagos::model()->findAll('id_pedidos=?', array($this->id));
+		foreach ($pagos as $pago) {
+			$adeudo -= $pago->importe; 
+		}
+		return $adeudo;
+	}
+
+	public function obtenerMontoPagado()
+	{
+		$pagado = 0;
+		if (isset($this->id)) {
+			$pagos = Pagos::model()->findAll('id_pedidos=?', array($this->id));
+			foreach ($pagos as $pago) {
+				$pagado += $pago->importe; 
+			}
+		}
+		return $pagado;
+	}
 }

@@ -46,7 +46,7 @@
                     <button type="button" data-toggle="collapse" data-target=".sidebar-collapse" class="navbar-toggle">
                         <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
                     </button>
-                    <a id="logo" href="<?= Yii::app()->request->baseUrl; ?>/site/index" class="navbar-brand">
+                    <a id="logo" href="<?= Yii::app()->request->baseUrl; ?>/site/index" class="logo navbar-brand">
                         <span class="fa fa-rocket"></span><span class="logo-text"><img height="40px" src="<?= Yii::app()->request->baseUrl; ?>/images/icons/logo.png"></span><span style="display: none" class="logo-text-icon">µ</span>
                     </a>
                 </div>
@@ -101,6 +101,7 @@
 
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/zabuto_calendar.min.js"></script>
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/index.js"></script>
+    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/jquery.blockUI.js"></script>
     <!--LOADING SCRIPTS FOR CHARTS-->
     <!--
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/highcharts.js"></script>
@@ -117,7 +118,6 @@
     <!-- DateTime Pickers -->
     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-
     <script>
         $('.datepicker').datepicker();
     </script>

@@ -18,16 +18,16 @@
 }
 
 .btn-red-stripped {
-	background-color: #C12F2F !important;
+	background-color: #C12F2F;
     border-radius: 10px !important;
-    border-left: solid 5px #333 !important;
-    color: white !important;
+    border-left: solid 5px #333;
+    color: white;
 }
 
 .btn-red-stripped:hover {
-	color: black !important;
-	background-color: #B94646 !important;
-	border-left: solid 5px #5D5D5D !important;
+	color: black;
+	background-color: #B94646;
+	border-left: solid 5px #5D5D5D;
 }
 
 .navbar-static-side ul li.active a{
@@ -41,7 +41,7 @@
     color: #FFF;
 }
 
-.grid-view table.items tr.odd {
+.grid-view .items tr.odd {
     background: #F4E5E6;
 }
 
@@ -83,7 +83,7 @@ hr {
 	text-align: right;
 }
 
-a#logo {
+.logo {
 	padding: 5px;
 }
 
@@ -95,7 +95,7 @@ ul.submenu li {
 	padding: 10px 0;
 }
 
-ul.submenu li.submenu-active {
+ul.submenu .submenu-active {
 	background-color: #A56464;
 }
 
@@ -107,17 +107,12 @@ ul.submenu li.submenu-active {
 	padding: 15px !important;
 }
 
-table.detail-view tr.odd {
+.detail-view tr.odd {
     background: #F4E5E6;
 }
 
 #content {
 	margin-bottom: 80px;
-}
-
-.btn-tin {
-	padding: 0px 5px !important;
-    margin-left: 5px;
 }
 
 .panel-ordenes {
@@ -129,6 +124,12 @@ table.detail-view tr.odd {
 	padding: 0px !important;
 }
 
+
+td.td-caracteristicas-especiales {
+	text-align: left !important;
+	color: red;
+	padding-left: 8px !important;
+}
 .padding-top {
 	padding-top: 1.5em;
 }
@@ -139,12 +140,6 @@ table.detail-view tr.odd {
     font-weight: bold;
     padding: 5px;
     border-radius: 10px
-}
-
-td.td-caracteristicas-especiales {
-	text-align: left !important;
-	color: red;
-	padding-left: 8px !important;
 }
 
 #ordenes_table .odd {

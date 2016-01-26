@@ -53,6 +53,10 @@ $this->menu=array(
 			'label'=>'Estatus del pago',
 			'value'=>$model->estatusPago->nombre,
 		),
+		array(
+			'label'=>'Cantidad por pagar',
+			'value'=>'$'.number_format($model->obtenerAdeudo(), 2),
+		),
 	),
 )); ?>
 <div class="descripcion-pedido form-body">
