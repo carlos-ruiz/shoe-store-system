@@ -26,7 +26,11 @@ $this->menu=array(
 	'columns'=>array(
 		'id',
 		'nombre',
-		'imagen',
+		array(
+            'name'  => 'imagen',
+            'type'  => 'raw',
+            'value' => 'CHtml::image($data->imagen,"",array(\'height\'=>\'50\'))',
+        ),
 		array(
 			'class'=>'CButtonColumn',
 		),

@@ -15,21 +15,27 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-green"></div>
                 </i><span class="menu-title">Colores</span></a>
             </li>
-            <li class="<?php if($this->section == 'suelas'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/suelas/admin"><i class="fa fa-database fa-fw">
-                <div class="icon-bg bg-violet"></div>
-                </i><span class="menu-title">Suelas</span></a>
-            </li>
-            <li class="<?php if($this->section == 'tacones'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/tacones/admin"><i class="fa fa-database fa-fw">
-                <div class="icon-bg bg-violet"></div>
-                </i><span class="menu-title">Tacones</span></a>
-            </li>
-            <li class="<?php if($this->section == 'agujetas'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/agujetas/admin"><i class="fa fa-random fa-fw">
-                <div class="icon-bg bg-violet"></div>
-                </i><span class="menu-title">Agujetas</span></a>
-            </li>
-            <li class="<?php if($this->section == 'ojillos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/ojillos/admin"><i class="fa fa-circle-o fa-fw">
-                <div class="icon-bg bg-violet"></div>
-                </i><span class="menu-title">Ojillos</span></a>
+            <li class="menu <?php if($this->section == 'materiaPrima'){ echo 'active'; } ?>"><a href="#"><i class="fa fa-chevron-circle-down fa-fw">
+                <div class="icon-bg bg-red"></div>
+                </i><span class="menu-title">Materias primas</span></a>
+                <ul class="submenu">
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'suelas'){ echo 'submenu-active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/suelas/admin"><i class="fa fa-database fa-fw">
+                        <div class="icon-bg bg-violet"></div>
+                        </i><span class="menu-title">Suelas</span></a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'tacones'){ echo 'submenu-active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/tacones/admin"><i class="fa fa-level-up fa-fw">
+                        <div class="icon-bg bg-violet"></div>
+                        </i><span class="menu-title">Tacones</span></a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'agujetas'){ echo 'submenu-active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/agujetas/admin"><i class="fa fa-random fa-fw">
+                        <div class="icon-bg bg-violet"></div>
+                        </i><span class="menu-title">Agujetas</span></a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'ojillos'){ echo 'submenu-active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/ojillos/admin"><i class="fa fa-circle-o fa-fw">
+                        <div class="icon-bg bg-violet"></div>
+                        </i><span class="menu-title">Ojillos</span></a>
+                    </li>
+                </ul>
             </li>
             <li class="<?php if($this->section == 'clientes'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/clientes/admin"><i class="fa fa-users fa-fw">
                 <div class="icon-bg bg-blue"></div>
@@ -108,7 +114,15 @@ data-position="right" class="navbar-default navbar-static-side">
                             <i class="fa fa-sort-numeric-asc fa-fw">
                                 <div class="icon-bg bg-red"></div>
                             </i>
-                            <span class="menu-title">Configurar números</span>
+                            <span class="menu-title">Modelos-Suelas números</span>
+                        </a>
+                    </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'numeros_suelas_tacones'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/suelastaconesnumeros/admin">
+                            <i class="fa fa-sort-numeric-desc fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Suelas-Tacones números</span>
                         </a>
                     </li>
                 </ul>
@@ -128,6 +142,6 @@ data-position="right" class="navbar-default navbar-static-side">
         }
     });
     $('.menu>a').click(function(){
-        $(".submenu").toggle();
+        $(this).parent().children(".submenu").slideToggle();
     });
 </script>

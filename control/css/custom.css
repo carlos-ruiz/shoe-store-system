@@ -124,6 +124,14 @@ ul.submenu .submenu-active {
 	padding: 0px !important;
 }
 
+.without-padding-table th, .without-padding-table td {
+	padding: 0 !important;
+	text-align: center;
+}
+
+.without-padding-table td input{
+	text-align: center;
+}
 
 td.td-caracteristicas-especiales {
 	text-align: left !important;

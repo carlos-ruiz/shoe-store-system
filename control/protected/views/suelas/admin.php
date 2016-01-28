@@ -16,6 +16,7 @@ $this->menu=array(
 <h1>Administración de suelas</h1>
 
 <div class="text-right">
+	<?php echo CHtml::link('<i class="fa fa-plus"></i> Agregar a inventario', array('suelas/agregarInventario'), array('class'=>'btn btn-red-stripped')); ?>
 	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nueva', array('suelas/create'), array('class'=>'btn btn-red-stripped')); ?>
 </div>
 

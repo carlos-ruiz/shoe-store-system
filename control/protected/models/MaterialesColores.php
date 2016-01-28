@@ -52,8 +52,8 @@ class MaterialesColores extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id_materiales' => 'Id Materiales',
-			'id_colores' => 'Id Colores',
+			'id_materiales' => 'Material',
+			'id_colores' => 'Color',
 		);
 	}
 

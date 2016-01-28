@@ -3,12 +3,11 @@
 
 $this->breadcrumbs=array(
 	'Inventarios',
-	);
-	?>
+);
+?>
 <div id="tab-general">
 	<div class="row mbl">
 		<div class="col-lg-12">
-
 			<div class="col-md-12">
 				<div id="area-chart-spline" style="width: 100%; height: 300px; display: none;">
 				</div>
@@ -26,6 +25,9 @@ $this->breadcrumbs=array(
 					</li>
 					<li>
 						<a href="#terminados-tab" data-toggle="tab">Zapatos terminados</a>
+					</li>
+					<li>
+						<a href="<?= Yii::app()->request->baseUrl ?>/inventarios/admin">Todos</a>
 					</li>
 				</ul>
 				<div id="generalTabContent" class="tab-content responsive">

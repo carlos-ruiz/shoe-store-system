@@ -18,14 +18,26 @@ $this->menu=array(
 
 <h1>Material #<?php echo $model->id.' - '.$model->nombre; ?></h1>
 
-<?php $this->widget('zii.widgets.CDetailView', array(
-	'data'=>$model,
-	'attributes'=>array(
-		'id',
-		'nombre',
-		'unidad_medida',
-	),
-)); ?>
+<div class="row">
+	<div class="col-md-6">
+	<h3>General</h3>
+		<?php $this->widget('zii.widgets.CDetailView', array(
+			'data'=>$model,
+			'attributes'=>array(
+				'nombre',
+				'unidad_medida',
+			),
+		)); ?>
+	</div>
+	<div class="col-md-4">
+		<h3>Colores</h3>
+		<ul>
+			<?php foreach ($model->colores as $materialColor) { ?>
+				<li><?= $materialColor->color->color ?></li>
+			<?php } ?>
+		</ul>
+	</div>
+</div>
 
 <?php if(!Yii::app()->user->isGuest) { ?>
 	<div class="row">

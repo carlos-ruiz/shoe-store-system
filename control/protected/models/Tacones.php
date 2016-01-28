@@ -50,6 +50,7 @@ class Tacones extends CActiveRecord
 			'suelas' => array(self::MANY_MANY, 'Suelas', 'suelas_tacones(id_tacones, id_suelas)'),
 			'taconesColores' => array(self::HAS_MANY, 'TaconesColores', 'id_tacones'),
 			'taconesNumeros' => array(self::HAS_MANY, 'TaconesNumeros', 'id_tacones'),
+			'taconesSuelas' => array(self::HAS_MANY, 'SuelasTacones', 'id_tacones'),
 		);
 	}
 

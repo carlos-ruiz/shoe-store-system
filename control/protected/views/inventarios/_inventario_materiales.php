@@ -12,6 +12,7 @@
                     <th>Unidad de medida</th>
                     <th>Existencia</th>
                     <th>Apartada</th>
+                    <th>Precio</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,6 +27,7 @@
                         <td><?= $inventarioMaterial->material->unidad_medida ?></td>
                         <td><?= $inventarioMaterial->existencia ?></td>
                         <td><?= isset($inventarioMaterial->cantidad_apartada)?$inventarioMaterial->cantidad_apartada:0 ?></td>
+                        <td><?= isset($inventarioMaterial->ultimo_precio)?$inventarioMaterial->ultimo_precio:0 ?></td>
                     </tr>
                 <?php } ?>
             </tbody>

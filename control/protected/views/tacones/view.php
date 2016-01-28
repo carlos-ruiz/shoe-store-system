@@ -35,6 +35,14 @@ $this->menu=array(
 			<?php } ?>
 		</ul>
 	</div>
+	<div class="col-md-4">
+		<h3>Suelas</h3>
+		<ul>
+			<?php foreach ($model->taconesSuelas as $taconSuela) { ?>
+				<li><?= $taconSuela->suela->nombre ?></li>
+			<?php } ?>
+		</ul>
+	</div>
 </div>
 
 <?php if(!Yii::app()->user->isGuest) { ?>

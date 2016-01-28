@@ -5,18 +5,24 @@
  *
  * The followings are the available columns in table 'inventarios':
  * @property integer $id
+ * @property integer $id_tipos_articulos_inventario
+ * @property integer $id_articulo
+ * @property string $nombre_articulo
+ * @property double $numero
+ * @property integer $id_colores
  * @property double $cantidad_existente
  * @property double $cantidad_apartada
  * @property string $unidad_medida
  * @property string $ultimo_precio
- * @property integer $id_tipos_articulos_inventario
- * @property integer $id_articulo
  *
  * The followings are the available model relations:
  * @property TiposArticulosInventario $idTiposArticulosInventario
  */
 class Inventarios extends CActiveRecord
 {
+	public $var_tipo_articulo;
+	public $var_color;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -33,14 +39,14 @@ class Inventarios extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('cantidad_existente, unidad_medida, ultimo_precio, id_tipos_articulos_inventario, id_articulo', 'required'),
-			array('id_tipos_articulos_inventario, id_articulo', 'numerical', 'integerOnly'=>true),
-			array('cantidad_existente, cantidad_apartada', 'numerical'),
+			array('id_tipos_articulos_inventario, id_articulo, cantidad_existente, unidad_medida, ultimo_precio', 'required'),
+			array('id_tipos_articulos_inventario, id_articulo, id_colores', 'numerical', 'integerOnly'=>true),
+			array('numero, cantidad_existente, cantidad_apartada', 'numerical'),
 			array('unidad_medida', 'length', 'max'=>45),
 			array('ultimo_precio', 'length', 'max'=>7),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, id_tipos_articulos_inventario, id_articulo', 'safe', 'on'=>'search'),
+			array('id, id_tipos_articulos_inventario, id_articulo, nombre_articulo, numero, id_colores, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, var_tipo_articulo, var_color', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -51,8 +57,17 @@ class Inventarios extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
+		// $relations = array();
+		// $relations['tipoArticulo'] = array(self::BELONGS_TO, 'TiposArticulosInventario', 'id_tipos_articulos_inventario');
+		// $relations['color'] = array(self::BELONGS_TO, 'Colores', 'id_colores');
+
+		// return $relations;
 		return array(
-			'idTiposArticulosInventario' => array(self::BELONGS_TO, 'TiposArticulosInventario', 'id_tipos_articulos_inventario'),
+			'tipoArticulo' => array(self::BELONGS_TO, 'TiposArticulosInventario', 'id_tipos_articulos_inventario'),
+			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
+			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_articulo'),
+			'material' => array(self::BELONGS_TO, 'Materiales', 'id_articulo'),
+			'agujeta' => array(self::BELONGS_TO, 'Agujetas', 'id_articulo'),
 		);
 	}
 
@@ -63,12 +78,17 @@ class Inventarios extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'cantidad_existente' => 'Cantidad Existente',
-			'cantidad_apartada' => 'Cantidad Apartada',
-			'unidad_medida' => 'Unidad Medida',
-			'ultimo_precio' => 'Ultimo Precio',
-			'id_tipos_articulos_inventario' => 'Id Tipos Articulos Inventario',
-			'id_articulo' => 'Id Articulo',
+			'id_tipos_articulos_inventario' => 'Tipo de artículo',
+			'id_articulo' => 'Artículo',
+			'numero' => 'Número',
+			'id_colores' => 'Color',
+			'cantidad_existente' => 'Cantidad existente',
+			'cantidad_apartada' => 'Cantidad apartada',
+			'unidad_medida' => 'Unidad de medida',
+			'ultimo_precio' => 'Último precio',
+			'var_tipo_articulo' => 'Tipo de artículo',
+			'var_color' => 'Color',
+			'nombre_articulo' => 'Artículo',
 		);
 	}
 
@@ -90,13 +110,19 @@ class Inventarios extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
+		$criteria->compare('t.id',$this->id);
+		$criteria->compare('id_tipos_articulos_inventario',$this->id_tipos_articulos_inventario);
+		$criteria->compare('id_articulo',$this->id_articulo);
+		$criteria->compare('nombre_articulo',$this->nombre_articulo,true);
+		$criteria->compare('numero',$this->numero);
+		$criteria->compare('id_colores',$this->id_colores);
 		$criteria->compare('cantidad_existente',$this->cantidad_existente);
 		$criteria->compare('cantidad_apartada',$this->cantidad_apartada);
 		$criteria->compare('unidad_medida',$this->unidad_medida,true);
 		$criteria->compare('ultimo_precio',$this->ultimo_precio,true);
-		$criteria->compare('id_tipos_articulos_inventario',$this->id_tipos_articulos_inventario);
-		$criteria->compare('id_articulo',$this->id_articulo);
+		$criteria->with = array('tipoArticulo', 'color');
+		$criteria->compare('tipoArticulo.tipo', $this->var_tipo_articulo, true);
+		$criteria->compare('color.color', $this->var_color, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

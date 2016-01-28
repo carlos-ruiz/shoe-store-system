@@ -20,25 +20,29 @@
 		<div class="form-group <?php if($form->error($model,'id_materiales')!=''){ echo 'has-error'; }?>">
 			<?php echo $form->labelEx($model,'id_materiales', array('class'=>'control-label')); ?>
 			<div class="input-group">
-				<?php echo $form->dropDownList($model,'id_materiales', $model->obtenerMateriales(), array('class' => 'form-control',"empty"=>"Seleccione una opci&oacute;n")); ?>
+				<?php 
+					$htmlOptions = array(
+						"ajax"=>array(
+							"url"=>$this->createUrl("inventarios/agregarForm"),
+							// "url"=>$this->createUrl("inventarios/unidadMedidaMaterial"),
+                            // $('#unidad_medida_label').attr('value',data);
+							"type"=>"POST",
+							"update"=>"#form_container"
+							// "success"=>"function(data)
+       //                      {
+       //                      	$('#form_container').attr('value',data);
+       //                      }"
+						),
+						"class" => "form-control",
+						"empty"=>"Seleccione una opci&oacute;n",
+					);
+				?>
+				<?php echo $form->dropDownList($model,'id_materiales', $model->obtenerMateriales(), $htmlOptions); ?>
 				<?php echo $form->error($model,'id_materiales', array('class'=>'help-block')); ?>
 			</div>
 		</div>
-
-		<div class="form-group <?php if($form->error($model,'cantidad')!=''){ echo 'has-error'; }?>">
-			<?php echo $form->labelEx($model,'cantidad', array('class'=>'control-label')); ?>
-			<div class="input-group">
-				<?php echo $form->textField($model,'cantidad',array('size'=>45,'maxlength'=>45, 'class'=>'form-control')); ?>
-				<?php echo $form->error($model,'cantidad', array('class'=>'help-block')); ?>
-			</div>
-		</div>
-
-		<div class="form-group <?php if($form->error($model,'ultimo_precio')!=''){ echo 'has-error'; }?>">
-			<?php echo $form->labelEx($model,'ultimo_precio', array('class'=>'control-label')); ?>
-			<div class="input-group">
-				<?php echo $form->textField($model,'ultimo_precio',array('size'=>45,'maxlength'=>45, 'class'=>'form-control')); ?>
-				<?php echo $form->error($model,'ultimo_precio', array('class'=>'help-block')); ?>
-			</div>
+		<div id="form_container">
+			
 		</div>
 
 		<div class="form-group">

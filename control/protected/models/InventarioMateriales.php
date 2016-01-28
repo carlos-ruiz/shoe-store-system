@@ -62,7 +62,7 @@ class InventarioMateriales extends CActiveRecord
 			'id' => 'ID',
 			'existencia' => 'Existencia',
 			'cantidad_apartada' => 'Cantidad apartada',
-			'id_materiales' => 'Id Materiales',
+			'id_materiales' => 'Material',
 			'cantidad' => 'Cantidad',
 			'ultimo_precio' => 'Último precio',
 		);

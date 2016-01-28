@@ -41,6 +41,8 @@ class SuelasTacones extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
+			'tacon' => array(self::BELONGS_TO, 'Tacones', 'id_tacones'),
 		);
 	}
 

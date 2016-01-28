@@ -2,7 +2,8 @@
 
 class TaconesController extends Controller
 {
-	public $section = 'tacones';
+	public $section = 'materiaPrima';
+	public $subsection = 'tacones';
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -65,6 +66,7 @@ class TaconesController extends Controller
 	{
 		$model=new Tacones;
 		$colores = Colores::model()->findAll();
+		$suelas = Suelas::model()->findAll();
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -85,6 +87,12 @@ class TaconesController extends Controller
 					$suelaNumero->id_tacones = $model->id;
 					$suelaNumero->save();
 				}
+				foreach ($_POST['TaconesSuelas']['id_suelas'] as $id_suela => $value) {
+					$suelaTacon = new SuelasTacones;
+					$suelaTacon->id_suelas = $id_suela;
+					$suelaTacon->id_tacones = $model->id;
+					$suelaTacon->save();
+				}
 				$this->redirect(array('view','id'=>$model->id));
 			}
 		}
@@ -92,6 +100,7 @@ class TaconesController extends Controller
 		$this->render('create',array(
 			'model'=>$model,
 			'colores'=>$colores,
+			'suelas'=>$suelas,
 		));
 	}
 
@@ -104,21 +113,94 @@ class TaconesController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$colores = Colores::model()->findAll();
-		
+		$suelas = Suelas::model()->findAll();
+
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Tacones']))
 		{
 			$model->attributes=$_POST['Tacones'];
-			if($model->save()){
-				$this->redirect(array('view','id'=>$model->id));
+			$transaction = Yii::app()->db->beginTransaction();
+			try{
+				if($model->save()){
+					$ids_colores_seleccionados = array();
+					if (isset($_POST['TaconesColores']['id_colores'])) {
+						foreach ($_POST['TaconesColores']['id_colores'] as $id => $value) {
+							array_push($ids_colores_seleccionados, $id);
+						}
+					}
+					foreach ($model->taconesColores as $taconColor) {
+						if(!in_array($taconColor->id_colores, $ids_colores_seleccionados)){
+							$taconColor->delete();
+						}else{
+							$ids_colores_seleccionados = array_diff($ids_colores_seleccionados, array($taconColor->id_colores));
+						}
+					}
+
+					$ids_numeros_seleccionados = array();
+					if (isset($_POST['TaconesNumeros']['numero'])) {
+						foreach ($_POST['TaconesNumeros']['numero'] as $numero => $value) {
+							array_push($ids_numeros_seleccionados, $numero);
+						}
+					}
+					foreach ($model->taconesNumeros as $taconNumero) {
+						if(!in_array($taconNumero->numero, $ids_numeros_seleccionados)){
+							foreach ($taconNumero->suelasTaconesNumeros as $suelaTaconNumero) {
+								$suelaTaconNumero->delete();
+							}
+							$taconNumero->delete();
+						}else{
+							$ids_numeros_seleccionados = array_diff($ids_numeros_seleccionados, array($taconNumero->numero));
+						}
+					}
+
+					$ids_suelas_seleccioandas = array();
+					if (isset($_POST['TaconesSuelas']['id_suelas'])) {
+						foreach ($_POST['TaconesSuelas']['id_suelas'] as $id => $value) {
+							array_push($ids_suelas_seleccioandas, $id);
+						}
+					}
+					foreach ($model->taconesSuelas as $taconSuela) {
+						if(!in_array($taconSuela->id_suelas, $ids_suelas_seleccioandas)){
+							$taconSuela->delete();
+						}
+						else{
+							$ids_suelas_seleccioandas = array_diff($ids_suelas_seleccioandas, array($taconSuela->id_suelas));
+						}
+					}
+					foreach ($ids_colores_seleccionados as $id) {
+						$suelaColor = new TaconesColores;
+						$suelaColor->id_tacones = $model->id;
+						$suelaColor->id_colores = $id;
+						$suelaColor->save();
+					}
+					foreach ($ids_numeros_seleccionados as $numero) {
+						$suelaNumero = new TaconesNumeros;
+						$suelaNumero->numero = $numero;
+						$suelaNumero->id_tacones = $model->id;
+						$suelaNumero->save();
+					}
+					foreach ($ids_suelas_seleccioandas as $id_suela) {
+						$suelaTacon = new SuelasTacones;
+						$suelaTacon->id_suelas = $id_suela;
+						$suelaTacon->id_tacones = $model->id;
+						$suelaTacon->save();
+					}
+					$transaction->commit();
+					$this->redirect(array('view','id'=>$model->id));
+				}
+			}catch(Exception $ex){
+				$transaction->rollback();
+				print_r($ex);
+				return;
 			}
 		}
 
 		$this->render('update',array(
 			'model'=>$model,
 			'colores'=>$colores,
+			'suelas'=>$suelas,
 		));
 	}
 

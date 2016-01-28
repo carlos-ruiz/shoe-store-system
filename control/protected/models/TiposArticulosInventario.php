@@ -28,9 +28,8 @@ class TiposArticulosInventario extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, tipo', 'required'),
+			array('tipo', 'required'),
 			array('id, tipo', 'unique'),
-			array('id', 'numerical', 'integerOnly'=>true),
 			array('tipo', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -46,7 +45,7 @@ class TiposArticulosInventario extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'inventarioses' => array(self::HAS_MANY, 'Inventarios', 'id_tipos_articulos_inventario'),
+			'inventarios' => array(self::HAS_MANY, 'Inventarios', 'id_tipos_articulos_inventario'),
 		);
 	}
 

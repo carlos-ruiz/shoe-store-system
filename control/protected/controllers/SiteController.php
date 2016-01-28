@@ -122,6 +122,7 @@ class SiteController extends Controller
 		$this->crearPerfilesUsuario();
 		$this->crearEstatusDePedido();
 		$this->crearEstatusDePagos();
+		$this->inicializarTiposDeInventarios();
 		if(Usuarios::model()->find('usuario=?', array('admin')) == null){
 			$perfilAdministrador = PerfilesUsuarios::model()->find('nombre=?', array('Administrador'));
 			$usuario = new Usuarios;
@@ -182,6 +183,27 @@ class SiteController extends Controller
 			$estatus = new EstatusPagos;
 			$estatus->nombre="Pagado";
 			$estatus->save();
+		}
+	}
+
+	public function inicializarTiposDeInventarios()
+	{
+		if(TiposArticulosInventario::model()->count()==0){
+			$tipoInventario = new TiposArticulosInventario;
+			$tipoInventario->tipo = 'Suelas';
+			$tipoInventario->save();
+			$tipoInventario = new TiposArticulosInventario;
+			$tipoInventario->tipo = 'Tacones';
+			$tipoInventario->save();
+			$tipoInventario = new TiposArticulosInventario;
+			$tipoInventario->tipo = 'Agujetas';
+			$tipoInventario->save();
+			$tipoInventario = new TiposArticulosInventario;
+			$tipoInventario->tipo = 'Ojillos';
+			$tipoInventario->save();
+			$tipoInventario = new TiposArticulosInventario;
+			$tipoInventario->tipo = 'Materiales';
+			$tipoInventario->save();
 		}
 	}
 }

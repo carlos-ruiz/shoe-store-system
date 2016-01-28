@@ -2,7 +2,8 @@
 
 class SuelasController extends Controller
 {
-	public $section = 'suelas';
+	public $section = 'materiaPrima';
+	public $subsection = 'suelas';
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -36,7 +37,7 @@ class SuelasController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
+				'actions'=>array('admin','delete', 'agregarInventario'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -254,5 +255,45 @@ class SuelasController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionAgregarInventario()
+	{
+		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Suelas'));
+		$suelas = Suelas::model()->findAll();
+		if (isset($_POST['Inventario'])) {
+			if (isset($_POST['Inventario']['suelacolor'])) {
+				$suelasColores = $_POST['Inventario']['suelacolor'];
+				foreach ($suelasColores as $clave => $id_suela_color) {
+					$suelaColor = SuelasColores::model()->findByPk($id_suela_color);
+					if (isset($_POST['Inventario']['numeros'][$clave])) {
+						$numeros = $_POST['Inventario']['numeros'][$clave];
+						foreach ($numeros as $numero => $cantidad) {
+							if($cantidad != 0){
+								$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=? AND numero=?', array($tipoArticulo->id, $suelaColor->id_suelas, $suelaColor->id_colores, $numero));
+								if (!isset($inventario)) {
+									$inventario = new Inventarios;
+									$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+									$inventario->id_articulo = $suelaColor->id_suelas;
+									$inventario->nombre_articulo = $suelaColor->suela->nombre;
+									$inventario->id_colores = $suelaColor->id_colores;
+									$inventario->numero = $numero;
+									$inventario->cantidad_existente = 0;
+									$inventario->cantidad_apartada = 0;
+									$inventario->unidad_medida = 'Pares';
+									$inventario->ultimo_precio = 0;
+								}
+								$inventario->cantidad_existente += $cantidad;
+								$inventario->save();
+							}
+						}
+					}
+				}
+				$this->redirect(array('admin'));
+			}
+		}
+		$this->render('add_stock',array(
+			'suelas'=>$suelas,
+		));
 	}
 }

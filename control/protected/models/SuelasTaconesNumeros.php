@@ -41,6 +41,8 @@ class SuelasTaconesNumeros extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'suelaNumero' => array(self::BELONGS_TO, 'SuelasNumeros', 'id_suelas_numeros'),
+			'taconNumero' => array(self::BELONGS_TO, 'TaconesNumeros', 'id_tacones_numeros'),
 		);
 	}
 
@@ -50,8 +52,8 @@ class SuelasTaconesNumeros extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id_suelas_numeros' => 'Id Suelas Numeros',
-			'id_tacones_numeros' => 'Id Tacones Numeros',
+			'id_suelas_numeros' => 'Suela número',
+			'id_tacones_numeros' => 'Tacon número',
 		);
 	}
 

@@ -18,14 +18,14 @@
 	<div class="form-body">
 		<hr/>
 		<div class="row">
-			<div class="form-group col-md-4 <?php if($form->error($model,'nombre')!=''){ echo 'has-error'; }?>">
+			<div class="form-group col-md-3 <?php if($form->error($model,'nombre')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'nombre', array('class'=>'control-label')); ?>
 				<div class="input-group">
 					<?php echo $form->textField($model,'nombre',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
 					<?php echo $form->error($model,'nombre', array('class'=>'help-block')); ?>
 				</div>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<h4>Colores</h4>
 				<hr/>
 				<?php 
@@ -43,7 +43,7 @@
 				</div>
 				<?php } ?>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<h4>Números</h4>
 				<hr/>
 				<?php
@@ -57,6 +57,24 @@
 					<label for="TaconesNumeros_numero_<?= $i; ?>"><?= $i; ?></label>
 					<div class="input-group inline-block">
 						<input name="TaconesNumeros[numero][<?= $i; ?>]" id="TaconesNumeros_numero_<?= $i; ?>" value="1" type="checkbox" <?php if(in_array($i, $numerosSeleccionados)){echo "checked";} ?>>
+					</div>
+				</div>
+				<?php } ?>
+			</div>
+			<div class="col-md-3">
+				<h4>Suelas</h4>
+				<hr/>
+				<?php 
+					$suelasSeleccionadas = array();
+					foreach ($model->suelas as $suela) {
+						array_push($suelasSeleccionadas, $suela);
+					}
+				?>
+				<?php foreach ($suelas as $suela) { ?>
+				<div class="form-group col-md-6">
+					<label for="TaconesSuelas_id_suelas_<?= $suela->id ?>"><?= $suela->nombre; ?></label>
+					<div class="input-group inline-block">
+						<input size="45" maxlength="45" name="TaconesSuelas[id_suelas][<?= $suela->id; ?>]" id="TaconesSuelas_id_suelas_<?= $suela->id ?>" value="1" type="checkbox" <?php if(in_array($suela, $suelasSeleccionadas)){echo "checked";} ?>>
 					</div>
 				</div>
 				<?php } ?>

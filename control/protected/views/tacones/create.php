@@ -19,5 +19,6 @@ $this->menu=array(
 	array(
 	'model'=>$model,
 	'colores'=>$colores,
+	'suelas'=>$suelas,
 	)
 ); ?>
