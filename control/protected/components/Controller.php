@@ -20,4 +20,21 @@ class Controller extends CController
 	 * for more details on how to specify this property.
 	 */
 	public $breadcrumbs=array();
+
+	public function beforeAction(){
+        // Check only when the user is logged in
+        if (!Yii::app()->user->isGuest)  {
+        	if(Yii::app()->user->getState('perfil')){
+        		return true;
+        	}
+        	else{
+        		$user = Usuarios::model()->find("usuario=?",array(Yii::app()->user->name));
+        		Yii::app()->user->setState('perfil',$user->perfil->nombre);
+        		Yii::app()->user->setState('usuario_nombre',$user->usuario);
+        		return true;
+        	}
+        } else {
+            return true;
+        }
+    }
 }

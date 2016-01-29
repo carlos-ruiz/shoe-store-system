@@ -8,6 +8,9 @@
  * @property double $existencia
  * @property double $cantidad_apartada
  * @property integer $id_materiales
+ * @property integer $id_colores
+ * @property double $stock_minimo
+ * @property string $ultimo_precio
  *
  * The followings are the available model relations:
  * @property Materiales $idMateriales
@@ -31,13 +34,13 @@ class InventarioMateriales extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('existencia, id_materiales', 'required'),
-			array('id_materiales', 'numerical', 'integerOnly'=>true),
-			array('existencia, cantidad_apartada, cantidad, ultimo_precio', 'numerical'),
-			array('cantidad', 'required', 'on'=>'agregarMaterial'),
+			array('existencia, id_materiales, stock_minimo', 'required'),
+			array('id_materiales, id_colores', 'numerical', 'integerOnly'=>true),
+			array('existencia, cantidad_apartada, cantidad, ultimo_precio, stock_minimo', 'numerical'),
+			array('cantidad, stock_minimo', 'required', 'on'=>'agregarMaterial'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, existencia, cantidad_apartada, id_materiales', 'safe', 'on'=>'search'),
+			array('id, existencia, cantidad_apartada, id_materiales, id_colores, stock_minimo, ultimo_precio', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -50,6 +53,7 @@ class InventarioMateriales extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'material' => array(self::BELONGS_TO, 'Materiales', 'id_materiales'),
+			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
 		);
 	}
 
@@ -63,8 +67,10 @@ class InventarioMateriales extends CActiveRecord
 			'existencia' => 'Existencia',
 			'cantidad_apartada' => 'Cantidad apartada',
 			'id_materiales' => 'Material',
+			'id_colores' => 'Color',
 			'cantidad' => 'Cantidad',
 			'ultimo_precio' => 'Último precio',
+			'stock_minimo' => 'Cantidad mínima en bodega',
 		);
 	}
 
@@ -90,6 +96,9 @@ class InventarioMateriales extends CActiveRecord
 		$criteria->compare('existencia',$this->existencia);
 		$criteria->compare('cantidad_apartada',$this->cantidad_apartada);
 		$criteria->compare('id_materiales',$this->id_materiales);
+		$criteria->compare('id_colores',$this->id_colores);
+		$criteria->compare('ultimo_precio',$this->ultimo_precio);
+		$criteria->compare('stock_minimo',$this->stock_minimo);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

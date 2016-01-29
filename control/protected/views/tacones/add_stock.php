@@ -1,18 +1,18 @@
 <?php
-/* @var $this SuelasController */
-/* @var $model Suelas */
+/* @var $this TaconesController */
+/* @var $model Tacones */
 /* @var $form CActiveForm */
 ?>
 <?php
-	$suelasDiferentes = array();
+	$taconesDiferentes = array();
 	$contador = 0;
-	foreach ($suelas as $suela) { 
-		foreach ($suela->suelasColores as $i => $suelaColor) {
-			$suelasDiferentes[$contador]['id_suela'] = $suela->id;
-			$suelasDiferentes[$contador]['suela'] = $suela->nombre;
-			$suelasDiferentes[$contador]['id_color'] = $suelaColor->id_colores;
-			$suelasDiferentes[$contador]['color'] = $suelaColor->color->color;
-			$suelasDiferentes[$contador]['id_suela_color'] = $suelaColor->id;
+	foreach ($tacones as $tacon) { 
+		foreach ($tacon->taconesColores as $i => $taconColor) {
+			$taconesDiferentes[$contador]['id_tacon'] = $tacon->id;
+			$taconesDiferentes[$contador]['tacon'] = $tacon->nombre;
+			$taconesDiferentes[$contador]['id_color'] = $taconColor->id_colores;
+			$taconesDiferentes[$contador]['color'] = $taconColor->color->color;
+			$taconesDiferentes[$contador]['id_tacon_color'] = $taconColor->id;
 			$contador++;
 		}
 	}
@@ -33,12 +33,12 @@
 		<hr/>
 		<div class="row">
 			<div class="panel panel-red panel-ordenes">
-				<div class="panel-heading">Agregar suelas a inventario</div>
+				<div class="panel-heading">Agregar tacones a inventario</div>
 				<div class="panel-body">
-					<table class="table table-hover table-striped without-padding-table" summary="Muestra todas las variantes de suelas para agregar a inventarios">
+					<table class="table table-hover table-striped without-padding-table" summary="Muestra todas las variantes de tacones para agregar a inventarios">
 						<thead>
 							<tr>
-								<th>Suela</th>
+								<th>Tacón</th>
 								<th>Color</th>
 								<?php for ($i=12; $i < 32 ; $i++) { ?>
 								<th><?= $i ?></th>
@@ -46,20 +46,20 @@
 							</tr>
 						</thead>
 						<tbody id="ordenes_table">
-							<?php foreach ($suelasDiferentes as $index => $row) { 
+							<?php foreach ($taconesDiferentes as $index => $row) { 
 								$time = microtime();
 								$time = str_replace(' ', '', $time);
 								$time = str_replace('.', '', $time);
-								$suelaNumeros = SuelasNumeros::model()->findAll('id_suelas=?', array($row['id_suela']));
+								$taconNumeros = TaconesNumeros::model()->findAll('id_tacones=?', array($row['id_tacon']));
 								$numerosPosibles = array();
-								foreach ($suelaNumeros as $suelaNumero) {
-									array_push($numerosPosibles, $suelaNumero->numero);
+								foreach ($taconNumeros as $taconNumero) {
+									array_push($numerosPosibles, $taconNumero->numero);
 								}
 								?>
 
 								<tr id="row_<?= $time ?>">
-									<td class="suela" data-id="<?= $row['id_suela'] ?>">
-										<?= $row['suela'] ?><input type="hidden" name="Inventario[suelacolor][<?= $time ?>]" value="<?= $row['id_suela_color'] ?>">
+									<td class="tacon" data-id="<?= $row['id_tacon'] ?>">
+										<?= $row['tacon'] ?><input type="hidden" name="Inventario[taconColor][<?= $time ?>]" value="<?= $row['id_tacon_color'] ?>">
 									</td>
 									<td class="color" data-id="<?= $row['id_color'] ?>">
 										<?= $row['color'] ?>

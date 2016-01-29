@@ -14,6 +14,7 @@
  * @property double $cantidad_apartada
  * @property string $unidad_medida
  * @property string $ultimo_precio
+ * @property double $stock_minimo
  *
  * The followings are the available model relations:
  * @property TiposArticulosInventario $idTiposArticulosInventario
@@ -41,12 +42,12 @@ class Inventarios extends CActiveRecord
 		return array(
 			array('id_tipos_articulos_inventario, id_articulo, cantidad_existente, unidad_medida, ultimo_precio', 'required'),
 			array('id_tipos_articulos_inventario, id_articulo, id_colores', 'numerical', 'integerOnly'=>true),
-			array('numero, cantidad_existente, cantidad_apartada', 'numerical'),
+			array('numero, cantidad_existente, cantidad_apartada, stock_minimo', 'numerical'),
 			array('unidad_medida', 'length', 'max'=>45),
 			array('ultimo_precio', 'length', 'max'=>7),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_tipos_articulos_inventario, id_articulo, nombre_articulo, numero, id_colores, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, var_tipo_articulo, var_color', 'safe', 'on'=>'search'),
+			array('id, id_tipos_articulos_inventario, id_articulo, nombre_articulo, numero, id_colores, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, stock_minimo, var_tipo_articulo, var_color', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -89,6 +90,7 @@ class Inventarios extends CActiveRecord
 			'var_tipo_articulo' => 'Tipo de artículo',
 			'var_color' => 'Color',
 			'nombre_articulo' => 'Artículo',
+			'stock_minimo' => 'Cantidad mínima',
 		);
 	}
 
@@ -118,6 +120,7 @@ class Inventarios extends CActiveRecord
 		$criteria->compare('id_colores',$this->id_colores);
 		$criteria->compare('cantidad_existente',$this->cantidad_existente);
 		$criteria->compare('cantidad_apartada',$this->cantidad_apartada);
+		$criteria->compare('stock_minimo',$this->stock_minimo);
 		$criteria->compare('unidad_medida',$this->unidad_medida,true);
 		$criteria->compare('ultimo_precio',$this->ultimo_precio,true);
 		$criteria->with = array('tipoArticulo', 'color');
@@ -126,6 +129,9 @@ class Inventarios extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'Pagination' => array (
+                'PageSize' => 20,
+            ),
 		));
 	}
 

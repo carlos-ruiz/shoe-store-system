@@ -122,6 +122,7 @@ class SiteController extends Controller
 		$this->crearPerfilesUsuario();
 		$this->crearEstatusDePedido();
 		$this->crearEstatusDePagos();
+		$this->crearFormasDePago();
 		$this->inicializarTiposDeInventarios();
 		if(Usuarios::model()->find('usuario=?', array('admin')) == null){
 			$perfilAdministrador = PerfilesUsuarios::model()->find('nombre=?', array('Administrador'));
@@ -183,6 +184,30 @@ class SiteController extends Controller
 			$estatus = new EstatusPagos;
 			$estatus->nombre="Pagado";
 			$estatus->save();
+		}
+	}
+
+	public function crearFormasDePago()
+	{
+		if (FormasPago::model()->count()==0) {
+			$formaDePago = new FormasPago;
+			$formaDePago->nombre = 'Efectivo';
+			$formaDePago->save();
+			$formaDePago = new FormasPago;
+			$formaDePago->nombre = 'Crédito';
+			$formaDePago->save();
+			$formaDePago = new FormasPago;
+			$formaDePago->nombre = 'Cheque';
+			$formaDePago->save();
+			$formaDePago = new FormasPago;
+			$formaDePago->nombre = 'Tarjeta de crédito';
+			$formaDePago->save();
+			$formaDePago = new FormasPago;
+			$formaDePago->nombre = 'Tarjeta de débito';
+			$formaDePago->save();
+			$formaDePago = new FormasPago;
+			$formaDePago->nombre = 'Transferencia';
+			$formaDePago->save();
 		}
 	}
 

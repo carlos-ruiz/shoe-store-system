@@ -30,3 +30,12 @@ $this->menu=array(
 	</div>
 	<div class="col-md-4"></div>
 </div>
+
+<?php if(!Yii::app()->user->isGuest) { ?>
+	<div class="row">
+		<div class="col-md-12 padding-top">
+			<?php echo CHtml::link('<i class="fa fa-plus"></i> Agregar nueva', array('agujetas/create'), array('class'=>'link-button')); ?>
+		</div>
+	</div>
+<?php } ?>
+

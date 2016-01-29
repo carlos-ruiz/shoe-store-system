@@ -38,7 +38,7 @@ class TaconesController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
+				'actions'=>array('admin','delete', 'agregarInventario'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -192,8 +192,6 @@ class TaconesController extends Controller
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
-				print_r($ex);
-				return;
 			}
 		}
 
@@ -270,5 +268,45 @@ class TaconesController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionAgregarInventario()
+	{
+		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Tacones'));
+		$tacones = Tacones::model()->findAll();
+		if (isset($_POST['Inventario'])) {
+			if (isset($_POST['Inventario']['taconColor'])) {
+				$taconesColores = $_POST['Inventario']['taconColor'];
+				foreach ($taconesColores as $clave => $id_tacon_color) {
+					$taconColor = TaconesColores::model()->findByPk($id_tacon_color);
+					if (isset($_POST['Inventario']['numeros'][$clave])) {
+						$numeros = $_POST['Inventario']['numeros'][$clave];
+						foreach ($numeros as $numero => $cantidad) {
+							if($cantidad != 0){
+								$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=? AND numero=?', array($tipoArticulo->id, $taconColor->id_tacones, $taconColor->id_colores, $numero));
+								if (!isset($inventario)) {
+									$inventario = new Inventarios;
+									$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+									$inventario->id_articulo = $taconColor->id_tacones;
+									$inventario->nombre_articulo = $taconColor->tacon->nombre;
+									$inventario->id_colores = $taconColor->id_colores;
+									$inventario->numero = $numero;
+									$inventario->cantidad_existente = 0;
+									$inventario->cantidad_apartada = 0;
+									$inventario->unidad_medida = 'Pares';
+									$inventario->ultimo_precio = 0;
+								}
+								$inventario->cantidad_existente += $cantidad;
+								$inventario->save();
+							}
+						}
+					}
+				}
+				$this->redirect(array('admin'));
+			}
+		}
+		$this->render('add_stock',array(
+			'tacones'=>$tacones,
+		));
 	}
 }

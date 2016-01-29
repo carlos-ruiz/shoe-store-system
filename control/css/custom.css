@@ -181,3 +181,7 @@ td.td-caracteristicas-especiales {
 .button-column a:hover {
 	border: solid 1px #999999;
 }
+
+.red {
+	color: red;
+}
