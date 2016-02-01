@@ -14,6 +14,13 @@
  */
 class SuelasColores extends CActiveRecord
 {
+	public $var_color;
+	public $var_suela;
+	public $precio_extrachico;
+	public $precio_chico;
+	public $precio_mediano;
+	public $precio_grande;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -34,7 +41,7 @@ class SuelasColores extends CActiveRecord
 			array('id_suelas, id_colores', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_suelas, id_colores', 'safe', 'on'=>'search'),
+			array('id, id_suelas, id_colores, var_color, var_suela', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,6 +67,8 @@ class SuelasColores extends CActiveRecord
 			'id' => 'ID',
 			'id_suelas' => 'Id Suelas',
 			'id_colores' => 'Id Colores',
+			'var_suela' => 'Suela',
+			'var_color' => 'Color',
 		);
 	}
 
@@ -84,6 +93,9 @@ class SuelasColores extends CActiveRecord
 		$criteria->compare('id',$this->id);
 		$criteria->compare('id_suelas',$this->id_suelas);
 		$criteria->compare('id_colores',$this->id_colores);
+		$criteria->with = array('suela', 'color');
+		$criteria->compare('suela.nombre', $this->var_suela, true);
+		$criteria->compare('color.color', $this->var_color, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

@@ -110,7 +110,8 @@ class ZapatosController extends Controller
 								$nuevoZapato->id_colores = $modeloColor->id_colores;
 								$nuevoZapato->id_suelas_colores = $suelaColor->id;
 								$nuevoZapato->numero = $numero;
-								$nuevoZapato->codigo_barras = printf('%03d',$zapatoPrecios->id_modelos).printf('%03d', $suelacolor->id).printf('%03d',$modeloColor->id_colores).printf('%03d', $numero);
+								$numeroCodigo = str_replace('.', '', $numero);
+								$nuevoZapato->codigo_barras = sprintf('%03d',$zapatoPrecios->id_modelos).sprintf('%03d', $suelaColor->id).sprintf('%03d',$modeloColor->id_colores).sprintf('%03d', $numeroCodigo);
 								if($numero >= 12 && $numero < 18){
 									$nuevoZapato->precio = $zapatoPrecios->precio_extrachico;
 								}

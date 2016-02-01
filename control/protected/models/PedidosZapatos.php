@@ -25,6 +25,10 @@ class PedidosZapatos extends CActiveRecord
 	public $id_suelas;
 	public $id_suelas_color;
 	public $numero;
+	public $id_agujetas;
+	public $id_agujetas_color;
+	public $id_ojillos;
+	public $id_ojillos_color;
 
 	/**
 	 * @return string the associated database table name
@@ -85,6 +89,10 @@ class PedidosZapatos extends CActiveRecord
 			'numero'=>'Número',
 			'caracteristicas_especiales' => 'Características especiales',
 			'precio_unitario' => 'Precio unitario',
+			'id_agujetas' => 'Agujetas',
+			'id_agujetas_color' => 'Color de agujetas',
+			'id_ojillos' => 'Ojillos',
+			'id_ojillos_color' => 'Color de ojillos',
 		);
 	}
 

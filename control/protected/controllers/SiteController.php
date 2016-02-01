@@ -122,6 +122,7 @@ class SiteController extends Controller
 		$this->crearPerfilesUsuario();
 		$this->crearEstatusDePedido();
 		$this->crearEstatusDePagos();
+		$this->crearEstatusDeZapatos();
 		$this->crearFormasDePago();
 		$this->inicializarTiposDeInventarios();
 		if(Usuarios::model()->find('usuario=?', array('admin')) == null){
@@ -183,6 +184,27 @@ class SiteController extends Controller
 			$estatus->save();
 			$estatus = new EstatusPagos;
 			$estatus->nombre="Pagado";
+			$estatus->save();
+		}
+	}
+
+	public function crearEstatusDeZapatos()
+	{
+		if(EstatusZapatos::model()->count()==0){
+			$estatus = new EstatusZapatos;
+			$estatus->nombre="Pendiente";
+			$estatus->save();
+			$estatus = new EstatusZapatos;
+			$estatus->nombre="En corte";
+			$estatus->save();
+			$estatus = new EstatusZapatos;
+			$estatus->nombre="En pespunte";
+			$estatus->save();
+			$estatus = new EstatusZapatos;
+			$estatus->nombre="En ensuelado";
+			$estatus->save();
+			$estatus = new EstatusZapatos;
+			$estatus->nombre="Terminado";
 			$estatus->save();
 		}
 	}

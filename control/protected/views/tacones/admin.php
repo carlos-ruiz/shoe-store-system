@@ -16,7 +16,8 @@ $this->menu=array(
 <h1>Administración de tacones</h1>
 
 <div class="text-right">
-	<?php echo CHtml::link('<i class="fa fa-plus"></i> Agregar a inventario', array('tacones/agregarInventario'), array('class'=>'btn btn-red-stripped')); ?>
+	<?php echo CHtml::link('<i class="fa fa-usd"></i> Definir precios', array('tacones/definirPrecios'), array('class'=>'btn btn-red-stripped')); ?>
+	<?php echo CHtml::link('<i class="fa fa-cubes"></i> Agregar a inventario', array('tacones/agregarInventario'), array('class'=>'btn btn-red-stripped')); ?>
 	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nuevo', array('tacones/create'), array('class'=>'btn btn-red-stripped')); ?>
 </div>
 

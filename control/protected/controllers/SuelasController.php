@@ -37,7 +37,7 @@ class SuelasController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'agregarInventario'),
+				'actions'=>array('admin','delete', 'agregarInventario', 'definirPrecios', 'actualizarPrecios'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -295,5 +295,67 @@ class SuelasController extends Controller
 		$this->render('add_stock',array(
 			'suelas'=>$suelas,
 		));
+	}
+
+	public function actionDefinirPrecios()
+	{
+		$model=new SuelasColores('search');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_GET['SuelasColores'])){
+			$model->attributes=$_GET['SuelasColores'];
+		}
+
+		$this->render('set_prices', array(
+			'model'=>$model,
+		));
+	}
+
+	public function actionActualizarPrecios()
+	{
+		$id = $_POST["id"];
+		$precio = $_POST["precio"];
+		$tipo_precio = $_POST['tipo_precio'];
+
+		$suelaColor = SuelasColores::model()->findByPk($id);
+		$suela = Suelas::model()->findByPk($suelaColor->id_suelas);
+		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Suelas'));
+
+		foreach ($suela->suelaNumeros as $suelaNumero) {
+			$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=? AND numero=?', array($tipoArticulo->id, $suela->id, $suelaColor->id_colores, $suelaNumero->numero));
+			if (!isset($inventario)) {
+				$inventario = new Inventarios;
+				$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+				$inventario->id_articulo = $suela->id;
+				$inventario->id_colores = $suelaColor->id_colores;
+				$inventario->numero = $suelaNumero->numero;
+				$inventario->nombre_articulo = $suela->nombre;
+				$inventario->cantidad_existente = 0;
+				$inventario->cantidad_apartada = 0;
+				$inventario->unidad_medida = 'Pares';
+			}
+			if ($tipo_precio == 'precio_extrachico') {
+				if($suelaNumero->numero >= 12 && $suelaNumero->numero < 18){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			elseif ($tipo_precio == 'precio_chico') {
+				if($suelaNumero->numero >= 18 && $suelaNumero->numero < 22){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			elseif ($tipo_precio == 'precio_mediano') {
+				if($suelaNumero->numero >= 22 && $suelaNumero->numero < 25){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			elseif ($tipo_precio == 'precio_grande') {
+				if($suelaNumero->numero >= 25 && $suelaNumero->numero < 32){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			$inventario->save();
+		}
+
+		echo $precio;
 	}
 }

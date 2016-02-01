@@ -102,4 +102,13 @@ class AgujetasColores extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerColoresPorAgujeta($id_agujeta){
+		$agujetaColores=AgujetasColores::model()->findAll("id_agujetas=?", array($id_agujeta));
+		$colores = array();
+		foreach ($agujetaColores as $agujetaColor) {
+			array_push($colores, $agujetaColor->color);
+		}
+		return CHtml::listData($colores, 'id', 'nombre');
+	}
 }

@@ -66,7 +66,7 @@
 									</td>
 									<?php for ($i=12; $i < 32; $i++) { ?>
 										<td data-numero="<?= $i ?>">
-											<input class="input-cantidad" type="number" name="Inventario[numeros][<?= $time ?>][<?= $i ?>]" min="0" max="9999" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'";} ?>/>
+											<input class="input-cantidad" type="text" name="Inventario[numeros][<?= $time ?>][<?= $i ?>]" size="1" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'";} ?>/>
 										</td>
 									<?php } ?>
 								</tr>
@@ -85,3 +85,15 @@
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->
+
+<script type="text/javascript">
+	$('.input-cantidad').change(function(){
+		cantidad = $(this).attr('value');
+		if(!/^([0-9]*(\.[0-9]+)?)$/.test(cantidad)){
+			// alert('Debe escribir un valor numerico');
+			$(this).css({ "border": '#FF0000 3px solid'});
+			return;
+		}
+		$(this).removeAttr('style');
+	});
+</script>

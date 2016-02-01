@@ -37,7 +37,7 @@ class PedidosController extends Controller
 			// 	'users'=>array('@'),
 			// ),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'actualizarInventarios'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'actualizarInventarios', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -67,11 +67,15 @@ class PedidosController extends Controller
 		$model->fecha_pedido = date('d-m-Y H:i:s');
 		$model->total = 0.0;
 		$pedidoZapato = new PedidosZapatos;
+		$estatusPedido = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
+		$model->id_estatus_pedidos = $estatusPedido->id;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Pedidos']))
 		{
+			print_r($_POST);
+			return;
 			$transaction = Yii::app()->db->beginTransaction();
 			try{
 				$model->attributes=$_POST['Pedidos'];
@@ -122,7 +126,8 @@ class PedidosController extends Controller
 										$zapato = new Zapatos;
 										$zapato->numero = $numero;
 										$zapato->precio = 0;
-										$zapato->codigo_barras = printf('%03d',$modeloColor->id_modelos).printf('%03d', $datosPedido['suelacolor'][$id]).printf('%03d',$modeloColor->id_colores).printf('%03d', $numero);
+										$numeroCodigo = str_replace('.', '', $numero);
+										$zapato->codigo_barras = sprintf('%03d',$modeloColor->id_modelos).sprintf('%03d', $datosPedido['suelacolor'][$id]).sprintf('%03d',$modeloColor->id_colores).sprintf('%03d', $numeroCodigo);
 										$zapato->id_modelos = $modeloColor->id_modelos;
 										$zapato->id_colores = $modeloColor->id_colores;
 										$zapato->id_suelas_colores = $datosPedido['suelacolor'][$id];
@@ -233,7 +238,8 @@ class PedidosController extends Controller
 										$zapato = new Zapatos;
 										$zapato->numero = $numero;
 										$zapato->precio = 0;
-										$zapato->codigo_barras = printf('%03d',$modeloColor->id_modelos).printf('%03d', $datosPedido['suelacolor'][$id]).printf('%03d',$modeloColor->id_colores).printf('%03d', $numero);
+										$numeroCodigo = str_replace('.', '', $numero);
+										$zapato->codigo_barras = sprintf('%03d',$modeloColor->id_modelos).sprintf('%03d', $datosPedido['suelacolor'][$id]).sprintf('%03d',$modeloColor->id_colores).sprintf('%03d', $numeroCodigo);
 										$zapato->id_modelos = $modeloColor->id_modelos;
 										$zapato->id_colores = $modeloColor->id_colores;
 										$zapato->id_suelas_colores = $datosPedido['suelacolor'][$id];
@@ -438,9 +444,41 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
 	}
 
+	public function actionRevisarSiTieneAgujetas()
+	{
+		$id_modelo = $_POST['PedidosZapatos']['id_modelos'];
+		$modelo = Modelos::model()->findByPk($id_modelo);
+		$materialAgujeta = Materiales::model()->find('nombre=?', array('Agujetas'));
+		$materialOjillos = Materiales::model()->find('nombre=?', array('Ojillos'));
+		$modeloMaterial = ModelosMateriales::model()->find('id_modelos=? AND (id_materiales=? OR id_materiales=? )', array($modelo->id, $materialAgujeta->id, $materialOjillos->id));
+		if (isset($modeloMaterial)) {
+			echo 'true';
+		}else{
+			echo 'false';
+		}
+	}
+
+	public function actionColoresPorAgujeta()
+	{
+		$id_agujeta = $_POST['PedidosZapatos']['id_agujetas'];
+		$agujetaColores = AgujetasColores::model()->findAll('id_agujetas=?', array($id_agujeta));
+		foreach($agujetaColores as $data)
+			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+	}
+
+	public function actionColoresPorOjillo()
+	{
+		$id_ojillo = $_POST['PedidosZapatos']['id_ojillos'];
+		$ojillosColores = OjillosColores::model()->findAll('id_ojillos=?', array($id_ojillo));
+		foreach($ojillosColores as $data)
+			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+	}
+
 	public function actionAgregarOrden()
 	{
 		if (isset($_POST)) {
+			print_r($_POST);
+			return;
 			$modelo = Modelos::model()->findByPk($_POST['id_modelos']);
 			$color = Colores::model()->findByPk($_POST['id_colores']);
 			$suela = Suelas::model()->findByPk($_POST['id_suelas']);

@@ -14,6 +14,13 @@
  */
 class TaconesColores extends CActiveRecord
 {
+	public $var_color;
+	public $var_tacon;
+	public $precio_extrachico;
+	public $precio_chico;
+	public $precio_mediano;
+	public $precio_grande;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -34,7 +41,7 @@ class TaconesColores extends CActiveRecord
 			array('id_colores, id_tacones', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_colores, id_tacones', 'safe', 'on'=>'search'),
+			array('id, id_colores, id_tacones, var_tacon, var_color', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,8 +65,10 @@ class TaconesColores extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'id_colores' => 'Id Colores',
-			'id_tacones' => 'Id Tacones',
+			'id_colores' => 'Color',
+			'id_tacones' => 'Tacón',
+			'var_tacon' => 'Tacón',
+			'var_color' => 'Color',
 		);
 	}
 
@@ -84,6 +93,9 @@ class TaconesColores extends CActiveRecord
 		$criteria->compare('id',$this->id);
 		$criteria->compare('id_colores',$this->id_colores);
 		$criteria->compare('id_tacones',$this->id_tacones);
+		$criteria->with = array('color', 'tacon');
+		$criteria->compare('color.color', $this->var_color, true);
+		$criteria->compare('tacon.nombre', $this->var_tacon, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

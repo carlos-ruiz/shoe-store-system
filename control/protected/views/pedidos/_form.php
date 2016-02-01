@@ -129,6 +129,59 @@
 				</div>
 			</div>
 		</div>
+		<div class="row" id="agujetas_ojillos_panel">
+			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'id_agujetas')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($pedidoZapato,'id_agujetas', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php
+						$htmlOptionsAjax = array(
+									"ajax"=>array(
+										"url"=>$this->createUrl("pedidos/coloresPorAgujeta"),
+										"type"=>"POST",
+										"update"=>"#PedidosZapatos_id_agujetas_color"
+									),
+									"class" => "form-control input-medium select2me",
+									"empty"=>"Seleccione una opci&oacute;n",
+								);
+					?>
+					<?php echo $form->dropDownList($pedidoZapato,'id_agujetas',CHtml::listData(Agujetas::model()->findAll(), 'id', 'nombre'), $htmlOptionsAjax); ?>
+					<?php echo $form->error($pedidoZapato,'id_agujetas', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'id_agujetas_color')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($pedidoZapato,'id_agujetas_color', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->dropDownList($pedidoZapato,'id_agujetas_color',AgujetasColores::model()->obtenerColoresPorAgujeta(isset($pedidoZapato->id_agujetas)?$pedidoZapato->id_agujetas:0), $htmlOptions); ?>
+					<?php echo $form->error($pedidoZapato,'id_agujetas_color', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+			
+			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'id_ojillos')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($pedidoZapato,'id_ojillos', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php
+						$htmlOptionsAjax = array(
+									"ajax"=>array(
+										"url"=>$this->createUrl("pedidos/coloresPorOjillo"),
+										"type"=>"POST",
+										"update"=>"#PedidosZapatos_id_ojillos_color"
+									),
+									"class" => "form-control input-medium select2me",
+									"empty"=>"Seleccione una opci&oacute;n",
+								);
+					?>
+					<?php echo $form->dropDownList($pedidoZapato,'id_ojillos',CHtml::listData(Ojillos::model()->findAll(), 'id', 'nombre'), $htmlOptionsAjax); ?>
+					<?php echo $form->error($pedidoZapato,'id_ojillos', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+			<div class="form-group col-md-3 <?php if($form->error($pedidoZapato,'id_ojillos_color')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($pedidoZapato,'id_ojillos_color', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->dropDownList($pedidoZapato,'id_ojillos_color',AgujetasColores::model()->obtenerColoresPorAgujeta(isset($pedidoZapato->id_agujetas)?$pedidoZapato->id_agujetas:0), $htmlOptions); ?>
+					<?php echo $form->error($pedidoZapato,'id_ojillos_color', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+		</div>
 		<div class="row">
 			<div class="form-group col-md-3 ">
 				<label class="control-label" for="Pedidos_es_especial">¿Es especial?</label>
@@ -336,6 +389,8 @@
 </div><!-- form -->
 
 <script type="text/javascript">
+	var tieneAgujetas = false;
+
 	$(document).ready(function(){
 		total = parseFloat($('#Pedidos_total').val());
 		descuentoCliente = parseFloat($('#Cliente_descuento').val());
@@ -369,6 +424,17 @@
 					actualizarColoresSuelas();
 				}
 			});
+			jQuery.ajax({'url':'/controlbom/control/pedidos/revisarSiTieneAgujetas','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+					if (html == 'true') {
+						$('#agujetas_ojillos_panel').show(500);
+						tieneAgujetas = true;
+					}
+					else{
+						$('#agujetas_ojillos_panel').hide(500);
+						tieneAgujetas = false;
+					}
+				}
+			});
 			return false;
 		});
 	});
@@ -382,21 +448,35 @@
 		id_colores = $('#PedidosZapatos_id_colores').val();
 		id_suelas = $('#PedidosZapatos_id_suelas').val();
 		id_color_suela = $('#PedidosZapatos_id_suelas_color').val();
+		id_agujetas = $('#PedidosZapatos_id_agujetas').val();
+		id_color_agujetas = $('#PedidosZapatos_id_agujetas_color').val();
+		id_ojillos = $('#PedidosZapatos_id_ojillos').val();
+		id_color_ojillos = $('#PedidosZapatos_id_ojillos_color').val();
 		rows = $('#ordenes_table tr').length;
 		caracteristicas_especiales = $('#PedidosZapatos_caracteristicas_especiales').val();
 
-
 		if (id_modelos>0 && id_colores>0 && id_suelas>0 && id_color_suela>0) {
+			var datos = {};
+			datos.id_modelos = id_modelos;
+			datos.id_colores = id_colores;
+			datos.id_suelas = id_suelas;
+			datos.id_color_suela = id_color_suela;
+			datos.row = rows;
+			datos.especial = caracteristicas_especiales;
+			if(tieneAgujetas){
+				if (id_agujetas>0 && id_color_agujetas>0 && id_ojillos>0 && id_color_ojillos>0) {
+					datos.id_agujetas = id_agujetas;
+					datos.id_color_agujetas = id_color_agujetas;
+					datos.id_ojillos = id_ojillos;
+					datos.id_color_ojillos = id_color_ojillos;
+				}else{
+					alert('Está mal');
+					return;
+				}
+			}
 			$.post(
 				"<?php echo $this->createUrl('pedidos/agregarOrden/');?>",
-				{
-					id_modelos:id_modelos,
-					id_colores:id_colores,
-					id_suelas:id_suelas,
-					id_color_suela:id_color_suela,
-					row:rows,
-					especial:caracteristicas_especiales
-				},
+				datos,
 				function(data){
 					$("#ordenes_table").append(data);
 					limpiarCamposOrden();

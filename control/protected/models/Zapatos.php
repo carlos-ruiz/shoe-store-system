@@ -29,6 +29,7 @@ class Zapatos extends CActiveRecord
 	public $var_modelo;
 	public $var_color;
 	public $id_suelas;
+	public $var_color_suela;
 
 	/**
 	 * @return string the associated database table name
@@ -54,7 +55,7 @@ class Zapatos extends CActiveRecord
 			array('codigo_barras', 'length', 'max'=>12),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, numero, precio, codigo_barras, var_suela, var_modelo, var_color', 'safe', 'on'=>'search'),
+			array('id, numero, precio, codigo_barras, var_suela, var_modelo, var_color, var_color_suela', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -90,6 +91,7 @@ class Zapatos extends CActiveRecord
 			'id_colores' => 'Color',
 			'id_modelos' => 'Modelo',
 			'var_suela' => 'Suela',
+			'var_color_suela' => 'Color de suela',
 			'var_modelo' => 'Modelo',
 			'var_color' => 'Color',
 			'id_agujetas_colores' => 'Agujetas',
@@ -122,13 +124,20 @@ class Zapatos extends CActiveRecord
 		$criteria->compare('id_suelas_colores',$this->id_suelas_colores);
 		$criteria->compare('id_ojillos_colores',$this->id_ojillos_colores);
 		$criteria->compare('id_agujetas_colores',$this->id_agujetas_colores);
-		$criteria->with = array('modelo', 'color');
-		// $criteria->compare('suela.nombre', $this->var_suela, true);
+		$criteria->with = array('modelo', 'color', 'suelaColor.suela', "suelaColor.color" => array(
+			    'alias' => 'scolor'
+			)
+		);
+		$criteria->compare('suela.nombre', $this->var_suela, true);
 		$criteria->compare('modelo.nombre', $this->var_modelo, true);
 		$criteria->compare('color.color', $this->var_color, true);
+		$criteria->compare('scolor.color', $this->var_color_suela, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'Pagination' => array (
+				'PageSize' => 20,
+			),
 		));
 	}
 

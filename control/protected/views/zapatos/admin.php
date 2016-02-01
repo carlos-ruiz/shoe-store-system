@@ -36,10 +36,14 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	        'name'=>'var_color',
 	        'value'=>'$data->color->color',
     	),
-		// array(
-	 //        'name'=>'var_suela',
-	 //        'value'=>'$data->suela->nombre',
-  //   	),
+		array(
+	        'name'=>'var_suela',
+	        'value'=>'$data->suelaColor->suela->nombre',
+    	),
+		array(
+	        'name'=>'var_color_suela',
+	        'value'=>'$data->suelaColor->color->color',
+    	),
 		'numero',
 		array('name'=>'precio',
             'class'=>'EEditableColumn', 'editable_type'=>'editbox',

@@ -38,7 +38,7 @@ class TaconesController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'agregarInventario'),
+				'actions'=>array('admin','delete', 'agregarInventario', 'definirPrecios', 'actualizarPrecios'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -308,5 +308,67 @@ class TaconesController extends Controller
 		$this->render('add_stock',array(
 			'tacones'=>$tacones,
 		));
+	}
+
+	public function actionDefinirPrecios()
+	{
+		$model=new TaconesColores('search');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_GET['TaconesColores'])){
+			$model->attributes=$_GET['TaconesColores'];
+		}
+
+		$this->render('set_prices', array(
+			'model'=>$model,
+		));
+	}
+
+	public function actionActualizarPrecios()
+	{
+		$id = $_POST["id"];
+		$precio = $_POST["precio"];
+		$tipo_precio = $_POST['tipo_precio'];
+
+		$taconColor = TaconesColores::model()->findByPk($id);
+		$tacon = Tacones::model()->findByPk($taconColor->id_tacones);
+		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Tacones'));
+
+		foreach ($tacon->taconesNumeros as $taconNumero) {
+			$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=? AND numero=?', array($tipoArticulo->id, $tacon->id, $taconColor->id_colores, $taconNumero->numero));
+			if (!isset($inventario)) {
+				$inventario = new Inventarios;
+				$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+				$inventario->id_articulo = $tacon->id;
+				$inventario->id_colores = $taconColor->id_colores;
+				$inventario->numero = $taconNumero->numero;
+				$inventario->nombre_articulo = $tacon->nombre;
+				$inventario->cantidad_existente = 0;
+				$inventario->cantidad_apartada = 0;
+				$inventario->unidad_medida = 'Pares';
+			}
+			if ($tipo_precio == 'precio_extrachico') {
+				if($taconNumero->numero >= 12 && $taconNumero->numero < 18){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			elseif ($tipo_precio == 'precio_chico') {
+				if($taconNumero->numero >= 18 && $taconNumero->numero < 22){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			elseif ($tipo_precio == 'precio_mediano') {
+				if($taconNumero->numero >= 22 && $taconNumero->numero < 25){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			elseif ($tipo_precio == 'precio_grande') {
+				if($taconNumero->numero >= 25 && $taconNumero->numero < 32){
+					$inventario->ultimo_precio = $precio;
+				}
+			}
+			$inventario->save();
+		}
+
+		echo $precio;
 	}
 }

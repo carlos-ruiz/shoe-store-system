@@ -126,7 +126,7 @@ class ZapatoPreciosController extends Controller
 
 	public function actualizarPreciosAnteriores($id_modelo, $id_suela, $tipo_precio, $precio)
 	{
-		$zapatos = Zapatos::model()->findAll('id_modelos=? AND id_suelas=?', array($id_modelo, $id_suela));
+		$zapatos = Zapatos::model()->with(array('suelaColor.suela'=>array('alias'=>'suela')))->findAll('id_modelos=? AND suela.id=?', array($id_modelo, $id_suela));
 		if (isset($zapatos)) {
 			foreach ($zapatos as $zapato) {
 				if ($tipo_precio == 'precio_extrachico') {

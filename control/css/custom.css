@@ -185,3 +185,12 @@ td.td-caracteristicas-especiales {
 .red {
 	color: red;
 }
+
+.under-stock {
+	font-weight: bold;
+	color: #e81c2f;
+}
+
+#agujetas_ojillos_panel {
+	display: none;
+}

@@ -26,7 +26,7 @@
     	),
     	array(
 	        'name'=>'cantidad_existente',
-	        'cssClassExpression'=> '(($data->cantidad_existente < $data->stock_minimo) ? "red" : "green")',
+	        'cssClassExpression'=> '(($data->cantidad_existente < $data->stock_minimo) ? "under-stock" : "")',
     	),
     	'cantidad_apartada',
     	'stock_minimo',
