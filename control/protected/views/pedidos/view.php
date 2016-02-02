@@ -73,6 +73,12 @@ $this->menu=array(
 							<th>Color</th>
 							<th>Suela</th>
 							<th>Color de suela</th>
+
+							<th>Agujetas</th>
+							<th>Color de agujetas</th>
+
+							<th>Ojillos</th>
+							<th>Color de ojillos</th>
 							<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 							<th><?php if(fmod($i ,1)==0){ echo $i;} else{echo "-";} ?></th>
 							<?php } ?>
@@ -86,6 +92,10 @@ $this->menu=array(
 							$id_color = 0;
 							$id_suela = 0;
 							$id_color_suela = 0;
+							$id_agujeta = 0;
+							$id_color_agujeta = 0;
+							$id_ojillo = 0;
+							$id_color_ojillo = 0;
 							$contador = 0;
 							$caracteristicas_especiales = '';
 							foreach ($model->pedidosZapatos as $pedidoZapato) { 
@@ -96,12 +106,32 @@ $this->menu=array(
 									$pedidoZapato->zapato->suelaColor->color->id != $id_color_suela || 
 									$pedidoZapato->caracteristicas_especiales != $caracteristicas_especiales
 								) {
-									$contador++;
-									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->modelo->nombre;
-									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->color->color;
-									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->suelaColor->suela->nombre;
-									$zapatosDiferentes[$contador][] = $pedidoZapato->zapato->suelaColor->color->color;
-									$zapatosDiferentes[$contador][] = $pedidoZapato->caracteristicas_especiales;
+									if (isset($pedidoZapato->zapato->agujetaColor)) {
+										if (
+											$pedidoZapato->zapato->agujetaColor->agujeta->id != $id_agujeta || 
+											$pedidoZapato->zapato->agujetaColor->color->id != $id_color_agujeta || 
+											$pedidoZapato->zapato->ojilloColor->ojillo->id != $id_ojillo || 
+											$pedidoZapato->zapato->ojilloColor->color->id != $id_color_ojillo) {
+											$contador++;
+											
+											$zapatosDiferentes[$contador]['agujeta'] = $pedidoZapato->zapato->agujetaColor->agujeta->nombre;
+											$zapatosDiferentes[$contador]['coloragujeta'] = $pedidoZapato->zapato->agujetaColor->color->color;
+											$zapatosDiferentes[$contador]['ojillo'] = $pedidoZapato->zapato->ojilloColor->ojillo->nombre;
+											$zapatosDiferentes[$contador]['colorojillo'] = $pedidoZapato->zapato->ojilloColor->color->color;		
+										}
+									}
+									else{
+										$contador++;
+										$zapatosDiferentes[$contador]['agujeta'] = 'N/A';
+										$zapatosDiferentes[$contador]['coloragujeta'] = 'N/A';
+										$zapatosDiferentes[$contador]['ojillo'] = 'N/A';
+										$zapatosDiferentes[$contador]['colorojillo'] = 'N/A';
+									}
+									$zapatosDiferentes[$contador]['modelo'] = $pedidoZapato->zapato->modelo->nombre;
+									$zapatosDiferentes[$contador]['color'] = $pedidoZapato->zapato->color->color;
+									$zapatosDiferentes[$contador]['suela'] = $pedidoZapato->zapato->suelaColor->suela->nombre;
+									$zapatosDiferentes[$contador]['colorsuela'] = $pedidoZapato->zapato->suelaColor->color->color;
+									$zapatosDiferentes[$contador]['especial'] = $pedidoZapato->caracteristicas_especiales;
 									$id_modelo = $pedidoZapato->zapato->modelo->id;
 									$id_suela = $pedidoZapato->zapato->suelaColor->suela->id;
 									$id_color_suela = $pedidoZapato->zapato->suelaColor->color->id;
@@ -117,10 +147,14 @@ $this->menu=array(
 							<?php $rowOdd = (($index % 2)==0)?1:0; ?>
 
 							<tr class="<?= $rowOdd==1?'odd':'' ?>">
-								<td><?= $row[0] ?></td>
-								<td><?= $row[1] ?></td>
-								<td><?= $row[2] ?></td>
-								<td><?= $row[3] ?></td>
+								<td><?= $row['modelo'] ?></td>
+								<td><?= $row['color'] ?></td>
+								<td><?= $row['suela'] ?></td>
+								<td><?= $row['colorsuela'] ?></td>
+								<td><?= $row['agujeta'] ?></td>
+								<td><?= $row['coloragujeta'] ?></td>
+								<td><?= $row['ojillo'] ?></td>
+								<td><?= $row['colorojillo'] ?></td>
 								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 									<?php if(isset($row[''.$i])){ ?>
 										<td><b><?= $row[''.$i] ?></b></td>

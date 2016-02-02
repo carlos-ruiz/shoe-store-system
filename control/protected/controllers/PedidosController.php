@@ -74,8 +74,8 @@ class PedidosController extends Controller
 
 		if(isset($_POST['Pedidos']))
 		{
-			print_r($_POST);
-			return;
+			// print_r($_POST);
+			// return;
 			$transaction = Yii::app()->db->beginTransaction();
 			try{
 				$model->attributes=$_POST['Pedidos'];
@@ -121,16 +121,25 @@ class PedidosController extends Controller
 									$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($datosPedido['modelo'][$id], $datosPedido['color'][$id]));
 									
 									$zapato = Zapatos::model()->find('numero=? AND id_suelas_colores=? AND id_modelos=? AND id_colores=?', array($numero, $datosPedido['suelacolor'][$id], $modeloColor->id_modelos, $modeloColor->id_colores));
+									$precioZapato = isset($zapato)?$zapato->precio:0;
+									if (isset($datosPedido['agujetas'][$id])) {
+										$zapatoConAgujeta = Zapatos::model()->find('numero=? AND id_suelas_colores=? AND id_modelos=? AND id_colores=? AND id_agujetas_colores=? AND id_ojillos_colores=?', array($numero, $datosPedido['suelacolor'][$id], $modeloColor->id_modelos, $modeloColor->id_colores, $datosPedido['agujetascolor'][$id], $datosPedido['colorojillos'][$id]));
+										$zapato = $zapatoConAgujeta;
+									}
 	
 									if (!isset($zapato)) {
 										$zapato = new Zapatos;
 										$zapato->numero = $numero;
-										$zapato->precio = 0;
+										$zapato->precio = $precioZapato;
 										$numeroCodigo = str_replace('.', '', $numero);
 										$zapato->codigo_barras = sprintf('%03d',$modeloColor->id_modelos).sprintf('%03d', $datosPedido['suelacolor'][$id]).sprintf('%03d',$modeloColor->id_colores).sprintf('%03d', $numeroCodigo);
 										$zapato->id_modelos = $modeloColor->id_modelos;
 										$zapato->id_colores = $modeloColor->id_colores;
 										$zapato->id_suelas_colores = $datosPedido['suelacolor'][$id];
+										if (isset($datosPedido['agujetas'][$id])) {
+											$zapato->id_agujetas_colores = $datosPedido['agujetascolor'][$id];
+											$zapato->id_ojillos_colores = $datosPedido['colorojillos'][$id];
+										}
 										$zapato->save();
 									}
 									$pedidoZapato = new PedidosZapatos;
@@ -477,14 +486,31 @@ class PedidosController extends Controller
 	public function actionAgregarOrden()
 	{
 		if (isset($_POST)) {
-			print_r($_POST);
-			return;
+			// print_r($_POST);
+			// return;
 			$modelo = Modelos::model()->findByPk($_POST['id_modelos']);
 			$color = Colores::model()->findByPk($_POST['id_colores']);
 			$suela = Suelas::model()->findByPk($_POST['id_suelas']);
+
+			$rows = $_POST['row'];
+			$rows++;
+			$rowOdd = (($rows % 2)==0)?1:0;
+			// echo $rows;
+			// return;
+
+			$tieneAgujetas = false;
+			if(isset($_POST['id_agujetas'])){
+				$tieneAgujetas = true;
+				$agujetas = Agujetas::model()->findByPk($_POST['id_agujetas']);
+				$agujetasColor = AgujetasColores::model()->find('id_agujetas=? AND id_colores=?', array($agujetas->id, $_POST['id_color_agujetas']));
+				$ojillos = Ojillos::model()->findByPk($_POST['id_ojillos']);
+				$ojillosColor = OjillosColores::model()->find('id_ojillos=? AND id_colores=?', array($ojillos->id, $_POST['id_color_ojillos']));
+			}
+
 			$suelaColor = SuelasColores::model()->find('id_suelas=? AND id_colores=?', array($suela->id, $_POST['id_color_suela']));
 			$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($modelo->id));
 			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($modelo->id, $color->id));
+
 			$numerosPosibles = array();
 			foreach ($modeloNumeros as $modeloNumero) {
 				array_push($numerosPosibles, $modeloNumero->numero);
@@ -499,11 +525,24 @@ class PedidosController extends Controller
 			$time = str_replace(' ', '', $time);
 			$time = str_replace('.', '', $time);
 			?>
-			<tr id="row_<?= $time ?>">
+			<tr id="row_<?= $time ?>" class="<?= $rowOdd==1?'odd':'' ?>">
 				<td class="modelo" data-id="<?= $modelo->id ?>"><?= $modelo->nombre; ?><input type="hidden" name="Pedido[modelo][<?= $time ?>]" value="<?= $modelo->id ?>"></td>
 				<td class="color" data-id="<?= $color->id ?>"><?= $color->color; ?><input type="hidden" name="Pedido[color][<?= $time ?>]" value="<?= $color->id ?>"></td>
 				<td class="suela" data-id="<?= $suela->id ?>"><?= $suela->nombre; ?><input type="hidden" name="Pedido[suela][<?= $time ?>]" value="<?= $suela->id ?>"></td>
 				<td class="colorsuela" data-id="<?= $suelaColor->id ?>"><?= $suelaColor->color->color; ?><input type="hidden" name="Pedido[suelacolor][<?= $time ?>]" value="<?= $suelaColor->id ?>"></td>
+
+				<?php if($tieneAgujetas){ ?>
+				<td class="agujeta" data-id="<?= $agujetas->id ?>"><?= $agujetas->nombre; ?><input type="hidden" name="Pedido[agujetas][<?= $time ?>]" value="<?= $agujetas->id ?>"></td>
+				<td class="coloragujetas" data-id="<?= $agujetasColor->id ?>"><?= $agujetasColor->color->color; ?><input type="hidden" name="Pedido[agujetascolor][<?= $time ?>]" value="<?= $agujetasColor->id ?>"></td>
+				<td class="ojillos" data-id="<?= $ojillos->id ?>"><?= $ojillos->nombre; ?><input type="hidden" name="Pedido[ojillos][<?= $time ?>]" value="<?= $ojillos->id ?>"></td>
+				<td class="colorojillos" data-id="<?= $ojillosColor->id ?>"><?= $ojillosColor->color->color; ?><input type="hidden" name="Pedido[colorojillos][<?= $time ?>]" value="<?= $ojillosColor->id ?>"></td>
+				<?php } else{ ?>
+				<td class="agujeta">N/A</td>
+				<td class="coloragujetas">N/A</td>
+				<td class="ojillos">N/A</td>
+				<td class="colorojillos">N/A</td>
+				<?php } ?>
+
 			
 			<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 				<td data-numero="<?= $i; ?>">
@@ -516,10 +555,13 @@ class PedidosController extends Controller
 			</tr>
 
 			<?php if (isset($_POST['especial']) && strlen($_POST['especial']) > 0) { ?>
-				<tr>
-					<td>
+				<tr class="row_<?= $time ?> especial <?= $rowOdd==1?'odd':'' ?>">
+					<td  class="td-caracteristicas-especiales" colspan="46">
 						<?= $_POST['especial'] ?>
 						<input type="hidden" name="Pedido[especiales][<?= $time ?>]" value="<?= $_POST['especial'] ?>">
+					</td>
+					<td colspan="2">
+						<a data-row="<?= $time ?>" class="quitar-especial" title="Quitar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Quitar">Quitar</a>
 					</td>
 				</tr>
 			<?php } ?>

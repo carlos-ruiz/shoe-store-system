@@ -208,6 +208,10 @@
 		$id_color = 0;
 		$id_suela = 0;
 		$id_color_suela = 0;
+		$id_agujeta = 0;
+		$id_color_agujeta = 0;
+		$id_ojillo = 0;
+		$id_color_ojillo = 0;
 		$contador = 0;
 		$caracteristicas_especiales = '';
 		foreach ($model->pedidosZapatos as $pedidoZapato) { 
@@ -215,10 +219,38 @@
 				$pedidoZapato->zapato->modelo->id != $id_modelo ||
 				$pedidoZapato->zapato->color->id != $id_color ||
 				$pedidoZapato->zapato->suelaColor->suela->id != $id_suela || 
-				$pedidoZapato->zapato->suelaColor->color->id != $id_color_suela || 
+				$pedidoZapato->zapato->suelaColor->color->id != $id_color_suela ||
 				$pedidoZapato->caracteristicas_especiales != $caracteristicas_especiales
 			) {
-				$contador++;
+				if (isset($pedidoZapato->zapato->agujetaColor)) {
+					if (
+						$pedidoZapato->zapato->agujetaColor->agujeta->id != $id_agujeta || 
+						$pedidoZapato->zapato->agujetaColor->color->id != $id_color_agujeta || 
+						$pedidoZapato->zapato->ojilloColor->ojillo->id != $id_ojillo || 
+						$pedidoZapato->zapato->ojilloColor->color->id != $id_color_ojillo) {
+						$contador++;
+						
+						$zapatosDiferentes[$contador]['id_agujeta'] = $pedidoZapato->zapato->agujetaColor->id_agujetas;
+						$zapatosDiferentes[$contador]['agujeta'] = $pedidoZapato->zapato->agujetaColor->agujeta->nombre;
+						$zapatosDiferentes[$contador]['id_agujetacolor'] = $pedidoZapato->zapato->agujetaColor->id;
+						$zapatosDiferentes[$contador]['coloragujeta'] = $pedidoZapato->zapato->agujetaColor->color->color;
+						$zapatosDiferentes[$contador]['id_ojillo'] = $pedidoZapato->zapato->ojilloColor->id_ojillos;
+						$zapatosDiferentes[$contador]['ojillo'] = $pedidoZapato->zapato->ojilloColor->ojillo->nombre;
+						$zapatosDiferentes[$contador]['id_ojillocolor'] = $pedidoZapato->zapato->ojilloColor->id;
+						$zapatosDiferentes[$contador]['colorojillo'] = $pedidoZapato->zapato->ojilloColor->color->color;		
+					}
+				}
+				else{
+					$contador++;
+					$zapatosDiferentes[$contador]['id_agujeta'] = 'N/A';
+					$zapatosDiferentes[$contador]['agujeta'] = 'N/A';
+					$zapatosDiferentes[$contador]['id_agujetacolor'] = 'N/A';
+					$zapatosDiferentes[$contador]['coloragujeta'] = 'N/A';
+					$zapatosDiferentes[$contador]['id_ojillo'] = 'N/A';
+					$zapatosDiferentes[$contador]['ojillo'] = 'N/A';
+					$zapatosDiferentes[$contador]['id_ojillocolor'] = 'N/A';
+					$zapatosDiferentes[$contador]['colorojillo'] = 'N/A';
+				}
 				$zapatosDiferentes[$contador]['id_modelo'] = $pedidoZapato->zapato->modelo->id;
 				$zapatosDiferentes[$contador]['modelo'] = $pedidoZapato->zapato->modelo->nombre;
 				$zapatosDiferentes[$contador]['id_color'] = $pedidoZapato->zapato->color->id;
@@ -227,6 +259,7 @@
 				$zapatosDiferentes[$contador]['suela'] = $pedidoZapato->zapato->suelaColor->suela->nombre;
 				$zapatosDiferentes[$contador]['id_suelacolor'] = $pedidoZapato->zapato->suelaColor->id;
 				$zapatosDiferentes[$contador]['colorsuela'] = $pedidoZapato->zapato->suelaColor->color->color;
+
 				$zapatosDiferentes[$contador]['especial'] = $pedidoZapato->caracteristicas_especiales;
 				$id_modelo = $pedidoZapato->zapato->modelo->id;
 				$id_suela = $pedidoZapato->zapato->suelaColor->id_suelas;
@@ -249,6 +282,10 @@
 								<th>Color</th>
 								<th>Suela</th>
 								<th>Color Suela</th>
+								<th>Agujetas</th>
+								<th>Color Agujetas</th>
+								<th>Ojillos</th>
+								<th>Color Ojillos</th>
 								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 								<th><?php if(fmod($i ,1)==0){ echo $i;} else{echo "-";} ?></th>
 								<?php } ?>
@@ -279,6 +316,20 @@
 									<td class="colorsuela" data-id="<?= $row['id_suelacolor'] ?>">
 										<?= $row['colorsuela'] ?><input type="hidden" name="Pedido[suelacolor][<?= $time ?>]" value="<?= $row['id_suelacolor'] ?>">
 									</td>
+
+									<td class="agujeta" data-id="<?= $row['id_agujeta'] ?>">
+										<?= $row['agujeta'] ?><input type="hidden" name="Pedido[agujeta][<?= $time ?>]" value="<?= $row['id_agujeta'] ?>">
+									</td>
+									<td class="coloragujeta" data-id="<?= $row['id_agujetacolor'] ?>">
+										<?= $row['coloragujeta'] ?><input type="hidden" name="Pedido[agujetacolor][<?= $time ?>]" value="<?= $row['id_agujetacolor'] ?>">
+									</td>
+
+									<td class="ojillo" data-id="<?= $row['id_ojillo'] ?>">
+										<?= $row['ojillo'] ?><input type="hidden" name="Pedido[ojillo][<?= $time ?>]" value="<?= $row['id_ojillo'] ?>">
+									</td>
+									<td class="colorojillo" data-id="<?= $row['id_ojillocolor'] ?>">
+										<?= $row['colorojillo'] ?><input type="hidden" name="Pedido[ojillocolor][<?= $time ?>]" value="<?= $row['id_ojillocolor'] ?>">
+									</td>
 								
 								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 									<td data-numero="<?= $i; ?>">
@@ -291,7 +342,7 @@
 								</tr>
 								<?php if(isset($row['especial'])) { ?>
 									<tr class="row_<?= $time ?> <?= $rowOdd==1?'odd':'' ?>">
-										<td class="td-caracteristicas-especiales" colspan="42">
+										<td class="td-caracteristicas-especiales" colspan="46">
 											<?= $row['especial'] ?><input type="hidden" name="Pedido[especiales][<?= $time ?>]" value="<?= $row['especial'] ?>">
 										</td>
 										<td colspan="2">
@@ -453,6 +504,8 @@
 		id_ojillos = $('#PedidosZapatos_id_ojillos').val();
 		id_color_ojillos = $('#PedidosZapatos_id_ojillos_color').val();
 		rows = $('#ordenes_table tr').length;
+		rows_especiales = $('#ordenes_table tr.especial').length;
+		rows = rows-rows_especiales;
 		caracteristicas_especiales = $('#PedidosZapatos_caracteristicas_especiales').val();
 
 		if (id_modelos>0 && id_colores>0 && id_suelas>0 && id_color_suela>0) {
@@ -573,6 +626,10 @@
 		$('#PedidosZapatos_id_colores').html('<option value="">Seleccione una opción</option>');
 		$('#PedidosZapatos_id_suelas').html('<option value="">Seleccione una opción</option>');
 		$('#PedidosZapatos_id_suelas_color').html('<option value="">Seleccione una opción</option>');
+		$('#PedidosZapatos_id_agujetas').val('');
+		$('#PedidosZapatos_id_agujetas_color').html('<option value="">Seleccione una opción</option>');
+		$('#PedidosZapatos_id_ojillos').val('');
+		$('#PedidosZapatos_id_ojillos_color').html('<option value="">Seleccione una opción</option>');
 		$('#Pedidos_es_especial').attr('checked', false);
 		$('#PedidosZapatos_caracteristicas_especiales').val('');
 		$('#especial_input').hide(500);
