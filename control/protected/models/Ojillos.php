@@ -96,4 +96,13 @@ class Ojillos extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerColores($id_ojillos){
+		$ojilloColores=OjillosColores::model()->findAll("id_ojillos=?", array($id_ojillos));
+		$colores = array();
+		foreach ($ojilloColores as $ojilloColor) {
+			array_push($colores, $ojilloColor->color);
+		}
+		return CHtml::listData($colores, 'id', 'color');
+	}
 }

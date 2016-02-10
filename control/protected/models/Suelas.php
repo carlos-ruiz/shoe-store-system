@@ -104,4 +104,13 @@ class Suelas extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerColores($id_suelas){
+		$suelaColores=SuelasColores::model()->findAll("id_suelas=?", array($id_suelas));
+		$colores = array();
+		foreach ($suelaColores as $suelaColor) {
+			array_push($colores, $suelaColor->color);
+		}
+		return CHtml::listData($colores, 'id', 'color');
+	}
 }

@@ -1,20 +1,28 @@
 <?php
 
 /**
- * This is the model class for table "suelas_tacones".
+ * This is the model class for table "materiales_apartados_pedido".
  *
- * The followings are the available columns in table 'suelas_tacones':
- * @property integer $id_suelas
- * @property integer $id_tacones
+ * The followings are the available columns in table 'materiales_apartados_pedido':
+ * @property integer $id
+ * @property integer $id_tipos_articulos_inventario
+ * @property integer $id_articulo
+ * @property integer $id_colores
+ * @property integer $id_pedidos
+ * @property double $cantidad_apartada
+ * @property string $fecha_actualizacion
+ *
+ * The followings are the available model relations:
+ * @property Pedidos $idPedidos
  */
-class SuelasTacones extends CActiveRecord
+class MaterialesApartadosPedido extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'suelas_tacones';
+		return 'materiales_apartados_pedido';
 	}
 
 	/**
@@ -25,11 +33,13 @@ class SuelasTacones extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_suelas, id_tacones', 'required'),
-			array('id_suelas, id_tacones', 'numerical', 'integerOnly'=>true),
+			array('id_tipos_articulos_inventario, id_articulo, id_pedidos, cantidad_apartada', 'required'),
+			array('id_tipos_articulos_inventario, id_articulo, id_colores, id_pedidos', 'numerical', 'integerOnly'=>true),
+			array('cantidad_apartada', 'numerical'),
+			array('fecha_actualizacion', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_suelas, id_tacones', 'safe', 'on'=>'search'),
+			array('id, id_tipos_articulos_inventario, id_articulo, id_colores, id_pedidos, cantidad_apartada, fecha_actualizacion', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -41,8 +51,7 @@ class SuelasTacones extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
-			'tacon' => array(self::BELONGS_TO, 'Tacones', 'id_tacones'),
+			'pedido' => array(self::BELONGS_TO, 'Pedidos', 'id_pedidos'),
 		);
 	}
 
@@ -52,8 +61,13 @@ class SuelasTacones extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id_suelas' => 'Id Suelas',
-			'id_tacones' => 'Id Tacones',
+			'id' => 'ID',
+			'id_tipos_articulos_inventario' => 'Tipo de artículo',
+			'id_articulo' => 'Artículo',
+			'id_colores' => 'Color',
+			'id_pedidos' => 'Pedido',
+			'cantidad_apartada' => 'Cantidad apartada',
+			'fecha_actualizacion' => 'Fecha de actualización',
 		);
 	}
 
@@ -75,8 +89,13 @@ class SuelasTacones extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id_suelas',$this->id_suelas);
-		$criteria->compare('id_tacones',$this->id_tacones);
+		$criteria->compare('id',$this->id);
+		$criteria->compare('id_tipos_articulos_inventario',$this->id_tipos_articulos_inventario);
+		$criteria->compare('id_articulo',$this->id_articulo);
+		$criteria->compare('id_colores',$this->id_colores);
+		$criteria->compare('id_pedidos',$this->id_pedidos);
+		$criteria->compare('cantidad_apartada',$this->cantidad_apartada);
+		$criteria->compare('fecha_actualizacion',$this->fecha_actualizacion,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -87,20 +106,10 @@ class SuelasTacones extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return SuelasTacones the static model class
+	 * @return MaterialesApartadosPedido the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
-	}
-
-
-	public function obtenerTaconesPorSuela($id_suelas){
-		$suelaTacones=SuelasTacones::model()->findAll("id_suelas=?", array($id_suelas));
-		$tacones = array();
-		foreach ($suelaTacones as $suelaTacon) {
-			array_push($tacones, $suelaTacon->tacon);
-		}
-		return CHtml::listData($tacones, 'id', 'nombre');
 	}
 }

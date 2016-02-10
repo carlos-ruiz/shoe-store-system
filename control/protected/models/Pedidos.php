@@ -14,8 +14,11 @@
  * @property string $prioridad
  * @property integer $descuento
  * @property integer $estatus_pagos_id
+ * @property string $fecha_creacion
+ * @property string $fecha_modificacion
  *
  * The followings are the available model relations:
+ * @property MaterialesApartadosPedido[] $materialesApartadosPedidos
  * @property Pagos[] $pagos
  * @property Clientes $cliente
  * @property EstatusPagos $estatusPago
@@ -51,7 +54,7 @@ class Pedidos extends CActiveRecord
 			array('pagado', 'numerical'),
 			array('total', 'length', 'max'=>10),
 			array('prioridad', 'length', 'max'=>45),
-			array('fecha_entrega, total', 'safe'),
+			array('fecha_entrega, total, fecha_creacion, fecha_modificacion', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, id_clientes, fecha_pedido, fecha_entrega, id_formas_pago, total, id_estatus_pedidos, prioridad, descuento, var_cliente_nombre, var_estatus, var_estatus_pago, var_forma_pago, estatus_pagos_id, pagado', 'safe', 'on'=>'search'),
@@ -72,6 +75,7 @@ class Pedidos extends CActiveRecord
 			'formaPago' => array(self::BELONGS_TO, 'FormasPago', 'id_formas_pago'),
 			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos', 'order'=>'caracteristicas_especiales ASC'),
 			'estatusPago' => array(self::BELONGS_TO, 'EstatusPagos', 'estatus_pagos_id'),
+			'materialesApartados' => array(self::HAS_MANY, 'MaterialesApartadosPedido', 'id_pedidos'),
 		);
 	}
 
@@ -96,6 +100,8 @@ class Pedidos extends CActiveRecord
 			'var_forma_pago' => 'Forma de pago',
 			'estatus_pagos_id' => 'Estatus de pago',
 			'pagado' => 'Su pago',
+			'fecha_creacion' => 'Fecha de creación',
+			'fecha_modificacion' => 'Fecha de última edición',
 		);
 	}
 
@@ -133,6 +139,8 @@ class Pedidos extends CActiveRecord
 		$criteria->compare('formaPago.nombre', $this->var_forma_pago, true);
 		$criteria->order='estatus.id ASC, fecha_entrega ASC';
 		$criteria->compare('estatus_pagos_id',$this->estatus_pagos_id);
+		$criteria->compare('fecha_creacion',$this->fecha_creacion,true);
+		$criteria->compare('fecha_modificacion',$this->fecha_modificacion,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

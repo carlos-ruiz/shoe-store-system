@@ -101,4 +101,13 @@ class Tacones extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerColores($id_tacones){
+		$taconColores=TaconesColores::model()->findAll("id_tacones=?", array($id_tacones));
+		$colores = array();
+		foreach ($taconColores as $taconColor) {
+			array_push($colores, $taconColor->color);
+		}
+		return CHtml::listData($colores, 'id', 'color');
+	}
 }

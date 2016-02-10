@@ -37,7 +37,7 @@ class PedidosController extends Controller
 			// 	'users'=>array('@'),
 			// ),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'actualizarInventarios', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -76,7 +76,7 @@ class PedidosController extends Controller
 		{
 			// print_r($_POST);
 			// return;
-			$transaction = Yii::app()->db->beginTransaction();
+			// $transaction = Yii::app()->db->beginTransaction();
 			try{
 				$model->attributes=$_POST['Pedidos'];
 				$prioridad = $_POST['Pedidos']['prioridad'];
@@ -183,11 +183,13 @@ class PedidosController extends Controller
 							$model->save();
 						}
 					}
-					$transaction->commit();
+					$this->actualizarInventarios($model);
+					// $transaction->commit();
 					$this->redirect(array('view','id'=>$model->id));
 				}
 			}catch(Exception $ex){
-				$transaction->rollback();
+				print_r($ex);
+				// $transaction->rollback();
 			}
 		}
 
@@ -587,10 +589,122 @@ class PedidosController extends Controller
 		return '$'.number_format($adeudo, 2, '.', '');
 	}
 
-	public function actionActualizarInventarios($id_pedidos)
+	public function actualizarInventarios($pedido)
 	{
-		$pedido = $this->loadModel($id_pedidos);
 		// Aqui se va a hacer todo el descuento de materiales, suelas, etc.
+		foreach ($pedido->pedidosZapatos as $pedidoZapato) {
+			$cantidad_pares = $pedidoZapato->cantidad_total;
+			$numero_zapato = $pedidoZapato->zapato->numero;
+			$modelo = Modelos::model()->findByPk($pedidoZapato->zapato->id_modelos);
+			$cantidad_ojillos = 0;
+			$cantidad_agujetas = 0;
+
+			// Agregar a apartados los materiales
+			foreach ($modelo->modelosMateriales as $modeloMaterial) {
+				$cantidad_a_descontar = 0;
+				if ($numero_zapato >= 12 && $numero_zapato < 18) {
+					$cantidad_a_descontar = $modeloMaterial->cantidad_extrachico;
+				}
+				elseif ($numero_zapato >= 18 && $numero_zapato < 22) {
+					$cantidad_a_descontar = $modeloMaterial->cantidad_chico;
+				}
+				elseif ($numero_zapato >= 22 && $numero_zapato < 25) {
+					$cantidad_a_descontar = $modeloMaterial->cantidad_mediano;
+				}
+				elseif ($numero_zapato >= 25 && $numero_zapato < 32) {
+					$cantidad_a_descontar = $modeloMaterial->cantidad_grande;
+				}
+				$cantidad_a_descontar = $cantidad_a_descontar*$cantidad_pares;
+				if ($modeloMaterial->material->nombre == 'Ojillos') {
+					$cantidad_ojillos = $cantidad_a_descontar;
+					continue;
+				}
+				else if ($modeloMaterial->material->nombre == 'Agujetas') {
+					$cantidad_agujetas = $cantidad_a_descontar;
+					continue;
+				}
+
+				$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Materiales'));
+				$materialTieneColores = (MaterialesColores::model()->count('id_materiales=?', array($modeloMaterial->id_materiales)) > 0)?true:false;
+				if($materialTieneColores){
+					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id, $pedidoZapato->zapato->id_colores));
+				}
+				if(!isset($materialApartado)){
+					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id));
+				}
+				if(!isset($materialApartado)){
+					$materialApartado = new MaterialesApartadosPedido;
+					$materialApartado->id_tipos_articulos_inventario = $tipoArticulo->id;
+					$materialApartado->id_articulo = $modeloMaterial->id_materiales;
+					if($materialTieneColores){
+						$materialApartado->id_colores = $pedidoZapato->zapato->id_colores;
+					}
+					$materialApartado->id_pedidos = $pedido->id;
+					$materialApartado->cantidad_apartada = 0;
+				}
+				$materialApartado->cantidad_apartada += $cantidad_a_descontar;
+				$materialApartado->fecha_actualizacion = date('Y-m-d H:i:s');
+				$materialApartado->save();
+			} // Fin foreach modelosMateriales
+
+			// Agregar a apartados las suelas
+			$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Suelas'));
+			$modeloNumero = ModelosNumeros::model()->find('id_modelos=? AND numero=?', array($modelo->id, $numero_zapato));
+			$modeloSuelaNumero = ModelosSuelasNumeros::model()->find('id_modelos_numeros=?', array($modeloNumero->id));
+			$numero_suela = $modeloSuelaNumero->suelaNumero->numero;
+			$suelasApartadas = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=? AND numero=?', array($tipoArticulo->id, $pedidoZapato->zapato->suelaColor->id_suelas, $pedido->id, $pedidoZapato->zapato->suelaColor->id_colores, $numero_suela));
+			if (!isset($suelasApartadas)) {
+				$suelasApartadas = new MaterialesApartadosPedido;
+				$suelasApartadas->id_tipos_articulos_inventario = $tipoArticulo->id;
+				$suelasApartadas->id_articulo = $tipoArticulo->id;
+				$suelasApartadas->id_colores = $pedidoZapato->zapato->suelaColor->id_colores;
+				$suelasApartadas->numero = $numero_suela;
+				$suelasApartadas->id_pedidos = $pedido->id;
+			}
+			$suelasApartadas->cantidad_apartada += $cantidad_pares;
+			$suelasApartadas->fecha_actualizacion = date('Y-m-d H:i:s');
+			$suelasApartadas->save();
+
+			// Apartar agujetas
+			if (isset($pedidoZapato->zapato->agujetaColor)) {
+				$agujetaColor = $pedidoZapato->zapato->agujetaColor;
+				$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Agujetas'));
+				$agujetasApartadas = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $agujetaColor->id_agujetas, $pedido->id, $agujetaColor->id_colores));
+				if (!isset($agujetasApartadas)) {
+					$agujetasApartadas = new MaterialesApartadosPedido;
+					$agujetasApartadas->id_tipos_articulos_inventario = $tipoArticulo->id;
+					$agujetasApartadas->id_articulo = $agujetaColor->id_agujetas;
+					$agujetasApartadas->id_colores = $agujetaColor->id_colores;
+					$agujetasApartadas->id_pedidos = $pedido->id;
+				}
+				$agujetasApartadas->cantidad_apartada += $cantidad_agujetas;
+				$agujetasApartadas->fecha_actualizacion = date('Y-m-d H:i:s');
+				$agujetasApartadas->save();
+			}
+
+			// Apartar ojillos
+			if (isset($pedidoZapato->zapato->ojilloColor)) {
+				$materialOjillos = Materiales::model()->find('nombre=?', array('Ojillos'));
+				$modeloMaterial = ModelosMateriales::model()->find('id_modelos=? AND id_materiales=?', array($modelo->id, $materialOjillos->id));
+				if(isset($modeloMaterial)){
+					$ojilloColor = $pedidoZapato->zapato->ojilloColor;
+					$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Ojillos'));
+					$ojillosApartados = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $ojilloColor->id_ojillos, $pedido->id, $ojilloColor->id_colores));
+					if (!isset($ojillosApartados)) {
+						$ojillosApartados = new MaterialesApartadosPedido;
+						$ojillosApartados->id_tipos_articulos_inventario = $tipoArticulo->id;
+						$ojillosApartados->id_articulo = $ojilloColor->id_ojillos;
+						$ojillosApartados->id_colores = $ojilloColor->id_colores;
+						$ojillosApartados->id_pedidos = $pedido->id;
+					}
+					$ojillosApartados->cantidad_apartada += $cantidad_ojillos;
+					$ojillosApartados->fecha_actualizacion = date('Y-m-d H:i:s');
+					$ojillosApartados->save();
+				}
+			}
+
+		} // Fin foreach pedidosZapatos
+
 	}
 
 }

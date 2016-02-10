@@ -127,6 +127,10 @@ data-position="right" class="navbar-default navbar-static-side">
                     </li>
                 </ul>
             </li>
+            <li class="<?php if($this->section == 'modelos_materiales_default'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/modelosmaterialespredeterminados/admin"><i class="fa fa-puzzle-piece fa-fw">
+                <div class="icon-bg bg-red"></div>
+                </i><span class="menu-title">Definición de zapatos</span></a>
+            </li>
             <li><a href="#"><i class="fa fa-file-pdf-o fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Reportes</span></a>
