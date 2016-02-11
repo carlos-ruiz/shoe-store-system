@@ -275,6 +275,9 @@ class TaconesController extends Controller
 		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Tacones'));
 		$tacones = Tacones::model()->findAll();
 		if (isset($_POST['Inventario'])) {
+			if (isset($_POST['Tacones']['stock_minimo'])) {
+				$stock_minimo_suelas = $_POST['Tacones']['stock_minimo'];
+			}
 			if (isset($_POST['Inventario']['taconColor'])) {
 				$taconesColores = $_POST['Inventario']['taconColor'];
 				foreach ($taconesColores as $clave => $id_tacon_color) {
@@ -295,6 +298,9 @@ class TaconesController extends Controller
 									$inventario->cantidad_apartada = 0;
 									$inventario->unidad_medida = 'Pares';
 									$inventario->ultimo_precio = 0;
+								}
+								if (isset($stock_minimo_suelas)) {
+									$inventario->stock_minimo = $stock_minimo_suelas;
 								}
 								$inventario->cantidad_existente += $cantidad;
 								$inventario->save();

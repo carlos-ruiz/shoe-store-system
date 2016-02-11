@@ -24,6 +24,7 @@
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/pace.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/kadmin/styles/jquery.news-ticker.css">
     <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/css/custom.css">
+    <link type="text/css" rel="stylesheet" href="<?= Yii::app()->request->baseurl; ?>/assets/plugins/bootstrap-modal/css/bootstrap-modal.css">
 
     <!-- DATE TIME PICKERS-->
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datepicker/css/datepicker3.css"/>
@@ -35,6 +36,22 @@
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery.ba-bbq.min.js"></script>
 </head>
 <body>
+<div class="modal fade" tabindex="-1" role="dialog" id="modal_alert">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
+                <h4 class="modal-title" id="modal_title">Aviso</h4>
+            </div>
+            <div class="modal-body">
+                Cargando...
+            </div>
+            <div class="modal-footer" id="modal_botones">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="wrapper-parent">
         <!--BEGIN BACK TO TOP-->
         <a id="totop" href="#"><i class="fa fa-angle-up"></i></a>
@@ -118,6 +135,10 @@
     <!-- DateTime Pickers -->
     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
     <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <!-- <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/modal.js"></script> -->
+    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-modal/js/bootstrap-modal.js"></script>
+    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/assets/plugins/bootstrap-modal/js/bootstrap-modalmanager.js"></script>
+    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl; ?>/js/custom.js"></script>
     <script>
         $('.datepicker').datepicker();
     </script>

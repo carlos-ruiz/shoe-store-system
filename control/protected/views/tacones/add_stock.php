@@ -21,7 +21,7 @@
 <div class="form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
-	'id'=>'suelas-add-stock-form',
+	'id'=>'tacones-add-stock-form',
 	// Please note: When you enable ajax validation, make sure the corresponding
 	// controller action is handling ajax validation correctly.
 	// There is a call to performAjaxValidation() commented in generated controller code.
@@ -76,6 +76,22 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="form-group col-md-6">
+				<label for="Tacones_stock_minimo_check">Aplicar mismo stock minimo a todos los tacones que se agregarán</label>
+				<div class="input-group inline-block">
+					<input size="45" maxlength="45" name="Tacones[stock_minimo_general]" id="Tacones_stock_minimo_check" value="1" type="checkbox">
+				</div>
+			</div>
+		</div>
+		<div class="row" id="stock_minimo_panel">
+			<div class="form-group col-md-6">
+				<div class="input-group inline-block">
+					<input size="45" maxlength="45" name="Tacones[stock_minimo]" id="Tacones_stock_minimo" value="1" type="number" min="0" max="1000">
+				</div>
+				<label for="Tacones_stock_minimo">Pares</label>
+			</div>
+		</div>
 
 		<div class="form-group">
 			<?php echo CHtml::submitButton('Aplicar', array('class'=>'btn btn-red-stripped')); ?>
@@ -87,13 +103,22 @@
 </div><!-- form -->
 
 <script type="text/javascript">
+	$(document).ready(function(){
+		if(!$('#Tacones_stock_minimo_check').is(":checked")){
+			$('#stock_minimo_panel').hide();
+		}
+	});
+
 	$('.input-cantidad').change(function(){
 		cantidad = $(this).attr('value');
 		if(!/^([0-9]*(\.[0-9]+)?)$/.test(cantidad)){
-			// alert('Debe escribir un valor numerico');
 			$(this).css({ "border": '#FF0000 3px solid'});
 			return;
 		}
 		$(this).removeAttr('style');
+	});
+
+	$('#Tacones_stock_minimo_check').click(function(){
+		$('#stock_minimo_panel').toggle(500);
 	});
 </script>

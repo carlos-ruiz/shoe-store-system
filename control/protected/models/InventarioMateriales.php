@@ -117,6 +117,6 @@ class InventarioMateriales extends CActiveRecord
 	}
 
 	public function obtenerMateriales(){
-		return CHtml::listData(Materiales::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
+		return CHtml::listData(Materiales::model()->findAll(array('order'=>'nombre', 'condition'=>'nombre!="Agujetas" AND nombre!="Ojillos"')), 'id', 'nombre');
 	}
 }

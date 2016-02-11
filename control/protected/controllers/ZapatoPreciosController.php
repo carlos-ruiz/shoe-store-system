@@ -163,7 +163,14 @@ class ZapatoPreciosController extends Controller
 
 		$zapato = Zapatos::model()->with(array('suelaColor.suela'=>array('alias'=>'suela')))->find('id_modelos=? AND suela.id=? AND numero=?', array($id_modelos, $id_suelas, $numero));
 
-		echo $zapato->precio;
+		if (isset($zapato)) {
+			echo $zapato->precio;
+		}else{
+			$modelo = Modelos::model()->findByPk($id_modelos);
+			$suela = Suelas::model()->findByPk($id_suelas);
+
+			echo "error#No se ha definido el precio del modelo ".$modelo->nombre.", suela ".$suela->nombre.", número ".$numero;
+		}
 	}
 
 	public function actionTotalRow()

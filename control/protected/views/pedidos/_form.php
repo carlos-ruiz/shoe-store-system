@@ -34,7 +34,7 @@
                                 }"
 							),
 							"class" => "form-control",
-							"empty"=>"Seleccione una opci&oacute;n",
+							"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
 						);
 					?>
 					<?php echo $form->dropDownList($model,'id_clientes', Clientes::model()->obtenerClientes(), $htmlOptions); ?>
@@ -61,14 +61,14 @@
 			<div class="form-group col-md-4 <?php if($form->error($model,'id_formas_pago')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'id_formas_pago', array('class'=>'control-label')); ?>
 				<div class="input-group">
-					<?php echo $form->dropDownList($model,'id_formas_pago', FormasPago::model()->obtenerFormasPago(), array('class' => 'form-control',"empty"=>"Seleccione una opci&oacute;n")); ?>
+					<?php echo $form->dropDownList($model,'id_formas_pago', FormasPago::model()->obtenerFormasPago(), array('class' => 'form-control',"empty"=>array('0'=>"Seleccione una opci&oacute;n"))); ?>
 					<?php echo $form->error($model,'id_formas_pago', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'id_estatus_pedidos')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'id_estatus_pedidos', array('class'=>'control-label')); ?>
 				<div class="input-group">
-					<?php echo $form->dropDownList($model,'id_estatus_pedidos', EstatusPedidos::model()->obtenerEstatusPedidos(), array('class' => 'form-control',"empty"=>"Seleccione una opci&oacute;n")); ?>
+					<?php echo $form->dropDownList($model,'id_estatus_pedidos', EstatusPedidos::model()->obtenerEstatusPedidos(), array('class' => 'form-control',"empty"=>array('0'=>"Seleccione una opci&oacute;n"))); ?>
 					<?php echo $form->error($model,'id_estatus_pedidos', array('class'=>'help-block')); ?>
 				</div>
 			</div>
@@ -89,7 +89,7 @@
 					<?php
 						$htmlOptions = array(
 							"class" => "form-control",
-							"empty"=>"Seleccione una opci&oacute;n",
+							"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
 						);
 					?>
 					<?php echo $form->dropDownList($pedidoZapato,'id_modelos',Modelos::model()->obtenerModelos(), $htmlOptions); ?>
@@ -114,7 +114,7 @@
 										"update"=>"#PedidosZapatos_id_suelas_color"
 									),
 									"class" => "form-control input-medium select2me",
-									"empty"=>"Seleccione una opci&oacute;n",
+									"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
 								);
 					?>
 					<?php echo $form->dropDownList($pedidoZapato,'id_suelas',Modelos::model()->obtenerSuelas(isset($pedidoZapato->id_modelos)?$pedidoZapato->id_modelos:0), $htmlOptionsAjax); ?>
@@ -134,17 +134,17 @@
 				<?php echo $form->labelEx($pedidoZapato,'id_agujetas', array('class'=>'control-label')); ?>
 				<div class="input-group">
 					<?php
-						$htmlOptionsAjax = array(
-									"ajax"=>array(
-										"url"=>$this->createUrl("pedidos/coloresPorAgujeta"),
-										"type"=>"POST",
-										"update"=>"#PedidosZapatos_id_agujetas_color"
-									),
-									"class" => "form-control input-medium select2me",
-									"empty"=>"Seleccione una opci&oacute;n",
-								);
+						// $htmlOptionsAjax = array(
+						// 			"ajax"=>array(
+						// 				"url"=>$this->createUrl("pedidos/coloresPorAgujeta"),
+						// 				"type"=>"POST",
+						// 				"update"=>"#PedidosZapatos_id_agujetas_color"
+						// 			),
+						// 			"class" => "form-control input-medium select2me",
+						// 			"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+						// 		);
 					?>
-					<?php echo $form->dropDownList($pedidoZapato,'id_agujetas',CHtml::listData(Agujetas::model()->findAll(), 'id', 'nombre'), $htmlOptionsAjax); ?>
+					<?php echo $form->dropDownList($pedidoZapato,'id_agujetas',CHtml::listData(Agujetas::model()->findAll(), 'id', 'nombre'), $htmlOptions); ?>
 					<?php echo $form->error($pedidoZapato,'id_agujetas', array('class'=>'help-block')); ?>
 				</div>
 			</div>
@@ -160,17 +160,17 @@
 				<?php echo $form->labelEx($pedidoZapato,'id_ojillos', array('class'=>'control-label')); ?>
 				<div class="input-group">
 					<?php
-						$htmlOptionsAjax = array(
-									"ajax"=>array(
-										"url"=>$this->createUrl("pedidos/coloresPorOjillo"),
-										"type"=>"POST",
-										"update"=>"#PedidosZapatos_id_ojillos_color"
-									),
-									"class" => "form-control input-medium select2me",
-									"empty"=>"Seleccione una opci&oacute;n",
-								);
+						// $htmlOptionsAjax = array(
+						// 			"ajax"=>array(
+						// 				"url"=>$this->createUrl("pedidos/coloresPorOjillo"),
+						// 				"type"=>"POST",
+						// 				"update"=>"#PedidosZapatos_id_ojillos_color"
+						// 			),
+						// 			"class" => "form-control input-medium select2me",
+						// 			"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+						// 		);
 					?>
-					<?php echo $form->dropDownList($pedidoZapato,'id_ojillos',CHtml::listData(Ojillos::model()->findAll(), 'id', 'nombre'), $htmlOptionsAjax); ?>
+					<?php echo $form->dropDownList($pedidoZapato,'id_ojillos',CHtml::listData(Ojillos::model()->findAll(), 'id', 'nombre'), $htmlOptions); ?>
 					<?php echo $form->error($pedidoZapato,'id_ojillos', array('class'=>'help-block')); ?>
 				</div>
 			</div>
@@ -469,7 +469,14 @@
 
 	jQuery(function($) {
 		jQuery('body').on('change','#PedidosZapatos_id_modelos',function(){
-			jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_colores").html(html);}});
+			jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+					jQuery("#PedidosZapatos_id_colores").html(html);
+					jQuery.ajax({'url':'/controlbom/control/pedidos/materialesPredeterminados','type':'POST','dataType':'json','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(json_response){
+							establecerMaterialesPredeterminados(json_response);
+						}
+					});
+				}
+			});
 			jQuery.ajax({'url':'/controlbom/control/pedidos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 					jQuery("#PedidosZapatos_id_suelas").html(html);
 					actualizarColoresSuelas();
@@ -488,7 +495,38 @@
 			});
 			return false;
 		});
+
+		jQuery('body').on('change','#PedidosZapatos_id_colores',function(){
+			jQuery.ajax({'url':'/controlbom/control/pedidos/materialesPredeterminados','type':'POST','dataType':'json','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(json_response){
+					console.log(json_response.id_modelo);
+					establecerMaterialesPredeterminados(json_response);
+				}
+			});
+			return false;
+		});
+
+		jQuery('body').on('change','#PedidosZapatos_id_agujetas',function(){
+			actualizarColoresDeAgujetas();
+			return false;
+		});
+		jQuery('body').on('change','#PedidosZapatos_id_ojillos',function(){
+			actualizarColoresDeOjillos();
+			return false;
+		});
 	});
+	function actualizarColoresDeAgujetas(){
+		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorAgujeta','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
+				jQuery("#PedidosZapatos_id_agujetas_color").html(html);
+			}
+		});
+	}
+
+	function actualizarColoresDeOjillos(){
+		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorOjillo','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
+				jQuery("#PedidosZapatos_id_ojillos_color").html(html);
+			}
+		});
+	}
 
 	function actualizarColoresSuelas(){
 		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html);}});
@@ -523,7 +561,7 @@
 					datos.id_ojillos = id_ojillos;
 					datos.id_color_ojillos = id_color_ojillos;
 				}else{
-					alert('Está mal');
+					alerta('Debe seleccionar tambien los datos de agujetas y ojillos', "Error");
 					return;
 				}
 			}
@@ -538,7 +576,7 @@
 				}
 			);
 		}else{
-			alert('Esta mal');
+			alerta('Debe seleccionar los datos de modelo y suela, así como sus respectivos colores', 'Error');
 		}
 		
 	});
@@ -553,13 +591,14 @@
 		total = parseFloat($('#Pedidos_subtotal').val());
 		cantidad = $(this).val();
 		if(!/^([0-9])*$/.test(cantidad)){
-			alert('Debe especificar la cantidad de pares, debe ser un número');
+			alerta('Debe especificar la cantidad de pares, debe ser un número');
 			cantidad = 0;
 			$(this).val(cantidad);
 		}
 		if($(this).val()===''){
 			$(this).val(0);
 		}
+		input = $(this);
 		$(".panel-ordenes").block({message:'Espere...'});
 		$.post(
 			"<?php echo $this->createUrl('zapatoprecios/consultarprecio/');?>",
@@ -569,6 +608,13 @@
 				id_suelas:id_suelas
 			},
 			function(data){
+				if(data.search("error")>=0){
+					input.val(0);
+					mensaje = data.split('#');
+					alerta(mensaje[1], 'Error');
+					$(".panel-ordenes").unblock();
+					return;
+				}
 				precio = parseFloat(data);
 				total += (precio*cantidad);
 				if(/^([0-9])*$/.test(valorAnterior)){
@@ -587,7 +633,7 @@
 	});
 	$(document).on("change","#Pedidos_descuento", function(){
 		if($(this).val() < 0 || $(this).val() > 100){
-			alert('El descuento debe ser un número entre 0 y 100');
+			alerta('El descuento debe ser un número entre 0 y 100');
 			$(this).val('0');
 		}
 		calcularTotal();
@@ -622,16 +668,16 @@
 	});
 
 	function limpiarCamposOrden(){
-		$('#PedidosZapatos_id_modelos').val('');
+		$('#PedidosZapatos_id_modelos').val(0);
 		$('#PedidosZapatos_id_colores').html('<option value="">Seleccione una opción</option>');
 		$('#PedidosZapatos_id_suelas').html('<option value="">Seleccione una opción</option>');
 		$('#PedidosZapatos_id_suelas_color').html('<option value="">Seleccione una opción</option>');
-		$('#PedidosZapatos_id_agujetas').val('');
+		$('#PedidosZapatos_id_agujetas').val(0);
 		$('#PedidosZapatos_id_agujetas_color').html('<option value="">Seleccione una opción</option>');
-		$('#PedidosZapatos_id_ojillos').val('');
+		$('#PedidosZapatos_id_ojillos').val(0);
 		$('#PedidosZapatos_id_ojillos_color').html('<option value="">Seleccione una opción</option>');
 		$('#Pedidos_es_especial').attr('checked', false);
-		$('#PedidosZapatos_caracteristicas_especiales').val('');
+		$('#PedidosZapatos_caracteristicas_especiales').val(0);
 		$('#especial_input').hide(500);
 	}
 
@@ -664,5 +710,34 @@
 		}
 		pendiente = total-pagado-pagoActual;
 		$('#PedidosTemp_pago_pendiente').val(pendiente.toFixed(2));
+	}
+
+	function establecerMaterialesPredeterminados(datos_json){
+		id_modelo = datos_json.id_modelo;
+		id_color_modelo = datos_json.id_color_modelo;
+		id_suela = datos_json.id_suela;
+		id_color_suela = datos_json.id_color_suela;
+		id_tacon = datos_json.id_tacon;
+		id_color_tacon = datos_json.id_color_tacon;
+		id_agujetas = datos_json.id_agujetas;
+		id_color_agujetas = datos_json.id_color_agujetas;
+		id_ojillos = datos_json.id_ojillos;
+		id_color_ojillos = datos_json.id_color_ojillos;
+		$('#PedidosZapatos_id_suelas').val(id_suela);
+		$('#PedidosZapatos_id_suelas_color').val(id_color_suela);
+		$('#PedidosZapatos_id_agujetas').val(id_agujetas);
+		$("select#PedidosZapatos_id_agujetas option").each(function(){
+			$(this).removeAttr('selected');
+		});
+		$("select#PedidosZapatos_id_agujetas option[value='"+id_agujetas+"']").attr("selected","selected");
+		$("select#PedidosZapatos_id_agujetas").change();
+		$('#PedidosZapatos_id_agujetas_color').val(id_color_agujetas);
+		$('#PedidosZapatos_id_ojillos').val(id_ojillos);
+		$("select#PedidosZapatos_id_ojillos option").each(function(){
+			$(this).removeAttr('selected');
+		});
+		$("select#PedidosZapatos_id_ojillos option[value='"+id_ojillos+"']").attr("selected","selected");
+		$("select#PedidosZapatos_id_ojillos").change();
+		$('#PedidosZapatos_id_ojillos_color').val(id_color_ojillos);
 	}
 </script>

@@ -261,7 +261,12 @@ class SuelasController extends Controller
 	{
 		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Suelas'));
 		$suelas = Suelas::model()->findAll();
+
 		if (isset($_POST['Inventario'])) {
+			if (isset($_POST['Suelas']['stock_minimo'])) {
+				$stock_minimo_suelas = $_POST['Suelas']['stock_minimo'];
+			}
+
 			if (isset($_POST['Inventario']['suelacolor'])) {
 				$suelasColores = $_POST['Inventario']['suelacolor'];
 				foreach ($suelasColores as $clave => $id_suela_color) {
@@ -282,6 +287,9 @@ class SuelasController extends Controller
 									$inventario->cantidad_apartada = 0;
 									$inventario->unidad_medida = 'Pares';
 									$inventario->ultimo_precio = 0;
+								}
+								if (isset($stock_minimo_suelas)) {
+									$inventario->stock_minimo = $stock_minimo_suelas;
 								}
 								$inventario->cantidad_existente += $cantidad;
 								$inventario->save();

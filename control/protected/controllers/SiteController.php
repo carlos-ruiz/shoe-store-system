@@ -125,6 +125,7 @@ class SiteController extends Controller
 		$this->crearEstatusDeZapatos();
 		$this->crearFormasDePago();
 		$this->inicializarTiposDeInventarios();
+		$this->inicializarMaterialesNecesarios();
 		if(Usuarios::model()->find('usuario=?', array('admin')) == null){
 			$perfilAdministrador = PerfilesUsuarios::model()->find('nombre=?', array('Administrador'));
 			$usuario = new Usuarios;
@@ -251,6 +252,22 @@ class SiteController extends Controller
 			$tipoInventario = new TiposArticulosInventario;
 			$tipoInventario->tipo = 'Materiales';
 			$tipoInventario->save();
+		}
+	}
+
+	public function inicializarMaterialesNecesarios()
+	{
+		if (Materiales::model()->count()==0) {
+			$material = new Materiales;
+			$material->nombre = 'Agujetas';
+			$material->unidad_medida = 'Millares';
+			$material->activo = 1;
+			$material->save();
+			$material = new Materiales;
+			$material->nombre = 'Ojillos';
+			$material->unidad_medida = 'Millares';
+			$material->activo = 1;
+			$material->save();
 		}
 	}
 }

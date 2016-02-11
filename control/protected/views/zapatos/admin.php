@@ -73,7 +73,7 @@ $(document).on("blur",".edit-cell", function(){
 	id = $(this).parent().attr('editable_id');
 	precio = parseFloat($(this).attr('value'));
 	if(isNaN(precio)){
-		alert('Debe escribir un valor numerico');
+		alerta('Debe escribir un valor numerico');
 		return;
 	}
 	$.post(

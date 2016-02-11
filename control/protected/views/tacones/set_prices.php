@@ -51,7 +51,7 @@ $(document).on("blur",".edit-cell", function(){
 	id = $(this).parent().attr('editable_id');
 	precio = $(this).attr('value');
 	if(!/^([0-9]*(\.[0-9]+)?)$/.test(precio)){
-		alert('Debe escribir un valor numerico');
+		alerta('Debe escribir un valor numerico');
 		return;
 	}
 	precio = parseFloat(precio);

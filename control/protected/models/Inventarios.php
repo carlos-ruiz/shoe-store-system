@@ -120,7 +120,7 @@ class Inventarios extends CActiveRecord
 		$criteria->compare('id_colores',$this->id_colores);
 		$criteria->compare('cantidad_existente',$this->cantidad_existente);
 		$criteria->compare('cantidad_apartada',$this->cantidad_apartada);
-		$criteria->compare('stock_minimo',$this->stock_minimo);
+		$criteria->compare('t.stock_minimo',$this->stock_minimo);
 		$criteria->compare('unidad_medida',$this->unidad_medida,true);
 		$criteria->compare('ultimo_precio',$this->ultimo_precio,true);
 		$criteria->with = array('tipoArticulo', 'color');
@@ -129,9 +129,24 @@ class Inventarios extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
-			'Pagination' => array (
+			'Pagination' => array(
                 'PageSize' => 20,
             ),
+            'sort'=>array(
+		        'attributes'=>array(
+		        	'var_tipo_articulo'=>array(
+		                'asc'=>'tipoArticulo.tipo',
+		                'desc'=>'tipoArticulo.tipo DESC',
+		            ),
+		            'nombre_articulo',
+		            'numero',
+		            'cantidad_existente',
+		            'cantidad_apartada',
+		            'stock_minimo',
+		            'unidad_medida',
+		            'ultimo_precio',
+		        ),
+		    ),
 		));
 	}
 

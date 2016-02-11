@@ -89,31 +89,8 @@ class ModelosMaterialesPredeterminadosController extends Controller
 				$ojillosColor = OjillosColores::model()->find('id_ojillos=? AND id_colores=?', array($datos['id_ojillos'], $datos['id_color_ojillos']));
 				$model->id_ojillos_colores = $ojillosColor->id;
 			}
-			$arrayParametros = array();
-			$stringQuery = 'id_modelos_colores=?';
-			array_push($arrayParametros, $model->id_modelos_colores);
-			// array_push($arrayParametros, $model->id_suelas_colores);
 
-			// if (isset($model->id_agujetas_colores)) {
-			// 	$stringQuery .= ' AND id_agujetas_colores=?';
-			// 	array_push($arrayParametros, $model->id_agujetas_colores);
-			// }else{
-			// 	$stringQuery .= ' AND id_agujetas_colores IS NULL';
-			// }
-			// if (isset($model->id_ojillos_colores)) {
-			// 	$stringQuery .= ' AND id_ojillos_colores=?';
-			// 	array_push($arrayParametros, $model->id_ojillos_colores);
-			// }else{
-			// 	$stringQuery .= ' AND id_ojillos_colores IS NULL';
-			// }
-			// if (isset($model->id_tacones_colores)) {
-			// 	$stringQuery .= ' AND id_tacones_colores=?';
-			// 	array_push($arrayParametros, $model->id_tacones_colores);
-			// }else{
-			// 	$stringQuery .= ' AND id_tacones_colores IS NULL';
-			// }
-
-			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find($stringQuery , $arrayParametros);
+			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?' , $model->id_modelos_colores);
 			
 			if (isset($configuracionExistente)) {
 				$configuracionExistente->delete();
@@ -179,41 +156,13 @@ class ModelosMaterialesPredeterminadosController extends Controller
 				$ojillosColor = OjillosColores::model()->find('id_ojillos=? AND id_colores=?', array($datos['id_ojillos'], $datos['id_color_ojillos']));
 				$model->id_ojillos_colores = $ojillosColor->id;
 			}
-			// $arrayParametros = array();
-			// $stringQuery = 'id_modelos_colores=?';
-			// array_push($arrayParametros, $model->id_modelos_colores);
-			// array_push($arrayParametros, $model->id_suelas_colores);
-
-			// if (isset($model->id_agujetas_colores)) {
-			// 	$stringQuery .= ' AND id_agujetas_colores=?';
-			// 	array_push($arrayParametros, $model->id_agujetas_colores);
-			// }else{
-			// 	$stringQuery .= ' AND id_agujetas_colores IS NULL';
-			// }
-			// if (isset($model->id_ojillos_colores)) {
-			// 	$stringQuery .= ' AND id_ojillos_colores=?';
-			// 	array_push($arrayParametros, $model->id_ojillos_colores);
-			// }else{
-			// 	$stringQuery .= ' AND id_ojillos_colores IS NULL';
-			// }
-			// if (isset($model->id_tacones_colores)) {
-			// 	$stringQuery .= ' AND id_tacones_colores=?';
-			// 	array_push($arrayParametros, $model->id_tacones_colores);
-			// }else{
-			// 	$stringQuery .= ' AND id_tacones_colores IS NULL';
-			// }
-			// unset($model->id);
-
+			
 			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=? AND id!=?' , array($model->id_modelos_colores, $model->id));
-			// print_r($configuracionExistente);
 			if (isset($configuracionExistente)) {
 				$configuracionExistente->delete();
 			}
 
 			if($model->save()){
-				// echo "<br/><br/><br/>";
-				// print_r($model);
-				// return;
 				$transaction->commit();
 				$this->redirect(array('admin'));
 			}else{

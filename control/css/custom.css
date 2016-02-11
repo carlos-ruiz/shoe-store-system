@@ -194,3 +194,7 @@ td.td-caracteristicas-especiales {
 #agujetas_ojillos_panel, #tacones_panel {
 	display: none;
 }
+
+.form-control {
+	z-index: 0 !important;
+}

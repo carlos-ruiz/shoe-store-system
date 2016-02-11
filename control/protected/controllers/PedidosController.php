@@ -37,7 +37,7 @@ class PedidosController extends Controller
 			// 	'users'=>array('@'),
 			// ),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -185,6 +185,7 @@ class PedidosController extends Controller
 					}
 					$this->actualizarInventarios($model);
 					// $transaction->commit();
+					return;
 					$this->redirect(array('view','id'=>$model->id));
 				}
 			}catch(Exception $ex){
@@ -330,8 +331,8 @@ class PedidosController extends Controller
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
-				print_r($ex);
-				return;
+				$mensaje = "Se ha producido un error inesperado.";
+				$titulo = "Error";
 			}
 		}
 
@@ -339,6 +340,7 @@ class PedidosController extends Controller
 			'model'=>$model,
 			'pedidoZapato'=>$pedidoZapato,
 		));
+		$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
 	}
 
 	/**
@@ -424,21 +426,18 @@ class PedidosController extends Controller
 	public function actionSuelasPorModelo()
 	{
 		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
+		echo "<option value=\"0\">Seleccione una opción</option>";
 		foreach($list as $i => $data){
-			if ($i==0) {
-				echo "<option value=\"{$data->suela->id}\" selected>{$data->suela->nombre}</option>";
-			}
-			else{
-				echo "<option value=\"{$data->suela->id}\">{$data->suela->nombre}</option>";
-			}
+			echo "<option value=\"{$data->suela->id}\"".($i==0?'selected':'').">{$data->suela->nombre}</option>";
 		}
 	}
 
 	public function actionColoresPorModelo()
 	{
 		$list = ModelosColores::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
-		foreach($list as $data)
-			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+		echo "<option value=\"0\">Seleccione una opción</option>";
+		foreach($list as $i => $data)
+			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
 	public function actionNumerosPorModelo()
@@ -451,8 +450,9 @@ class PedidosController extends Controller
 	public function actionColoresPorSuela()
 	{
 		$list = SuelasColores::model()->findAll("id_suelas=?",array($_POST["PedidosZapatos"]["id_suelas"]));
-		foreach($list as $data)
-			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+		echo "<option value=\"0\">Seleccione una opción</option>";
+		foreach($list as $i => $data)
+			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
 	public function actionRevisarSiTieneAgujetas()
@@ -473,16 +473,18 @@ class PedidosController extends Controller
 	{
 		$id_agujeta = $_POST['PedidosZapatos']['id_agujetas'];
 		$agujetaColores = AgujetasColores::model()->findAll('id_agujetas=?', array($id_agujeta));
-		foreach($agujetaColores as $data)
-			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+		echo "<option value=\"0\">Seleccione una opción</option>";
+		foreach($agujetaColores as $i => $data)
+			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
 	public function actionColoresPorOjillo()
 	{
 		$id_ojillo = $_POST['PedidosZapatos']['id_ojillos'];
 		$ojillosColores = OjillosColores::model()->findAll('id_ojillos=?', array($id_ojillo));
-		foreach($ojillosColores as $data)
-			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+		echo "<option value=\"0\">Seleccione una opción</option>";
+		foreach($ojillosColores as $i => $data)
+			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
 	public function actionAgregarOrden()
@@ -602,6 +604,7 @@ class PedidosController extends Controller
 			// Agregar a apartados los materiales
 			foreach ($modelo->modelosMateriales as $modeloMaterial) {
 				$cantidad_a_descontar = 0;
+				unset($materialApartado);
 				if ($numero_zapato >= 12 && $numero_zapato < 18) {
 					$cantidad_a_descontar = $modeloMaterial->cantidad_extrachico;
 				}
@@ -645,18 +648,21 @@ class PedidosController extends Controller
 				$materialApartado->cantidad_apartada += $cantidad_a_descontar;
 				$materialApartado->fecha_actualizacion = date('Y-m-d H:i:s');
 				$materialApartado->save();
+				$varImprimir = 'MaterialApartadoID: '.$materialApartado->id.' - cantidad_a_descontar = '.$cantidad_a_descontar.' - cantidad_apartada = '.$materialApartado->cantidad_apartada;
+				echo "<script>console.log($varImprimir);</script>";
+				echo $varImprimir;
 			} // Fin foreach modelosMateriales
 
 			// Agregar a apartados las suelas
 			$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Suelas'));
 			$modeloNumero = ModelosNumeros::model()->find('id_modelos=? AND numero=?', array($modelo->id, $numero_zapato));
-			$modeloSuelaNumero = ModelosSuelasNumeros::model()->find('id_modelos_numeros=?', array($modeloNumero->id));
+			$modeloSuelaNumero = ModelosSuelasNumeros::model()->with(array('suelaNumero.suela'=>array('alias'=>'suela')))->find('id_modelos_numeros=? AND suela.id=?', array($modeloNumero->id, $pedidoZapato->zapato->suelaColor->id_suelas));
 			$numero_suela = $modeloSuelaNumero->suelaNumero->numero;
 			$suelasApartadas = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=? AND numero=?', array($tipoArticulo->id, $pedidoZapato->zapato->suelaColor->id_suelas, $pedido->id, $pedidoZapato->zapato->suelaColor->id_colores, $numero_suela));
 			if (!isset($suelasApartadas)) {
 				$suelasApartadas = new MaterialesApartadosPedido;
 				$suelasApartadas->id_tipos_articulos_inventario = $tipoArticulo->id;
-				$suelasApartadas->id_articulo = $tipoArticulo->id;
+				$suelasApartadas->id_articulo = $pedidoZapato->zapato->suelaColor->id_suelas;
 				$suelasApartadas->id_colores = $pedidoZapato->zapato->suelaColor->id_colores;
 				$suelasApartadas->numero = $numero_suela;
 				$suelasApartadas->id_pedidos = $pedido->id;
@@ -704,7 +710,22 @@ class PedidosController extends Controller
 			}
 
 		} // Fin foreach pedidosZapatos
+	} // Fin metodo actualizarInventarios
 
+	public function actionMaterialesPredeterminados(){
+		header('Content-Type: application/json');
+		$respuesta = array();
+		
+		$id_modelo = $_POST['PedidosZapatos']['id_modelos'];
+		$id_color_modelo = $_POST['PedidosZapatos']['id_colores'];
+		$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($id_modelo, $id_color_modelo));
+		if(isset($modeloColor)){
+			$materialesPredeterminados = ModelosMaterialesPredeterminados::model()->findAll('id_modelos_colores=?', array($modeloColor->id));
+			foreach ($materialesPredeterminados as $material) {
+				$respuesta = array('id_modelo'=>$id_modelo, 'id_color_modelo'=>$id_color_modelo, 'id_suela'=>$material->suelaColor->id_suelas, 'id_color_suela'=>$material->suelaColor->id_colores, 'id_tacon'=>isset($material->taconColor)?$material->taconColor->id_tacones:0, 'id_color_tacon'=>isset($material->taconColor)?$material->taconColor->id_colores:0, 'id_agujetas'=>isset($material->agujetaColor)?$material->agujetaColor->id_agujetas:0, 'id_color_agujetas'=>isset($material->agujetaColor)?$material->agujetaColor->id_colores:0, 'id_ojillos'=>isset($material->ojillosColor)?$material->ojillosColor->id_ojillos:0, 'id_color_ojillos'=>isset($material->ojillosColor)?$material->ojillosColor->id_colores:0);
+			}
+		}
+		echo json_encode($respuesta);
 	}
 
 }
