@@ -3,6 +3,7 @@
 class PedidosController extends Controller
 {
 	public $section = 'pedidos';
+	public $subsection;
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -37,7 +38,7 @@ class PedidosController extends Controller
 			// 	'users'=>array('@'),
 			// ),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'seguimientoPedidos', 'actualizarEstatusZapatos'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -52,6 +53,9 @@ class PedidosController extends Controller
 	 */
 	public function actionView($id)
 	{
+		$pedido = $this->loadModel($id);
+		$this->imprimirEtiquetasPedido($pedido);
+		return;
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
@@ -185,7 +189,6 @@ class PedidosController extends Controller
 					}
 					$this->actualizarInventarios($model);
 					// $transaction->commit();
-					return;
 					$this->redirect(array('view','id'=>$model->id));
 				}
 			}catch(Exception $ex){
@@ -648,9 +651,6 @@ class PedidosController extends Controller
 				$materialApartado->cantidad_apartada += $cantidad_a_descontar;
 				$materialApartado->fecha_actualizacion = date('Y-m-d H:i:s');
 				$materialApartado->save();
-				$varImprimir = 'MaterialApartadoID: '.$materialApartado->id.' - cantidad_a_descontar = '.$cantidad_a_descontar.' - cantidad_apartada = '.$materialApartado->cantidad_apartada;
-				echo "<script>console.log($varImprimir);</script>";
-				echo $varImprimir;
 			} // Fin foreach modelosMateriales
 
 			// Agregar a apartados las suelas
@@ -726,6 +726,45 @@ class PedidosController extends Controller
 			}
 		}
 		echo json_encode($respuesta);
+	}
+
+	public function actionSeguimientoPedidos(){
+		$this->subsection = 'seguimiento';
+		$pedidos = Pedidos::model()->findAll();
+		$this->render('seguimiento',array(
+			'pedidos'=>$pedidos,
+		));
+	}
+
+	public function actionActualizarEstatusZapatos()
+	{
+		$pedidoZapato = PedidosZapatos::model()->findByPk($_POST['id']);
+		$estatusZapato = EstatusZapatos::model()->find('nombre=?', array($_POST['estatus']));
+		$estatusPedidoPendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
+		$estatusPedidoEnProceso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
+		$pedido = $pedidoZapato->pedido;
+
+		$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
+		if($pedidoZapato->save()){
+			if ($pedido->id_estatus_pedidos == $estatusPedidoPendiente->id) {
+				$pedido->id_estatus_pedidos = $estatusPedidoEnProceso->id;
+				$pedido->save();
+			}
+		}
+	}
+
+	public function imprimirEtiquetasPedido($pedido)
+	{
+		$etiquetas = array();
+		foreach ($pedido->pedidosZapatos as $pedidoZapato) {
+			$modelo = $pedidoZapato->zapato->modelo;
+			$datos = array('modelo'=>$modelo->nombre, 'color'=>$pedidoZapato->zapato->color->color, 'numero'=>$pedidoZapato->zapato->numero, 'foto'=>$modelo->imagen, 'codigo'=>$pedidoZapato->zapato->codigo_barras);
+			array_push($etiquetas, $datos);
+		}
+		$pdf = new ImprimirEtiquetasPedido('P','cm','letter');
+		$pdf->AddPage();
+		$pdf->contenido($etiquetas);
+		$pdf->Output();
 	}
 
 }

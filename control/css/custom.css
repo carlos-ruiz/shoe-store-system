@@ -198,3 +198,61 @@ td.td-caracteristicas-especiales {
 .form-control {
 	z-index: 0 !important;
 }
+
+.seguimiento_pedidos_panel h3{
+	font-weight: bold;
+	color: #716969;
+}
+
+.pedidos_pendientes {
+	background-color: #f99494;
+}
+
+.pedidos_corte {
+	background-color: #eac4a8;
+	
+}
+
+.pedidos_pespunte {
+	background-color: #c9def0;
+	
+}
+
+.pedidos_ensuelado {
+	background-color: #e6e6c0;
+	
+}
+
+.pedidos_terminado {
+	background-color: #c2ecb5;
+
+}
+
+.seguimiento_pedido_detalle {
+	border-radius: 5px;
+	background-color: white;
+	padding: 10px;
+	margin: 5px 0;
+	border: solid 2px #564C4C;
+	cursor: pointer;
+}
+
+.seguimiento_pedido_detalle:hover {
+	background-color: #e0d9d9;
+}
+
+.draggable-content {
+	height: 100%;
+}
+
+.flex-parent {
+	display: flex;
+}
+
+.flex-item {
+	flex: 1;
+	padding: 1em;
+	border: solid 3px #988e8e;
+	border-radius: 10px;
+	margin: 2px;
+}
