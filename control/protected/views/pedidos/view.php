@@ -177,3 +177,11 @@ $this->menu=array(
 		</div>
 	</div>
 </div>
+
+<?php if(!Yii::app()->user->isGuest) { ?>
+	<div class="row">
+		<div class="col-md-12 padding-top">
+			<?php echo CHtml::link('<i class="fa fa-print"></i> Imprimir etiquetas', array('pedidos/imprimirEtiquetasPedido/'.$model->id), array('class'=>'link-button', 'target'=>'_blank')); ?>
+		</div>
+	</div>
+<?php } ?>

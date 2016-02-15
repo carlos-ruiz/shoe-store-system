@@ -49,13 +49,7 @@
 					<?php echo $form->error($model,'id_tipo_cliente', array('class'=>'help-block')); ?>
 				</div>
 			</div> -->
-			<div class="form-group col-md-4 <?php if($form->error($model,'descuento')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'descuento', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->textField($model,'descuento',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
-					<?php echo $form->error($model,'descuento', array('class'=>'help-block')); ?>
-				</div>
-			</div>
+			
 			<div class="form-group col-md-4 <?php if($form->error($model,'rfc')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'rfc', array('class'=>'control-label')); ?>
 				<div class="input-group">
@@ -68,6 +62,13 @@
 				<div class="input-group">
 					<?php echo $form->textField($model,'razon_social',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
 					<?php echo $form->error($model,'razon_social', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+			<div class="form-group col-md-4 <?php if($form->error($model,'correo_electronico')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($model,'correo_electronico', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($model,'correo_electronico',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($model,'correo_electronico', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 		</div>
@@ -85,13 +86,6 @@
 				<div class="input-group">
 					<?php echo $form->textField($model,'celular',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
 					<?php echo $form->error($model,'celular', array('class'=>'help-block')); ?>
-				</div>
-			</div>
-			<div class="form-group col-md-4 <?php if($form->error($model,'correo_electronico')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'correo_electronico', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->textField($model,'correo_electronico',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
-					<?php echo $form->error($model,'correo_electronico', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 		</div>

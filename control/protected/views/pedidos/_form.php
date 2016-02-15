@@ -24,17 +24,17 @@
 				<div class="input-group">
 					<?php
 						$htmlOptions = array(
-							"ajax"=>array(
-								"url"=>$this->createUrl("pedidos/descuentoPorCliente"),
-								"type"=>"POST",
-								//"update"=>"#Cliente_descuento",
-								"success"=>"function(data)
-                                {
-                                	$('#Cliente_descuento').attr('value',data);
-                                }"
-							),
+							// "ajax"=>array(
+							// 	"url"=>$this->createUrl("pedidos/descuentoPorCliente"),
+							// 	"type"=>"POST",
+							// 	//"update"=>"#Cliente_descuento",
+							// 	"success"=>"function(data)
+       //                          {
+       //                          	$('#Cliente_descuento').attr('value',data);
+       //                          }"
+							// ),
 							"class" => "form-control",
-							"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+							"empty"=>array(''=>"Seleccione una opci&oacute;n"),
 						);
 					?>
 					<?php echo $form->dropDownList($model,'id_clientes', Clientes::model()->obtenerClientes(), $htmlOptions); ?>
@@ -368,28 +368,6 @@
 			</div>
 		</div>
 		<div class="row">
-			<?php
-			$descuentoCliente = 0;  
-			if(isset($model->cliente->descuento) && $model->cliente->descuento > 0) { $descuentoCliente = $model->cliente->descuento; }?>
-			<div class="col-md-8"></div>
-			<div class="form-group col-md-4">
-				<label class="control-label required" for="Pedidos_total">Descuento al cliente (%)</label>
-				<div class="input-group">
-					<input size="60" maxlength="128" class="form-control" disabled="disabled" name="Aux[descuento]" id="Cliente_descuento" type="text" value="<?= $descuentoCliente ?>">
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-8"></div>
-			<div class="form-group col-md-4 <?php if($form->error($model,'descuento')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'descuento', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->textField($model,'descuento',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
-					<?php echo $form->error($model,'descuento', array('class'=>'help-block')); ?>
-				</div>
-			</div>
-		</div>
-		<div class="row">
 			<div class="col-md-8"></div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'total')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'total', array('class'=>'control-label')); ?>
@@ -444,17 +422,7 @@
 
 	$(document).ready(function(){
 		total = parseFloat($('#Pedidos_total').val());
-		descuentoCliente = parseFloat($('#Cliente_descuento').val());
-		descuentoPedido = parseFloat($('#Pedidos_descuento').val());
 		subtotal = total;
-		if(total > 0){
-			if(descuentoPedido > 0){
-				subtotal = subtotal/((100-descuentoPedido)/100);
-			}
-			if(descuentoCliente > 0){
-				subtotal = subtotal/((100-descuentoCliente)/100);
-			}
-		}
 		$('#Pedidos_subtotal').val(subtotal.toFixed(2));
 
 		checked = $('#Pedidos_es_especial').is(":checked");
@@ -630,14 +598,6 @@
 	$(document).on("change","#Pedidos_pagado", function(){
 		calcularMontoPendiente();
 	});
-	$(document).on("change","#Pedidos_descuento", function(){
-		if($(this).val() < 0 || $(this).val() > 100){
-			alerta('El descuento debe ser un número entre 0 y 100');
-			$(this).val('0');
-		}
-		calcularTotal();
-		calcularMontoPendiente();
-	});
 
 	$(document).on("click","a.delete", function(){
 		id_modelos = $(this).parent().parent().find('.modelo').data('id');
@@ -676,22 +636,13 @@
 		$('#PedidosZapatos_id_ojillos').val(0);
 		$('#PedidosZapatos_id_ojillos_color').html('<option value="">Seleccione una opción</option>');
 		$('#Pedidos_es_especial').attr('checked', false);
-		$('#PedidosZapatos_caracteristicas_especiales').val(0);
+		$('#PedidosZapatos_caracteristicas_especiales').val('');
 		$('#especial_input').hide(500);
 	}
 
 	function calcularTotal(){
 		subtotal = $('#Pedidos_subtotal').val();
-		granTotal = subtotal;
-		descuentoCliente = $('#Cliente_descuento').val();
-		descuentoPedido = parseFloat($('#Pedidos_descuento').val());
-		if(isNaN(descuentoPedido)){
-			descuentoPedido=0;
-			$('#Pedidos_descuento').val('0');
-		}
-		granTotal = granTotal * ((100-descuentoCliente)/100);
-		granTotal = granTotal * ((100-descuentoPedido)/100);
-		$('#Pedidos_total').attr("value", granTotal.toFixed(2));
+		$('#Pedidos_total').attr("value", subtotal);
 	}
 
 	function calcularMontoPendiente(){
@@ -757,4 +708,11 @@
 			}
 		});
 	}
+
+	$(document).keypress(function(e){
+    if (e.which == 13){
+        e.preventDefault();
+        return false;
+    }
+});
 </script>

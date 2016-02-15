@@ -38,7 +38,7 @@ class PedidosController extends Controller
 			// 	'users'=>array('@'),
 			// ),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden','descuentoPorCliente', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'seguimientoPedidos', 'actualizarEstatusZapatos'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'seguimientoPedidos', 'actualizarEstatusZapatos', 'imprimirEtiquetasPedido'),
 				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
@@ -53,9 +53,6 @@ class PedidosController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$pedido = $this->loadModel($id);
-		$this->imprimirEtiquetasPedido($pedido);
-		return;
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
@@ -116,7 +113,9 @@ class PedidosController extends Controller
 					$estatusDePago = EstatusPagos::model()->find('nombre=?', array('Pendiente de pago'));
 				}
 				$model->estatus_pagos_id = $estatusDePago->id;
-				if($model->save()){
+				$cantidad_pares_pedido = 0;
+
+				if($model->validate() && $model->save()){
 					if (isset($_POST['Pedido'])) {
 						$datosPedido = $_POST['Pedido'];
 						foreach ($datosPedido['modelo'] as $id => $value) {
@@ -159,12 +158,23 @@ class PedidosController extends Controller
 									}
 									$pedidoZapato->save();
 									$total += $pedidoZapato->precio_unitario * $cantidad;
+									$cantidad_pares_pedido += $cantidad;
 								}
 							}
 						}
 						if($total > 0){
-							if(isset($model->cliente->descuento) && $model->cliente->descuento > 0){
-								$total = $total*(1-$model->cliente->descuento/100);
+							$model->descuento = 0;
+							if ($cantidad_pares_pedido >= 6 && $cantidad_pares_pedido < 100) {
+								$model->descuento = 6;
+							}
+							else if ($cantidad_pares_pedido >= 100 && $cantidad_pares_pedido < 200) {
+								$model->descuento = 8;
+							}
+							else if ($cantidad_pares_pedido >= 200 && $cantidad_pares_pedido < 300) {
+								$model->descuento = 10;
+							}
+							else if ($cantidad_pares_pedido >= 300) {
+								$model->descuento = 12;
 							}
 							if(isset($model->descuento) && $model->descuento > 0){
 								$total = $total*(1-$model->descuento/100);
@@ -212,6 +222,9 @@ class PedidosController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$pedidoZapato = new PedidosZapatos;
+		if (isset($model->descuento) && $model->descuento > 0) {
+			$model->total = ($model->total/(1-($model->descuento/100)));
+		}
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
@@ -277,12 +290,6 @@ class PedidosController extends Controller
 							}
 						}
 						if($total > 0){
-							if(isset($model->cliente->descuento) && $model->cliente->descuento > 0){
-								$total = $total*(1-$model->cliente->descuento/100);
-							}
-							if(isset($model->descuento) && $model->descuento > 0){
-								$total = $total*(1-$model->descuento/100);
-							}
 							$model->total = $total;
 							$model->save();
 
@@ -359,6 +366,11 @@ class PedidosController extends Controller
 			foreach ($model->pedidosZapatos as $pedidoZapato) {
 				$pedidoZapato->delete();
 			}
+			if ($model->estatus->nombre == 'Pendiente') {
+				foreach ($model->materialesApartados as $materialApartado) {
+					$materialApartado->delete();
+				}
+			}
 			$model->delete();
 			$transaction->commit();
 
@@ -369,7 +381,6 @@ class PedidosController extends Controller
 		}catch(Exception $ex){
 			$transaction->rollback();
 		}
-
 	}
 
 	/**
@@ -575,12 +586,12 @@ class PedidosController extends Controller
 <?php		}
 	}
 
-	public function actionDescuentoPorCliente()
-	{
-		$id_clientes = $_POST['Pedidos']['id_clientes'];
-		$cliente = Clientes::model()->findByPk($id_clientes);
-		echo $cliente->descuento;
-	}
+	// public function actionDescuentoPorCliente()
+	// {
+	// 	$id_clientes = $_POST['Pedidos']['id_clientes'];
+	// 	$cliente = Clientes::model()->findByPk($id_clientes);
+	// 	echo $cliente->descuento;
+	// }
 
 	public function calcularAdeudo($data, $row)
 	{
@@ -753,14 +764,17 @@ class PedidosController extends Controller
 		}
 	}
 
-	public function imprimirEtiquetasPedido($pedido)
+	public function actionImprimirEtiquetasPedido($id)
 	{
 		$etiquetas = array();
+		$pedido = $this->loadModel($id);
 		foreach ($pedido->pedidosZapatos as $pedidoZapato) {
 			$modelo = $pedidoZapato->zapato->modelo;
 			$datos = array('modelo'=>$modelo->nombre, 'color'=>$pedidoZapato->zapato->color->color, 'numero'=>$pedidoZapato->zapato->numero, 'foto'=>$modelo->imagen, 'codigo'=>$pedidoZapato->zapato->codigo_barras);
-			array_push($etiquetas, $datos);
+			for($i=0; $i<$pedidoZapato->cantidad_total;$i++)
+				array_push($etiquetas, $datos);
 		}
+
 		$pdf = new ImprimirEtiquetasPedido('P','cm','letter');
 		$pdf->AddPage();
 		$pdf->contenido($etiquetas);
