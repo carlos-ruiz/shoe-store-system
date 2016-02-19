@@ -265,3 +265,23 @@ td.td-caracteristicas-especiales {
 .tabla-seguimiento-pedido-cortador td{
 	padding: 5px 2px !important;
 }
+
+.detalle-cliente {
+	padding: 10px;
+	border-radius: 5px;
+	margin: 5px;
+	color: white;
+	text-align: center;
+	font-weight: bold;
+	text-shadow: 1px 1px black;
+}
+
+.seguimiento_pedido_detalle p {
+	margin: 0;
+	color: white;
+	text-shadow: 1px 1px black;
+}
+
+.pedido-detalle-header {
+	display: none;
+}

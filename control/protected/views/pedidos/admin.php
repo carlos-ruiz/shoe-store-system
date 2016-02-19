@@ -19,7 +19,9 @@ $this->menu=array(
 	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nuevo', array('pedidos/create'), array('class'=>'btn btn-red-stripped')); ?>
 </div>
 
-<?php $this->widget('zii.widgets.grid.CGridView', array(
+<?php 
+$estatus_pendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'))->id;
+$this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'pedidos-grid',
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
@@ -54,6 +56,15 @@ $this->menu=array(
     	'prioridad',
 		array(
 			'class'=>'CButtonColumn',
+			'template'=>'{view}{delete}{update}',
+			'buttons'=>array(
+				'delete'=>array(
+					'visible'=>'$data->estatus->nombre == \'Pendiente\'',
+				),
+				'update'=>array(
+					'visible'=>'$data->estatus->nombre == \'Pendiente\'',
+				),
+			),
 		),
 	),
 )); ?>

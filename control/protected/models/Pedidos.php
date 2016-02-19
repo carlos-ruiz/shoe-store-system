@@ -122,9 +122,9 @@ class Pedidos extends CActiveRecord
 	public function search()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
-
+		$estatusTerminado = EstatusPedidos::model()->find('nombre=?', array('Terminado'));
 		$criteria=new CDbCriteria;
-
+		$criteria->condition='id_estatus_pedidos!='.$estatusTerminado->id;
 		$criteria->compare('t.id',$this->id);
 		$criteria->compare('id_clientes',$this->id_clientes);
 		$criteria->compare('fecha_pedido',$this->fecha_pedido,true);

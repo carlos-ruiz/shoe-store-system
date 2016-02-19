@@ -24,15 +24,15 @@
 				<div class="input-group">
 					<?php
 						$htmlOptions = array(
-							// "ajax"=>array(
-							// 	"url"=>$this->createUrl("pedidos/descuentoPorCliente"),
-							// 	"type"=>"POST",
-							// 	//"update"=>"#Cliente_descuento",
-							// 	"success"=>"function(data)
-       //                          {
-       //                          	$('#Cliente_descuento').attr('value',data);
-       //                          }"
-							// ),
+							"ajax"=>array(
+								"url"=>$this->createUrl("pedidos/descuentoPorCliente"),
+								"type"=>"POST",
+								//"update"=>"#Cliente_descuento",
+								"success"=>"function(data)
+                                {
+                                	$('#Cliente_descuento').attr('value',data);
+                                }"
+							),
 							"class" => "form-control",
 							"empty"=>array(''=>"Seleccione una opci&oacute;n"),
 						);
@@ -371,6 +371,18 @@
 			</div>
 		</div>
 		<div class="row">
+			<?php
+			$descuentoCliente = 0;  
+			if(isset($model->cliente->descuento) && $model->cliente->descuento > 0) { $descuentoCliente = $model->cliente->descuento; }?>
+			<div class="col-md-8"></div>
+			<div class="form-group col-md-4">
+				<label class="control-label required" for="Pedidos_total">Descuento al cliente (%)</label>
+				<div class="input-group">
+					<input size="60" maxlength="128" class="form-control" disabled="disabled" name="Aux[descuento]" id="Cliente_descuento" type="text" value="<?= $descuentoCliente ?>">
+				</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-md-8"></div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'total')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'total', array('class'=>'control-label')); ?>
@@ -425,10 +437,14 @@
 
 	$(document).ready(function(){
 		total = parseFloat($('#Pedidos_total').val());
+		descuentoCliente = parseFloat($('#Cliente_descuento').val());
 		descuento = parseFloat($('#Pedidos_descuento').val());
 		subtotal = total;
 		if(descuento > 0){
 			subtotal = total/(1-descuento/100);
+		}
+		if(descuentoCliente > 0){
+			subtotal = subtotal/(1-descuentoCliente/100);
 		}
 		$('#Pedidos_subtotal').val(subtotal.toFixed(2));
 
@@ -620,6 +636,8 @@
 			'cache':false,
 			'data':$('#ordenes_table #row_'+row+' :input').serialize(),
 			'success':function(html){
+				total_pares = obtenerCantidadPares();
+				establecerDescuento(total_pares);
 				reduccion = parseFloat(html);
 				total -= reduccion;
 				$('#Pedidos_subtotal').val(''+total.toFixed(2));
@@ -652,8 +670,14 @@
 
 	function calcularTotal(){
 		subtotal = $('#Pedidos_subtotal').val();
-		descuento = $('#Pedidos_descuento').val();
+		descuento = parseFloat($('#Pedidos_descuento').val());
+		descuentoCliente = parseFloat($('#Cliente_descuento').val());
+		if((descuento+descuentoCliente)>12){
+			descuentoCliente=12-descuento;
+			$('#Cliente_descuento').val(descuentoCliente);
+		}
 		total = subtotal*(1-descuento/100);
+		total = total*(1-descuentoCliente/100);
 		$('#Pedidos_total').attr("value", total.toFixed(2));
 	}
 

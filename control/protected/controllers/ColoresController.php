@@ -30,14 +30,10 @@ class ColoresController extends Controller
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
 				'actions'=>array('index','view'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
+				'actions'=>array('create','update','admin','delete', 'activarDesactivar'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -170,5 +166,21 @@ class ColoresController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	/**
+	 * Activar o desactivar un determinado color para que aparezca o no al dar de alta
+	 * modelos, suelas, tacones, etc.
+	 */
+	public function actionActivarDesactivar($id)
+	{
+		$color = $this->loadModel($id);
+		if($color->activo == 1){
+			$color->activo = 0;
+		}else{
+			$color->activo = 1;
+		}
+		$color->save();
+		$this->redirect(array('admin'));
 	}
 }

@@ -28,20 +28,20 @@ $this->menu=array(
 		'color',
 		array(
 			'class'=>'CButtonColumn',
-			'template'=>'{view}{update}{desactivar}',
+			'template'=>'{view}{update}{activar}{desactivar}',
 			'buttons'=>array(
 		        'activar' => array(
 		            'label'=>'<span class="fa fa-check"></span>',
 		            'imageUrl'=>false,
 		            'options'=>array('title'=>'Activar'),
-		            'url'=>'Yii::app()->createUrl("users/email", array("id"=>$data->id))',
+		            'url'=>'Yii::app()->createUrl("colores/activarDesactivar", array("id"=>$data->id))',
 		            'visible'=>'$data->activo == 0',
 		        ),
 		        'desactivar' => array(
 		            'label'=>'<span class="fa fa-ban"></span>',
 		            'imageUrl'=>false,
 		            'options'=>array('title'=>'Desactivar'),
-		            'url'=>'Yii::app()->createUrl("users/email", array("id"=>$data->id))',
+		            'url'=>'Yii::app()->createUrl("colores/activarDesactivar", array("id"=>$data->id))',
 		            'visible'=>'$data->activo == 1',
 		        ),
 			),

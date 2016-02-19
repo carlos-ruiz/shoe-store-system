@@ -39,7 +39,7 @@ class PedidosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -205,7 +205,6 @@ class PedidosController extends Controller
 
 					if($model->id_estatus_pedidos == $estatusPedidoEnProceso->id){
 						$respuesta = $this->actualizarInventario($model->id);
-						print_r($respuesta);
 						if ($respuesta !== 'true') {
 							$model->id_estatus_pedidos = $estatusPedido->id;
 							$model->save();
@@ -213,8 +212,9 @@ class PedidosController extends Controller
 							$mensaje = $respuesta;
 						}
 					}
-					$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
-					$this->redirect(array('view','id'=>$model->id));
+					if (!isset($mensaje)) {
+						$this->redirect(array('view','id'=>$model->id));
+					}
 				}
 			}catch(Exception $ex){
 				print_r($ex);
@@ -226,6 +226,7 @@ class PedidosController extends Controller
 			'model'=>$model,
 			'pedidoZapato'=>$pedidoZapato,
 		));
+		$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
 	}
 
 	/**
@@ -237,7 +238,8 @@ class PedidosController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$pedidoZapato = new PedidosZapatos;
-		
+		$estatusPedido = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
+		$estatusPedidoEnProceso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
@@ -250,11 +252,15 @@ class PedidosController extends Controller
 				foreach ($model->pedidosZapatos as $pedidoZapato) {
 					$pedidoZapato->delete();
 				}
+				foreach ($model->materialesApartados as $materialApartado) {
+					$materialApartado->delete();
+				}
 
 				$prioridad = $_POST['Pedidos']['prioridad'];
 				$model->prioridad = 'NORMAL';
 				if($prioridad == 1){
 					$model->prioridad = 'ALTA';
+					$model->id_estatus_pedidos = $estatusPedidoEnProceso->id;
 				}
 				$formaDePagoSeleccionada = $model->id_formas_pago;
 				$date = str_replace('/', '-', $model->fecha_entrega);
@@ -264,7 +270,7 @@ class PedidosController extends Controller
 				$newDate = date("Y-m-d H:i:s", strtotime($model->fecha_pedido));
 				$model->fecha_pedido = $newDate;
 				$total = 0;
-				
+				$cantidad_pares_pedido = 0;
 				if($model->save()){
 					if (isset($_POST['Pedido'])) {
 						$datosPedido = $_POST['Pedido'];
@@ -299,10 +305,27 @@ class PedidosController extends Controller
 									}
 									$pedidoZapato->save();
 									$total += $pedidoZapato->precio_unitario * $cantidad;
+									$cantidad_pares_pedido += $cantidad;
 								}
 							}
 						}
 						if($total > 0){
+							$model->descuento = 0;
+							if ($cantidad_pares_pedido >= 6 && $cantidad_pares_pedido < 100) {
+								$model->descuento = 6;
+							}
+							else if ($cantidad_pares_pedido >= 100 && $cantidad_pares_pedido < 200) {
+								$model->descuento = 8;
+							}
+							else if ($cantidad_pares_pedido >= 200 && $cantidad_pares_pedido < 300) {
+								$model->descuento = 10;
+							}
+							else if ($cantidad_pares_pedido >= 300) {
+								$model->descuento = 12;
+							}
+							if(isset($model->descuento) && $model->descuento > 0){
+								$total = $total*(1-$model->descuento/100);
+							}
 							$model->total = $total;
 							$model->save();
 
@@ -350,7 +373,19 @@ class PedidosController extends Controller
 						}
 					}
 					$transaction->commit();
-					$this->redirect(array('view','id'=>$model->id));
+					$this->apartarMateriales($model->id);
+					if($model->id_estatus_pedidos == $estatusPedidoEnProceso->id){
+						$respuesta = $this->actualizarInventario($model->id);
+						if ($respuesta !== 'true') {
+							$model->id_estatus_pedidos = $estatusPedido->id;
+							$model->save();
+							$titulo = 'Aviso';
+							$mensaje = $respuesta;
+						}
+					}
+					if(!isset($mensaje)){
+						$this->redirect(array('view','id'=>$model->id));
+					}
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
@@ -363,7 +398,7 @@ class PedidosController extends Controller
 			'model'=>$model,
 			'pedidoZapato'=>$pedidoZapato,
 		));
-		$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
+		$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:"", 'destino'=>Yii::app()->request->baseurl.'/pedidos/admin'));
 	}
 
 	/**
@@ -383,8 +418,11 @@ class PedidosController extends Controller
 				foreach ($model->materialesApartados as $materialApartado) {
 					$materialApartado->delete();
 				}
+				foreach ($model->pagos as $pago) {
+					$pago->delete();
+				}
+				$model->delete();
 			}
-			$model->delete();
 			$transaction->commit();
 
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
@@ -646,14 +684,14 @@ class PedidosController extends Controller
 				</tr>
 			<?php } ?>
 		<?php } ?>
-<?php	} 
+	<?php	} 
 
-	// public function actionDescuentoPorCliente()
-	// {
-	// 	$id_clientes = $_POST['Pedidos']['id_clientes'];
-	// 	$cliente = Clientes::model()->findByPk($id_clientes);
-	// 	echo $cliente->descuento;
-	// }
+	public function actionDescuentoPorCliente()
+	{
+		$id_clientes = $_POST['Pedidos']['id_clientes'];
+		$cliente = Clientes::model()->findByPk($id_clientes);
+		echo $cliente->descuento;
+	}
 
 	/**
 	 * Calcula el importe pendiente de pago de un pedido especifico
@@ -875,27 +913,27 @@ class PedidosController extends Controller
 		$perfil = Yii::app()->user->getState('perfil');
 		switch ($perfil) {
 			case 'Administrador':
-				$this->render('_seguimiento_administrador',array(
+				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
 				));
 				break;
 			case 'Cortador':
-				$this->render('_seguimiento_cortador',array(
+				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
 				));
 				break;
 			case 'Pespuntador':
-				$this->render('_seguimiento_pespuntador',array(
+				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
 				));
 				break;
 			case 'Ensuelador':
-				$this->render('_seguimiento_ensuelador',array(
+				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
 				));
 				break;
 			case 'Empacador':
-				$this->render('_seguimiento_empacador',array(
+				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
 				));
 				break;

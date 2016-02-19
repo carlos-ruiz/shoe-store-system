@@ -47,7 +47,7 @@
                     Cargando...
                 </div>
                 <div class="modal-footer" id="modal_botones">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <a id="modal_button" href="#" class="btn btn-default" data-dismiss="modal">Cerrar</a>
                 </div>
             </div>
         </div>
