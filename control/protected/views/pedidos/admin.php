@@ -48,7 +48,7 @@ $this->menu=array(
 	        'value'=>'\'$\'.$data->total',
     	),
     	array(
-	        'header'=>'Adeudo',
+	        'name'=>'var_adeudo',
 	        'value'=>array($this, 'calcularAdeudo'),
     	),
     	'prioridad',

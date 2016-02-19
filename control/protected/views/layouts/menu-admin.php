@@ -57,7 +57,7 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Etiquetas</span></a>
             </li>
-            <li class="<?php if($this->section == 'inventarios'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/inventarios/index"><i class="fa fa-cubes fa-fw">
+            <li class="<?php if($this->section == 'inventarios'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/inventarios/admin"><i class="fa fa-cubes fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Inventarios</span></a>
             </li>
@@ -138,6 +138,10 @@ data-position="right" class="navbar-default navbar-static-side">
             <li><a href="#"><i class="fa fa-file-pdf-o fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Reportes</span></a>
+            </li>
+            <li class="<?php if($this->section == 'usuarios'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/usuarios/admin"><i class="fa fa-tag fa-fw">
+                <div class="icon-bg bg-red"></div>
+                </i><span class="menu-title">Usuarios</span></a>
             </li>
         </ul>
     </div>

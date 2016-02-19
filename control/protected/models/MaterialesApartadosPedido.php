@@ -8,6 +8,7 @@
  * @property integer $id_tipos_articulos_inventario
  * @property integer $id_articulo
  * @property integer $id_colores
+ * @property integer $numero
  * @property integer $id_pedidos
  * @property double $cantidad_apartada
  * @property string $fecha_actualizacion
@@ -35,7 +36,7 @@ class MaterialesApartadosPedido extends CActiveRecord
 		return array(
 			array('id_tipos_articulos_inventario, id_articulo, id_pedidos, cantidad_apartada', 'required'),
 			array('id_tipos_articulos_inventario, id_articulo, id_colores, id_pedidos', 'numerical', 'integerOnly'=>true),
-			array('cantidad_apartada', 'numerical'),
+			array('cantidad_apartada, numero', 'numerical'),
 			array('fecha_actualizacion', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -52,6 +53,8 @@ class MaterialesApartadosPedido extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'pedido' => array(self::BELONGS_TO, 'Pedidos', 'id_pedidos'),
+			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
+			'tipoMaterial' => array(self::BELONGS_TO, 'TiposArticulosInventario', 'id_tipos_articulos_inventario'),
 		);
 	}
 
@@ -65,6 +68,7 @@ class MaterialesApartadosPedido extends CActiveRecord
 			'id_tipos_articulos_inventario' => 'Tipo de artículo',
 			'id_articulo' => 'Artículo',
 			'id_colores' => 'Color',
+			'numero' => 'Número',
 			'id_pedidos' => 'Pedido',
 			'cantidad_apartada' => 'Cantidad apartada',
 			'fecha_actualizacion' => 'Fecha de actualización',

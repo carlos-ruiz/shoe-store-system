@@ -96,4 +96,8 @@ class PerfilesUsuarios extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+	public function obtenerPerfilesUsuarioDropDown(){
+		return CHtml::listData(PerfilesUsuarios::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
+	}
 }

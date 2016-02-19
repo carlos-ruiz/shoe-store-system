@@ -204,6 +204,10 @@ td.td-caracteristicas-especiales {
 	color: #716969;
 }
 
+/*.seguimiento_pedidos_panel {
+	max-width: 350px;
+}*/
+
 .pedidos_pendientes {
 	background-color: #f99494;
 }
@@ -243,6 +247,7 @@ td.td-caracteristicas-especiales {
 
 .draggable-content {
 	height: 100%;
+	min-height: 100%;
 }
 
 .flex-parent {
@@ -255,4 +260,8 @@ td.td-caracteristicas-especiales {
 	border: solid 3px #988e8e;
 	border-radius: 10px;
 	margin: 2px;
+}
+
+.tabla-seguimiento-pedido-cortador td{
+	padding: 5px 2px !important;
 }

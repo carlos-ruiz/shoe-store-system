@@ -34,12 +34,11 @@ $this->menu=array(
 			'label'=>'Fecha de entrega',
 			'value'=>date_format(date_create($model->fecha_entrega), 'd-m-Y'),
 		),
-		array(
-			'label'=>'Descuento al cliente (%)',
-			'value'=>$model->cliente->descuento,
-		),
 		'descuento',
-		'total',
+		array(
+			'label'=>'Cantidad total',
+			'value'=>'$'.number_format($model->total, 2),
+		),
 		'prioridad',
 		array(
 			'label'=>'Forma de pago',

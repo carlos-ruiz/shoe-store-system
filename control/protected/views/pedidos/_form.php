@@ -65,13 +65,6 @@
 					<?php echo $form->error($model,'id_formas_pago', array('class'=>'help-block')); ?>
 				</div>
 			</div>
-			<div class="form-group col-md-4 <?php if($form->error($model,'id_estatus_pedidos')!=''){ echo 'has-error'; }?>">
-				<?php echo $form->labelEx($model,'id_estatus_pedidos', array('class'=>'control-label')); ?>
-				<div class="input-group">
-					<?php echo $form->dropDownList($model,'id_estatus_pedidos', EstatusPedidos::model()->obtenerEstatusPedidos(), array('class' => 'form-control',"empty"=>array('0'=>"Seleccione una opci&oacute;n"))); ?>
-					<?php echo $form->error($model,'id_estatus_pedidos', array('class'=>'help-block')); ?>
-				</div>
-			</div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'prioridad')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'prioridad', array('class'=>'control-label')); ?>
 				<div class="input-group">
@@ -369,6 +362,16 @@
 		</div>
 		<div class="row">
 			<div class="col-md-8"></div>
+			<div class="form-group col-md-4 <?php if($form->error($model,'descuento')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($model,'descuento', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($model,'descuento',array('size'=>60,'maxlength'=>128, 'class'=>'form-control', 'readonly'=>'readonly')); ?>
+					<?php echo $form->error($model,'descuento', array('class'=>'help-block')); ?>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8"></div>
 			<div class="form-group col-md-4 <?php if($form->error($model,'total')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'total', array('class'=>'control-label')); ?>
 				<div class="input-group">
@@ -422,8 +425,13 @@
 
 	$(document).ready(function(){
 		total = parseFloat($('#Pedidos_total').val());
+		descuento = parseFloat($('#Pedidos_descuento').val());
 		subtotal = total;
+		if(descuento > 0){
+			subtotal = total/(1-descuento/100);
+		}
 		$('#Pedidos_subtotal').val(subtotal.toFixed(2));
+
 
 		checked = $('#Pedidos_es_especial').is(":checked");
 		if(!checked){
@@ -582,6 +590,8 @@
 					$(".panel-ordenes").unblock();
 					return;
 				}
+				total_pares = obtenerCantidadPares();
+				establecerDescuento(total_pares);
 				precio = parseFloat(data);
 				total += (precio*cantidad);
 				if(/^([0-9])*$/.test(valorAnterior)){
@@ -642,7 +652,9 @@
 
 	function calcularTotal(){
 		subtotal = $('#Pedidos_subtotal').val();
-		$('#Pedidos_total').attr("value", subtotal);
+		descuento = $('#Pedidos_descuento').val();
+		total = subtotal*(1-descuento/100);
+		$('#Pedidos_total').attr("value", total.toFixed(2));
 	}
 
 	function calcularMontoPendiente(){
@@ -707,6 +719,36 @@
 				});
 			}
 		});
+	}
+
+	function obtenerCantidadPares(){
+		cantidad_pares = 0;
+		$('.input-cantidad').each(function(){
+			numero_pares = parseInt($(this).val());
+			if (isNaN(numero_pares)) {
+				numero_pares = 0;
+			}
+			cantidad_pares += numero_pares;
+		});
+		return cantidad_pares;
+	}
+
+	function establecerDescuento(cantidad_pares){
+		if (cantidad_pares < 6) {
+			$('#Pedidos_descuento').val(0);
+		}
+		else if (cantidad_pares >= 6 && cantidad_pares < 100) {
+			$('#Pedidos_descuento').val(6);
+		}
+		else if (cantidad_pares >= 100 && cantidad_pares < 200) {
+			$('#Pedidos_descuento').val(8);
+		}
+		else if (cantidad_pares >= 200 && cantidad_pares < 300) {
+			$('#Pedidos_descuento').val(10);
+		}
+		else if (cantidad_pares >= 300) {
+			$('#Pedidos_descuento').val(12);
+		}
 	}
 
 	$(document).keypress(function(e){

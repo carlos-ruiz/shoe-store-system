@@ -32,6 +32,7 @@ class Pedidos extends CActiveRecord
 	public $var_estatus;
 	public $var_estatus_pago;
 	public $var_forma_pago;
+	public $var_adeudo;
 	public $pagado;
 	/**
 	 * @return string the associated database table name
@@ -102,6 +103,7 @@ class Pedidos extends CActiveRecord
 			'pagado' => 'Su pago',
 			'fecha_creacion' => 'Fecha de creación',
 			'fecha_modificacion' => 'Fecha de última edición',
+			'var_adeudo' => 'Adeudo',
 		);
 	}
 
@@ -133,17 +135,42 @@ class Pedidos extends CActiveRecord
 		$criteria->compare('prioridad',$this->prioridad,true);
 		$criteria->compare('descuento',$this->descuento);
 		$criteria->with = array('cliente', 'estatus', 'formaPago', 'estatusPago');
-		$criteria->compare('cliente.nombre', $this->var_cliente_nombre, true);
+		$criteria->compare("CONCAT(
+								cliente.nombre,' ',
+								cliente.apellido_paterno,' ',
+								IFNULL(cliente.apellido_materno,'')
+							)", $this->var_cliente_nombre, true);
 		$criteria->compare('estatus.nombre', $this->var_estatus, true);
 		$criteria->compare('estatusPago.nombre', $this->var_estatus_pago, true);
 		$criteria->compare('formaPago.nombre', $this->var_forma_pago, true);
-		$criteria->order='estatus.id ASC, fecha_entrega ASC';
 		$criteria->compare('estatus_pagos_id',$this->estatus_pagos_id);
 		$criteria->compare('fecha_creacion',$this->fecha_creacion,true);
 		$criteria->compare('fecha_modificacion',$this->fecha_modificacion,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'fecha_entrega ASC',
+		        'attributes'=>array(
+		        	'var_cliente_nombre'=>array(
+		                'asc'=>'cliente.nombre',
+		                'desc'=>'cliente.nombre DESC',
+		            ),
+		            'var_forma_pago'=>array(
+		                'asc'=>'formaPago.nombre',
+		                'desc'=>'formaPago.nombre DESC',
+		            ),
+		            'var_estatus'=>array(
+		                'asc'=>'estatus.nombre',
+		                'desc'=>'estatus.nombre DESC',
+		            ),
+		            'var_estatus_pago'=>array(
+		                'asc'=>'estatusPago.nombre',
+		                'desc'=>'estatusPago.nombre DESC',
+		            ),
+		            '*',
+		        ),
+		    ),
 		));
 	}
 

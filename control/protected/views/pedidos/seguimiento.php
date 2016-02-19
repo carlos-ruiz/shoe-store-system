@@ -1,3 +1,14 @@
+<script type="text/javascript">
+	// window.onload = setupRefresh;
+
+	// function setupRefresh() {
+	// 	setTimeout("refreshPage();", 30000); // milliseconds
+	// }
+	// function refreshPage() {
+	// 	window.location = location.href;
+	// }
+</script> 
+
 <div class="row">
 	<div class="col-md-8"><h1>Seguimiento de todos los pedidos</h1></div>
 	<div class="col-md-4">
@@ -12,11 +23,13 @@
 	</div>
 </div>
 <hr/>
-<div class="row flex-parent" style="width: 1600px;">
+<!-- style="width: 1600px;" -->
+<div class="row flex-parent">
+	<?php if(in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Administrador'))) {?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_pendientes" id="pendientes">
 		<h3>Pendientes</h3>
 		<hr/>
-		<div class="draggable-content droptrue primera-etapa">
+		<div class="draggable-content primera-etapa">
 			<?php 
 			$estatusZapatoPendiente = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
 			foreach ($pedidos as $pedido) { 
@@ -59,6 +72,8 @@
 			} ?>
 		</div>
 	</div>
+	<?php } ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Pespuntador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_corte" id="corte">
 		<h3>Corte</h3>
 		<hr/>
@@ -105,6 +120,8 @@
 			} ?>
 		</div>
 	</div>
+	<?php } ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Pespuntador', 'Ensuelador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_pespunte" id="pespunte">
 		<h3>Pespunte</h3>
 		<hr/>
@@ -151,6 +168,8 @@
 			} ?>
 		</div>
 	</div>
+	<?php } ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Pespuntador', 'Ensuelador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_ensuelado" id="ensuelado">
 		<h3>Ensuelado</h3>
 		<hr/>
@@ -197,6 +216,8 @@
 			} ?>
 		</div>
 	</div>
+	<?php } ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Ensuelador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_terminado" id="terminado">
 		<h3>Terminados</h3>
 		<hr/>
@@ -243,6 +264,7 @@
 			} ?>
 		</div>
 	</div>
+	<?php } ?>
 </div>
 <script type="text/javascript">
 	$(function() {

@@ -43,8 +43,78 @@ if(Yii::app()->user->isGuest){
 
 }
 else{
+	$mesActual = date('m');
+	$anioActual = date('Y');
+	$fechaInicial = date('Y-m-d H:i:s', mktime(0, 0, 0, $mesActual, 1,   $anioActual));
+	$fechaFinal = date('Y-m-d H:i:s', mktime(23, 59, 59, $mesActual+1, 0, $anioActual));
+	$pedidosDelMes = Pedidos::model()->findAll('fecha_pedido BETWEEN ? AND ?', array($fechaInicial, $fechaFinal));
+	$pedidosDelMes = Pedidos::model()->findAll('fecha_pedido BETWEEN ? AND ?', array($fechaInicial, $fechaFinal));
+	$ventasDelMes = 0;
+	$porCobrar = 0;
+	foreach ($pedidosDelMes as $pedido) {
+		$ventasDelMes += $pedido->total;
+		$porCobrar += $pedido->total;
+		foreach ($pedido->pagos as $pago) {
+			$porCobrar -= $pago->importe;
+		}
+	}
+
 ?>
-<h1>Hola mundo!!!</h1>
+<div id="tab-general">
+    <div id="sum_box" class="row mbl">
+        <div class="col-sm-6 col-md-4">
+            <div class="panel profit db mbm">
+                <div class="panel-body">
+                    <p class="icon">
+                        <i class="icon fa fa-shopping-cart"></i>
+                    </p>
+                    <h4 class="value">
+                        <span data-counter="" data-start="10" data-end="50" data-step="1" data-duration="0"><?= number_format($ventasDelMes, 2) ?></span><span>$</span></h4>
+                    <p class="description">
+                        Ventas del mes</p>
+                    <div class="progress progress-sm mbn">
+                        <div role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;" class="progress-bar progress-bar-success">
+                            <span class="sr-only">80% Complete (success)</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="panel income db mbm">
+                <div class="panel-body">
+                    <p class="icon">
+                        <i class="icon fa fa-money"></i>
+                    </p>
+                    <h4 class="value">
+                        <span><?= number_format($porCobrar, 2) ?></span><span>$</span></h4>
+                    <p class="description">
+                        Por cobrar</p>
+                    <div class="progress progress-sm mbn">
+                        <div role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;" class="progress-bar progress-bar-info">
+                            <span class="sr-only">60% Complete (success)</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="panel task db mbm">
+                <div class="panel-body">
+                    <p class="icon">
+                        <i class="icon fa fa-signal"></i>
+                    </p>
+                    <h4 class="value">
+                        <span><?= sizeof($pedidosDelMes) ?></span></h4>
+                    <p class="description">
+                        Pedidos del mes</p>
+                    <div class="progress progress-sm mbn">
+                        <div role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%;" class="progress-bar progress-bar-danger">
+                            <span class="sr-only">50% Complete (success)</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <?php
 }
 ?>

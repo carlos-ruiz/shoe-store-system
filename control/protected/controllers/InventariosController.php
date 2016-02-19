@@ -25,7 +25,7 @@ class InventariosController extends Controller
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
 				'actions'=>array('admin','delete', 'agregarMaterial', 'agregarInsumo', 'unidadMedidaMaterial', 'agregarForm'),
-				'users'=>array('admin'),
+				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
 				'users'=>array('*'),
@@ -90,6 +90,7 @@ class InventariosController extends Controller
 						$inventario->id_articulo = $model->id_materiales;
 						$inventario->id_colores = $id_color;
 						$inventario->cantidad_existente = 0;
+						$inventario->cantidad_apartada = 0;
 						$inventario->nombre_articulo = $model->material->nombre;
 						$inventario->unidad_medida = $model->material->unidad_medida;
 					}

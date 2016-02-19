@@ -4,6 +4,7 @@ class PedidosController extends Controller
 {
 	public $section = 'pedidos';
 	public $subsection;
+
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -33,13 +34,13 @@ class PedidosController extends Controller
 				'actions'=>array('index','view'),
 				'users'=>array('*'),
 			),
-			// array('allow', // allow authenticated user to perform 'create' and 'update' actions
-			// 	'actions'=>array('create','update'),
-			// 	'users'=>array('@'),
-			// ),
+			array('allow', // allow authenticated user to perform 'create' and 'update' actions
+				'actions'=>array('seguimientoPedidos', 'actualizarEstatusZapatos', 'seguimiento'),
+				'users'=>array('@'),
+			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'seguimientoPedidos', 'actualizarEstatusZapatos', 'imprimirEtiquetasPedido'),
-				'users'=>array('admin'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido'),
+				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
 				'users'=>array('*'),
@@ -69,6 +70,7 @@ class PedidosController extends Controller
 		$model->total = 0.0;
 		$pedidoZapato = new PedidosZapatos;
 		$estatusPedido = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
+		$estatusPedidoEnProceso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
 		$model->id_estatus_pedidos = $estatusPedido->id;
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -77,7 +79,7 @@ class PedidosController extends Controller
 		{
 			// print_r($_POST);
 			// return;
-			// $transaction = Yii::app()->db->beginTransaction();
+			$transaction = Yii::app()->db->beginTransaction();
 			try{
 				$model->attributes=$_POST['Pedidos'];
 				$prioridad = $_POST['Pedidos']['prioridad'];
@@ -85,6 +87,7 @@ class PedidosController extends Controller
 				$model->prioridad = 'NORMAL';
 				if($prioridad == 1){
 					$model->prioridad = 'ALTA';
+					$model->id_estatus_pedidos = $estatusPedidoEnProceso->id;
 				}
 				$date = str_replace('/', '-', $model->fecha_entrega);
 				$newDate = date("Y-m-d", strtotime($date));
@@ -197,13 +200,25 @@ class PedidosController extends Controller
 							$model->save();
 						}
 					}
-					$this->actualizarInventarios($model);
-					// $transaction->commit();
+					$transaction->commit();
+					$this->apartarMateriales($model->id);
+
+					if($model->id_estatus_pedidos == $estatusPedidoEnProceso->id){
+						$respuesta = $this->actualizarInventario($model->id);
+						print_r($respuesta);
+						if ($respuesta !== 'true') {
+							$model->id_estatus_pedidos = $estatusPedido->id;
+							$model->save();
+							$titulo = 'Aviso';
+							$mensaje = $respuesta;
+						}
+					}
+					$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
 					$this->redirect(array('view','id'=>$model->id));
 				}
 			}catch(Exception $ex){
 				print_r($ex);
-				// $transaction->rollback();
+				$transaction->rollback();
 			}
 		}
 
@@ -222,9 +237,7 @@ class PedidosController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$pedidoZapato = new PedidosZapatos;
-		if (isset($model->descuento) && $model->descuento > 0) {
-			$model->total = ($model->total/(1-($model->descuento/100)));
-		}
+		
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
@@ -437,6 +450,12 @@ class PedidosController extends Controller
 		}
 	}
 
+	/**
+	 * Busca todas las suelas que puede llevar el modelo
+	 * @param id_modelo, Requiere el id del modelo del que
+	 * buscará las suelas, este se debe enviar por POST
+	 * @return estructura del select (DropDown) que mostrará los resultados
+	 */
 	public function actionSuelasPorModelo()
 	{
 		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
@@ -446,6 +465,12 @@ class PedidosController extends Controller
 		}
 	}
 
+	/**
+	 * Regresa todos los colores que puede llevar el modelo
+	 * @param id_modelo, Requiere el id del modelo del que
+	 * buscará los colores, este se debe enviar por POST
+	 * @return estructura del select (DropDown) que mostrará los resultados
+	 */
 	public function actionColoresPorModelo()
 	{
 		$list = ModelosColores::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
@@ -454,6 +479,12 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
+	/**
+	 * Regresa todos los numeros en que se puede hacer el modelo
+	 * @param id_modelo, Requiere el id del modelo del que
+	 * buscará los numeros, este se debe enviar por POST
+	 * @return estructura del select (DropDown) que mostrará los resultados
+	 */
 	public function actionNumerosPorModelo()
 	{
 		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
@@ -461,6 +492,12 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
 	}
 
+	/**
+	 * Regresa todos los colores que hay para la suela especificada
+	 * @param id_suelas, Requiere el id de la suela de la que
+	 * buscará los colores, este se debe enviar por POST
+	 * @return estructura del select (DropDown) que mostrará los resultados
+	 */
 	public function actionColoresPorSuela()
 	{
 		$list = SuelasColores::model()->findAll("id_suelas=?",array($_POST["PedidosZapatos"]["id_suelas"]));
@@ -469,6 +506,12 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
+	/**
+	 * Revisa si el modelo especificado debe llevar agujetas y ojillos o no,
+	 * @param id_modelos, Requiere el id del modelo que se revisará
+	 * este se debe enviar por POST
+	 * @return true si lleva agujetas o false si no es así
+	 */
 	public function actionRevisarSiTieneAgujetas()
 	{
 		$id_modelo = $_POST['PedidosZapatos']['id_modelos'];
@@ -483,6 +526,12 @@ class PedidosController extends Controller
 		}
 	}
 
+	/**
+	 * Busca todos los colores que hay para la agujeta especificada
+	 * @param id_agujetas, Requiere el id de la agujeta de la que
+	 * buscará los colores, este se debe enviar por POST
+	 * @return estructura del select (DropDown) que mostrará los resultados
+	 */
 	public function actionColoresPorAgujeta()
 	{
 		$id_agujeta = $_POST['PedidosZapatos']['id_agujetas'];
@@ -492,6 +541,12 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
+	/**
+	 * Busca todos los colores que hay para los ojillos especificados
+	 * @param id_ojillos, Requiere el id de los ojillos de los que
+	 * buscará los colores, este se debe enviar por POST
+	 * @return estructura del select (DropDown) que mostrará los resultados
+	 */
 	public function actionColoresPorOjillo()
 	{
 		$id_ojillo = $_POST['PedidosZapatos']['id_ojillos'];
@@ -501,6 +556,13 @@ class PedidosController extends Controller
 			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
 	}
 
+	/**
+	 * Generar el código necesario para agregar una nueva orden en el
+	 * formulario de pedidos (Fila de la tabla de ordenes)
+	 * @param id_modelos, id_colores, id_suelas, id_agujetas, id_color_agujetas,
+	 * id_ojillos, id_color_ojillos. Todos los parametros se deben enviar por POST.
+	 * @return codigo html para mostrar la nueva orden en el formulario
+	 */
 	public function actionAgregarOrden()
 	{
 		if (isset($_POST)) {
@@ -583,8 +645,8 @@ class PedidosController extends Controller
 					</td>
 				</tr>
 			<?php } ?>
-<?php		}
-	}
+		<?php } ?>
+<?php	} 
 
 	// public function actionDescuentoPorCliente()
 	// {
@@ -593,6 +655,14 @@ class PedidosController extends Controller
 	// 	echo $cliente->descuento;
 	// }
 
+	/**
+	 * Calcula el importe pendiente de pago de un pedido especifico
+	 * Esta funcion se usa solo para el CGridView de la vista de admin
+	 * para mostrar los datos en la tabla de administracion.
+	 * @param $data, el modelo Pedido
+	 * @param $row, no sé que es, no se usa pero debe estar 
+	 * @return el monto que se adeuda para el pedido
+	 */
 	public function calcularAdeudo($data, $row)
 	{
 		$adeudo = $data->total;
@@ -605,8 +675,15 @@ class PedidosController extends Controller
 		return '$'.number_format($adeudo, 2, '.', '');
 	}
 
-	public function actualizarInventarios($pedido)
+	/**
+	 * Apartar todos los materiales necesarios para completar el pedido
+	 * @param $id_pedido, id del pedido a apartar
+	 * @return nada, solo guarda en la base de datos la lista de materiales
+	 * que se requieren para completar el pedido
+	 */
+	public function apartarMateriales($id_pedido)
 	{
+		$pedido = $this->loadModel($id_pedido);
 		// Aqui se va a hacer todo el descuento de materiales, suelas, etc.
 		foreach ($pedido->pedidosZapatos as $pedidoZapato) {
 			$cantidad_pares = $pedidoZapato->cantidad_total;
@@ -643,10 +720,11 @@ class PedidosController extends Controller
 
 				$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Materiales'));
 				$materialTieneColores = (MaterialesColores::model()->count('id_materiales=?', array($modeloMaterial->id_materiales)) > 0)?true:false;
+
 				if($materialTieneColores){
 					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id, $pedidoZapato->zapato->id_colores));
 				}
-				if(!isset($materialApartado)){
+				if(!$materialTieneColores && !isset($materialApartado)){
 					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id));
 				}
 				if(!isset($materialApartado)){
@@ -659,6 +737,7 @@ class PedidosController extends Controller
 					$materialApartado->id_pedidos = $pedido->id;
 					$materialApartado->cantidad_apartada = 0;
 				}
+
 				$materialApartado->cantidad_apartada += $cantidad_a_descontar;
 				$materialApartado->fecha_actualizacion = date('Y-m-d H:i:s');
 				$materialApartado->save();
@@ -719,11 +798,55 @@ class PedidosController extends Controller
 					$ojillosApartados->save();
 				}
 			}
-
 		} // Fin foreach pedidosZapatos
-	} // Fin metodo actualizarInventarios
 
-	public function actionMaterialesPredeterminados(){
+		// Apartar materiales en inventarios (acumular a lo apartado de los 
+		// pedidos anteriores)
+		foreach ($pedido->materialesApartados as $materialApartado) {
+			$consulta = 'id_tipos_articulos_inventario=? AND id_articulo=?';
+			$parametros = array($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+			if (isset($materialApartado->numero)) {
+				$consulta .= ' AND numero=?';
+				array_push($parametros, $materialApartado->numero);
+			}
+			if (isset($materialApartado->id_colores)) {
+				$consulta .= ' AND id_colores=?';
+				array_push($parametros, $materialApartado->id_colores);
+			}
+
+			$inventario = Inventarios::model()->find($consulta, $parametros);
+			if (!isset($inventario)) {
+				$inventario = new Inventarios;
+				$inventario->id_tipos_articulos_inventario = $materialApartado->id_tipos_articulos_inventario;
+				$inventario->id_articulo = $materialApartado->id_articulo;
+				$inventario->id_colores = $materialApartado->id_colores;
+				$inventario->numero = $materialApartado->numero;
+				$inventario->cantidad_existente = 0;
+				$inventario->cantidad_apartada = 0;
+
+				$datosArticulo = $this->obtenerDatosArticulo($inventario->id_tipos_articulos_inventario, $inventario->id_articulo);
+				$inventario->nombre_articulo = $datosArticulo['nombre'];
+				$inventario->unidad_medida = $datosArticulo['unidad_medida'];
+			}
+
+			$inventario->cantidad_apartada += $materialApartado->cantidad_apartada;
+			$inventario->save();
+		}
+	} // Fin metodo apartarMateriales
+
+	/**
+	 * Buscar los materiales basicos predeterminados para un modelo y color especificos
+	 * @param id_modelos, id del modelo
+	 * @param id_colores, id del color del modelo
+	 * Los parametros se deben enviar por POST
+	 * @return json con los datos de los materiales que lleva por defecto
+	 * el modelo especificado, para el color especificado. Los datos que
+	 * incluye el json son: id_modelo, id_color_modelo, id_suela, id_color_suela,
+	 * [id_tacon, id_color_tacon], [id_agujetas, id_color_agujetas, id_ojillos, 
+	 * id_color_ojillos].
+	 */
+	public function actionMaterialesPredeterminados()
+	{
 		header('Content-Type: application/json');
 		$respuesta = array();
 		
@@ -739,14 +862,55 @@ class PedidosController extends Controller
 		echo json_encode($respuesta);
 	}
 
-	public function actionSeguimientoPedidos(){
+	/**
+	 * Busca todos los pedidos que ya estan en proceso para mostrar los detalles
+	 * de las tareas a realizar para finalizar el pedido
+	 * @return muestra la vista de tareas que se estan haciendo y que quedan por hacer
+	 */
+	public function actionSeguimientoPedidos()
+	{
 		$this->subsection = 'seguimiento';
-		$pedidos = Pedidos::model()->findAll();
-		$this->render('seguimiento',array(
-			'pedidos'=>$pedidos,
-		));
+		$estatusPedidoPendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
+		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos!=?', $estatusPedidoPendiente->id);
+		$perfil = Yii::app()->user->getState('perfil');
+		switch ($perfil) {
+			case 'Administrador':
+				$this->render('_seguimiento_administrador',array(
+					'pedidos'=>$pedidos,
+				));
+				break;
+			case 'Cortador':
+				$this->render('_seguimiento_cortador',array(
+					'pedidos'=>$pedidos,
+				));
+				break;
+			case 'Pespuntador':
+				$this->render('_seguimiento_pespuntador',array(
+					'pedidos'=>$pedidos,
+				));
+				break;
+			case 'Ensuelador':
+				$this->render('_seguimiento_ensuelador',array(
+					'pedidos'=>$pedidos,
+				));
+				break;
+			case 'Empacador':
+				$this->render('_seguimiento_empacador',array(
+					'pedidos'=>$pedidos,
+				));
+				break;
+		}
+		
 	}
 
+	/**
+	 * Actualiza el estatus de los zapatos que corresponden a algún pedido,
+	 * y que ha sido cambiado por el usuario en la vista de tareas.
+	 * @param id, id del modelo PedidosZapatos que se va a actualizar
+	 * @param estatus, nuevo estatus que se le pondrá al modelo
+	 * Los parametros se deben enviar por POST
+	 * @return nada, solo actualizar los modelos en la base de datos
+	 */
 	public function actionActualizarEstatusZapatos()
 	{
 		$pedidoZapato = PedidosZapatos::model()->findByPk($_POST['id']);
@@ -764,6 +928,11 @@ class PedidosController extends Controller
 		}
 	}
 
+	/**
+	 * Genera un PDF con todas las etiquetas de los zapatos que incluye un pedido
+	 * @param $id, id del pedido para el que se generan las etiquetas
+	 * @return documento PDF con las etiquetas
+	 */
 	public function actionImprimirEtiquetasPedido($id)
 	{
 		$etiquetas = array();
@@ -781,4 +950,114 @@ class PedidosController extends Controller
 		$pdf->Output();
 	}
 
+	/**
+	 * Actualizar los inventarios para descontar los materiales que se requieren
+	 * para completar el pedido especificado
+	 * @param $id_pedido, id del pedido a considerar
+	 * @return true si es correcto, string de errores si no lo es
+	 */
+	public function actualizarInventario($id_pedido)
+	{
+		$pedido = $this->loadModel($id_pedido);
+		$transaction = Yii::app()->db->beginTransaction();
+		$errores = '';
+		try{
+			foreach ($pedido->materialesApartados as $materialApartado) {
+				$consulta = 'id_tipos_articulos_inventario=? AND id_articulo=?';
+				$parametros = array($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+				if (isset($materialApartado->numero)) {
+					$consulta .= ' AND numero=?';
+					array_push($parametros, $materialApartado->numero);
+				}
+				if (isset($materialApartado->id_colores)) {
+					$consulta .= ' AND id_colores=?';
+					array_push($parametros, $materialApartado->id_colores);
+				}
+
+				$inventario = Inventarios::model()->find($consulta, $parametros);
+				if (!isset($inventario)) {
+					$errores .= "No existen ".$materialApartado->tipoMaterial->tipo." con id: ".$materialApartado->id_articulo;
+					if (isset($materialApartado->color)) {
+						$errores .= ", color: ".$materialApartado->color->color; 
+					}
+					if (isset($materialApartado->numero)) {
+						$errores .= ", numero: ".$materialApartado->numero; 
+					}
+					$errores .= ' en el inventario|';
+					continue;
+				}
+
+				if ($inventario->cantidad_existente >= $materialApartado->cantidad_apartada) {
+					$inventario->cantidad_existente -= $materialApartado->cantidad_apartada;
+					$inventario->cantidad_apartada -= $materialApartado->cantidad_apartada;
+					$inventario->save(); 
+				}else{
+					$errores .= "No hay suficiente ".$materialApartado->tipoMaterial->tipo." con id: ".$materialApartado->id_articulo;
+					if (isset($materialApartado->color)) {
+						$errores .= ", color: ".$materialApartado->color->color; 
+					}
+					if (isset($materialApartado->numero)) {
+						$errores .= ", numero: ".$materialApartado->numero; 
+					}
+					$errores .= ' en el inventario|';
+				}
+			}
+			if (strlen($errores) > 0) {
+				$transaction->rollback();
+				return $errores;
+			}else{
+				$transaction->commit();
+				return 'true';
+			}
+		}catch(Exception $ex){
+			$transaction->rollback();
+		}
+	}
+
+	/**
+	 * Obtener los datos necesasrios para dar de alta un modelo inventario si
+	 * solo se conoce el tipo de articulo y el id del articulo.
+	 * @param $id_tipo, id del tipo de articulo, modelo TiposArticulosInventario
+	 * ('Suelas', 'Tacones', 'Materiales', etc.)
+	 * @param $id_articulo, id del articulo que agrega al inventario 
+	 * (sea id de suela, id de tacon, etc.)
+	 * @return array('nombre'=>NOMBRE_DE_ARTICULO, 'unidad_medida'=>UNIDAD_MEDIDA)
+	 */
+	public function obtenerDatosArticulo($id_tipo, $id_articulo)
+	{
+		$tipo_articulo = TiposArticulosInventario::model()->findByPk($id_tipo);
+		switch ($tipo_articulo->tipo) {
+			case 'Suelas':
+				$articulo = Suelas::model()->findByPk($id_articulo);
+				return array('nombre'=>$articulo->nombre, 'unidad_medida'=>'Pares');
+				break;
+			case 'Tacones':
+				$articulo = Tacones::model()->findByPk($id_articulo);
+				return array('nombre'=>$articulo->nombre, 'unidad_medida'=>'Pares');
+				break;
+			case 'Agujetas':
+				$articulo = Agujetas::model()->findByPk($id_articulo);
+				return array('nombre'=>$articulo->nombre, 'unidad_medida'=>'Millares');
+				break;
+			case 'Ojillos':
+				$articulo = Ojillos::model()->findByPk($id_articulo);
+				return array('nombre'=>$articulo->nombre, 'unidad_medida'=>'Millares');
+				break;
+			case 'Materiales':
+				$articulo = Materiales::model()->findByPk($id_articulo);
+				return array('nombre'=>$articulo->nombre, 'unidad_medida'=>$articulo->unidad_medida);
+				break;
+		}
+	}
+
+	public function actionSeguimiento()
+	{
+		$this->subsection = 'seguimiento';
+		$estatusPedidoPendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
+		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos!=?', $estatusPedidoPendiente->id);
+		
+		$this->render('seguimiento',array(
+			'pedidos'=>$pedidos,
+		));
+	}
 }

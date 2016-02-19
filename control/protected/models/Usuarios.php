@@ -18,6 +18,9 @@
  */
 class Usuarios extends CActiveRecord
 {
+	public $var_perfil;
+	public $confirmarContrasenia;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -35,12 +38,14 @@ class Usuarios extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('usuario, contrasenia, creacion, ultima_modificacion, id_perfiles_usuarios', 'required'),
+			array('confirmarContrasenia', 'required', 'on'=>'createForm'),
+			array('contrasenia', 'compare', 'compareAttribute' => 'confirmarContrasenia'),
 			array('id_perfiles_usuarios', 'numerical', 'integerOnly'=>true),
 			array('usuario', 'length', 'max'=>45),
-			array('contrasenia', 'length', 'max'=>256),
+			array('contrasenia, confirmarContrasenia', 'length', 'max'=>256),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, usuario, contrasenia, creacion, ultima_modificacion, id_perfiles_usuarios', 'safe', 'on'=>'search'),
+			array('id, usuario, contrasenia, creacion, ultima_modificacion, id_perfiles_usuarios, var_perfil', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -54,7 +59,7 @@ class Usuarios extends CActiveRecord
 		return array(
 			'perdidasMateriales' => array(self::HAS_MANY, 'PerdidasMateriales', 'id_usuarios'),
 			'perfil' => array(self::BELONGS_TO, 'PerfilesUsuarios', 'id_perfiles_usuarios'),
-			'zapatoCortadors' => array(self::HAS_MANY, 'ZapatoCortador', 'id_usuarios'),
+			'zapatoCortador' => array(self::HAS_MANY, 'ZapatoCortador', 'id_usuarios'),
 		);
 	}
 
@@ -66,10 +71,12 @@ class Usuarios extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'usuario' => 'Usuario',
-			'contrasenia' => 'Contrasenia',
-			'creacion' => 'Creacion',
-			'ultima_modificacion' => 'Ultima Modificacion',
-			'id_perfiles_usuarios' => 'Id Perfiles Usuarios',
+			'contrasenia' => 'Contraseña',
+			'confirmarContrasenia' => 'Confirmar contraseña',
+			'creacion' => 'Creación',
+			'ultima_modificacion' => 'Última modificación',
+			'id_perfiles_usuarios' => 'Perfil de usuario',
+			'var_perfil' => 'Perfil de usuario',
 		);
 	}
 
@@ -97,9 +104,20 @@ class Usuarios extends CActiveRecord
 		$criteria->compare('creacion',$this->creacion,true);
 		$criteria->compare('ultima_modificacion',$this->ultima_modificacion,true);
 		$criteria->compare('id_perfiles_usuarios',$this->id_perfiles_usuarios);
+		$criteria->with = array('perfil');
+		$criteria->compare('perfil.nombre',$this->var_perfil,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array(
+				'attributes'=>array(
+					'var_perfil'=>array(
+						'asc'=>'perfil.nombre ASC',
+						'desc'=>'perfil.nombre DESC',
+					),
+					'*',
+				),
+			),
 		));
 	}
 
@@ -112,5 +130,15 @@ class Usuarios extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public function obtenerPorPerfil($perfil) {
+		$perfil = PerfilesUsuarios::model()->find('nombre=?', array($perfil));
+		$usuarios = $this->model()->findAll("id_perfiles_usuarios=?", array($perfil->id));
+		$nombresDeUsuario = array();
+		foreach ($usuarios as $usuario) {
+			array_push($nombresDeUsuario, $usuario->usuario);
+		}
+		return $nombresDeUsuario;
 	}
 }

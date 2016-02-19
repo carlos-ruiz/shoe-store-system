@@ -1,9 +1,8 @@
 <?php
 
-class EstatusPagosController extends Controller
+class UsuariosController extends Controller
 {
-	public $section = 'extras';
-	public $subsection = 'estatus_pagos';
+	public $section = 'usuarios';
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -64,16 +63,25 @@ class EstatusPagosController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new EstatusPagos;
+		$model=new Usuarios('createForm');
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['EstatusPagos']))
+		if(isset($_POST['Usuarios']))
 		{
-			$model->attributes=$_POST['EstatusPagos'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$creacion = date('Y-m-d H:i:s');
+			$edicion = '2000-01-01 00:00:00';
+
+			$model->attributes=$_POST['Usuarios'];
+			$model->creacion = $creacion;
+			$model->ultima_modificacion = $edicion;
+			if ($model->validate()) {
+				$model->contrasenia = base64_encode($model->contrasenia);
+				$model->confirmarContrasenia = $model->contrasenia;
+				if($model->save())
+					$this->redirect(array('view','id'=>$model->id));
+			}
 		}
 
 		$this->render('create',array(
@@ -93,9 +101,9 @@ class EstatusPagosController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['EstatusPagos']))
+		if(isset($_POST['Usuarios']))
 		{
-			$model->attributes=$_POST['EstatusPagos'];
+			$model->attributes=$_POST['Usuarios'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
@@ -124,7 +132,7 @@ class EstatusPagosController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('EstatusPagos');
+		$dataProvider=new CActiveDataProvider('Usuarios');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -135,10 +143,10 @@ class EstatusPagosController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new EstatusPagos('search');
+		$model=new Usuarios('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['EstatusPagos']))
-			$model->attributes=$_GET['EstatusPagos'];
+		if(isset($_GET['Usuarios']))
+			$model->attributes=$_GET['Usuarios'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -149,12 +157,12 @@ class EstatusPagosController extends Controller
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
-	 * @return EstatusPagos the loaded model
+	 * @return Usuarios the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id)
 	{
-		$model=EstatusPagos::model()->findByPk($id);
+		$model=Usuarios::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -162,11 +170,11 @@ class EstatusPagosController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param EstatusPagos $model the model to be validated
+	 * @param Usuarios $model the model to be validated
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='estatus-pagos-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='usuarios-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();

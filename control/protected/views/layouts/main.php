@@ -36,22 +36,22 @@
     <script src="<?php echo Yii::app()->request->baseurl; ?>/assets/kadmin/script/jquery.ba-bbq.min.js"></script>
 </head>
 <body>
-<div class="modal fade" tabindex="-1" role="dialog" id="modal_alert">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
-                <h4 class="modal-title" id="modal_title">Aviso</h4>
-            </div>
-            <div class="modal-body">
-                Cargando...
-            </div>
-            <div class="modal-footer" id="modal_botones">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal_alert">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">x</span></button>
+                    <h4 class="modal-title" id="modal_title">Aviso</h4>
+                </div>
+                <div class="modal-body">
+                    Cargando...
+                </div>
+                <div class="modal-footer" id="modal_botones">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
     <div class="wrapper-parent">
         <!--BEGIN BACK TO TOP-->
         <a id="totop" href="#"><i class="fa fa-angle-up"></i></a>
@@ -84,9 +84,13 @@
         <!--END TOPBAR-->
         <div id="wrapper">
             <!--BEGIN SIDEBAR MENU-->
-            <?php 
+            <?php
+                $accesos = array('Cortador', 'Pespuntador', 'Ensuelador', 'Empacador'); 
                 if(Yii::app()->user->getState('perfil')=='Administrador'){
-                        include_once("menu-admin.php");
+                    include_once("menu-admin.php");
+                }
+                else if (in_array(Yii::app()->user->getState('perfil'), $accesos)) {
+                    include_once("menu-empleados.php");
                 }
             ?>
             <!--END SIDEBAR MENU-->

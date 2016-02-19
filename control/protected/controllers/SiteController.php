@@ -31,11 +31,16 @@ class SiteController extends Controller
 	{
 		$this->section = 'index';
 		$this->subSection = 'index';
+
 		
 		$this->init();
 
 		if(Yii::app()->user->isGuest){
 			$this->layout='//layouts/loginForm';
+		}
+
+		if (!Yii::app()->user->isGuest && Yii::app()->user->getState('perfil') != 'Administrador') {
+			$this->redirect(array('pedidos/seguimientopedidos'));
 		}
 
 		$model=new LoginForm;
