@@ -7,7 +7,7 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-orange"></div>
                 </i><span class="menu-title">Pedidos</span></a>
             </li>
-            <li class="<?php if($this->section == 'pedidos' && (isset($this->subsection) && $this->subsection == 'seguimiento')){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/pedidos/seguimientopedidos"><i class="fa fa-list-alt fa-fw">
+            <li class="<?php if($this->section == 'pedidos' && (isset($this->subsection) && $this->subsection == 'seguimiento')){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/pedidos/seguimiento"><i class="fa fa-list-alt fa-fw">
                 <div class="icon-bg bg-orange"></div>
                 </i><span class="menu-title">Seguimiento de pedidos</span></a>
             </li>

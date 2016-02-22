@@ -32,6 +32,7 @@
 <div class="row">
 	<?php 
 		$ids_clientes = array();
+		$todos_color = rand_color();
 		foreach ($pedidos as $pedido) {
 			if(!in_array($pedido->cliente->id, $ids_clientes)){
 				$color = rand_color();
@@ -44,85 +45,39 @@
 			<?= Clientes::model()->findByPk($id_cliente)->obtenerNombreCompleto() ?>
 		</div>
 	<?php } ?>
+		<div class="col-md-2 detalle-cliente" style="background-color:<?= $todos_color ?>;">
+			Todos
+		</div>
 </div>
 <!-- style="width: 1600px;" -->
 <div class="row flex-parent">
-	<?php if(in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Administrador'))) {?>
-	<div class="flex-item seguimiento_pedidos_panel pedidos_pendientes" id="pendientes">
-		<h3>Pendientes</h3>
-		<hr/>
-		<div class="draggable-content primera-etapa">
-			<?php 
-			$estatusZapatoPendiente = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
-			foreach ($pedidos as $pedido) { 
-				foreach ($pedido->pedidosZapatos as $pedidoZapato) {
-					if($pedidoZapato->id_estatus_zapatos == $estatusZapatoPendiente->id){ ?>
-						<div class="seguimiento_pedido_detalle" data-id="<?= $pedidoZapato->id ?>">
-							<div class="pedido-detalle-header">
-								<?= 'Pedido '.$pedido->id.' - Cliente: '.$pedido->cliente->obtenerNombreCompleto() ?>
-								<hr/>
-							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
-									<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
-									<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-								</div>
-								<div class="col-md-6">
-									<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
-									<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
-									<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<?php if($pedidoZapato->zapato->agujetaColor) { ?>
-										<p><?= 'Agujeta: '.$pedidoZapato->zapato->agujetaColor->agujeta->nombre ?></p>
-										<p><?= 'Color agujeta: '.$pedidoZapato->zapato->agujetaColor->color->color ?></p>
-									<?php } ?>
-								</div>
-								<div class="col-md-6">
-									<?php if($pedidoZapato->zapato->ojilloColor) { ?>
-										<p><?= 'Ojillos: '.$pedidoZapato->zapato->ojilloColor->ojillo->nombre ?></p>
-										<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
-									<?php } ?>
-								</div>
-							</div>
-						</div>
-			<?php   }
-				}
-			} ?>
-		</div>
-	</div>
-	<?php } ?>
 	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Pespuntador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_corte" id="corte">
 		<h3>Corte</h3>
 		<hr/>
-		<div class="draggable-content primera-etapa segunda-etapa">
+		<div class="draggable-content primera-etapa">
 			<?php 
-			$estatusZapatoCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
-			foreach ($pedidos as $pedido) { 
-				foreach ($pedido->pedidosZapatos as $pedidoZapato) {
-					if($pedidoZapato->id_estatus_zapatos == $estatusZapatoCorte->id){
-						$color = $ids_clientes[$pedido->id_clientes];
-					 ?>
-						<div class="seguimiento_pedido_detalle" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
-							<div class="pedido-detalle-header">
-								<?= 'Pedido '.$pedido->id.' - Cliente: '.$pedido->cliente->obtenerNombreCompleto() ?>
-								<hr/>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
-									<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
-									<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-									<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
-								</div>
+			foreach ($tarjetasCorte as $pedidoZapato) {
+					$color = $ids_clientes[$pedidoZapato->pedido->id_clientes];
+				 ?>
+					<div class="seguimiento_pedido_detalle" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
+						<div class="pedido-detalle-header">
+							<?= 'Pedido '.$pedidoZapato->pedido->id.' - Cliente: '.$pedidoZapato->pedido->cliente->obtenerNombreCompleto() ?>
+							<hr/>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
+								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
+								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
+								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
+									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
+								<?php } ?>
 							</div>
 						</div>
-			<?php	}
-				}
+					</div>
+		<?php
 			} ?>
 		</div>
 	</div>
@@ -131,44 +86,34 @@
 	<div class="flex-item seguimiento_pedidos_panel pedidos_pespunte" id="pespunte">
 		<h3>Pespunte</h3>
 		<hr/>
-		<div class="draggable-content segunda-etapa tercera-etapa">
-			<?php 
-			$estatusZapatoPespunte = EstatusZapatos::model()->find('nombre=?', array('En pespunte'));
-			foreach ($pedidos as $pedido) { 
-				foreach ($pedido->pedidosZapatos as $pedidoZapato) {
-					if($pedidoZapato->id_estatus_zapatos == $estatusZapatoPespunte->id){
-						$color = $ids_clientes[$pedido->id_clientes];
-					 ?>
-						<div class="seguimiento_pedido_detalle" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
-							<div class="pedido-detalle-header">
-								<?= 'Pedido '.$pedido->id.' - Cliente: '.$pedido->cliente->obtenerNombreCompleto() ?>
-								<hr/>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
-									<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
-									<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-								</div>
-							</div>
-							<div class="row">
-								<!-- <div class="col-md-12">
-									<?php if($pedidoZapato->zapato->agujetaColor) { ?>
-										<p><?= 'Agujeta: '.$pedidoZapato->zapato->agujetaColor->agujeta->nombre ?></p>
-										<p><?= 'Color agujeta: '.$pedidoZapato->zapato->agujetaColor->color->color ?></p>
-									<?php } ?>
-								</div> -->
-								<div class="col-md-12">
-									<?php if($pedidoZapato->zapato->ojilloColor) { ?>
-										<p><?= 'Ojillos: '.$pedidoZapato->zapato->ojilloColor->ojillo->nombre ?></p>
-										<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
-									<?php } ?>
-									<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
-								</div>
-							</div>
+		<div class="draggable-content primera-etapa segunda-etapa">
+			<?php
+			foreach ($tarjetasPespunte as $pedidoZapato) {
+				$color = $ids_clientes[$pedidoZapato->pedido->id_clientes];
+			 ?>
+				<div class="seguimiento_pedido_detalle" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
+					<div class="pedido-detalle-header">
+						<?= 'Pedido '.$pedidoZapato->pedido->id.' - Cliente: '.$pedidoZapato->pedido->cliente->obtenerNombreCompleto() ?>
+						<hr/>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
+							<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
+							<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
 						</div>
-			<?php	}
-				}
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<?php if($pedidoZapato->zapato->ojilloColor) { ?>
+								<p><?= 'Ojillos: '.$pedidoZapato->zapato->ojilloColor->ojillo->nombre ?></p>
+								<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
+							<?php } ?>
+							<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+						</div>
+					</div>
+				</div>
+			<?php
 			} ?>
 		</div>
 	</div>
@@ -177,91 +122,121 @@
 	<div class="flex-item seguimiento_pedidos_panel pedidos_ensuelado" id="ensuelado">
 		<h3>Ensuelado</h3>
 		<hr/>
-		<div class="draggable-content tercera-etapa cuarta-etapa">
+		<div class="draggable-content segunda-etapa tercera-etapa">
 			<?php 
-			$estatusZapatoEnsuelado = EstatusZapatos::model()->find('nombre=?', array('En ensuelado'));
-			foreach ($pedidos as $pedido) { 
-				foreach ($pedido->pedidosZapatos as $pedidoZapato) {
-					if($pedidoZapato->id_estatus_zapatos == $estatusZapatoEnsuelado->id){ 
-						$color = $ids_clientes[$pedido->id_clientes];
-						?>
-						<div class="seguimiento_pedido_detalle" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
-							<div class="pedido-detalle-header">
-								<?= 'Pedido '.$pedido->id.' - Cliente: '.$pedido->cliente->obtenerNombreCompleto() ?>
-								<hr/>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
-									<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
-									<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-									<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
-									<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
-									<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
-								</div>
+				foreach ($tarjetasEnsuelado as $pedidoZapato) {
+					$color = $ids_clientes[$pedidoZapato->pedido->id_clientes];
+					?>
+					<div class="seguimiento_pedido_detalle" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
+						<div class="pedido-detalle-header">
+							<?= 'Pedido '.$pedidoZapato->pedido->id.' - Cliente: '.$pedidoZapato->pedido->cliente->obtenerNombreCompleto() ?>
+							<hr/>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
+								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
+								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
+								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
+								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
+								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
 							</div>
 						</div>
-			<?php	}
-				}
-			} ?>
+					</div>
+			<?php
+				} ?>
 		</div>
 	</div>
 	<?php } ?>
-	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Ensuelador', 'Administrador'))) { ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Ensuelador', 'Adornador', 'Administrador'))) { ?>
+	<div class="flex-item seguimiento_pedidos_panel pedidos_adorno" id="adorno">
+		<h3>Adorno</h3>
+		<hr/>
+		<div class="draggable-content tercera-etapa cuarta-etapa">
+			<?php 
+				foreach ($tarjetasAdornado as $pedidoZapato) {
+					$color = $ids_clientes[$pedidoZapato->pedido->id_clientes];
+					?>
+					<div class="seguimiento_pedido_detalle" style="background-color: <?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
+						<div class="pedido-detalle-header">
+							<?= 'Pedido '.$pedidoZapato->pedido->id.' - Cliente: '.$pedidoZapato->pedido->cliente->obtenerNombreCompleto() ?>
+							<hr/>
+						</div>
+						<div class="row">
+							<div class="col-md-12">
+								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
+								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
+								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
+								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+							</div>
+						</div>
+					</div>
+			<?php	
+				} ?>
+		</div>
+	</div>
+	<?php } ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Adornador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_terminado" id="terminado">
-		<h3>Terminados</h3>
+		<h3>Terminado</h3>
 		<hr/>
 		<div class="draggable-content cuarta-etapa">
 			<?php 
-			$estatusZapatoTerminado = EstatusZapatos::model()->find('nombre=?', array('Terminado'));
-			foreach ($pedidos as $pedido) { 
-				foreach ($pedido->pedidosZapatos as $pedidoZapato) {
-					if($pedidoZapato->id_estatus_zapatos == $estatusZapatoTerminado->id){ 
-						$color = $ids_clientes[$pedido->id_clientes];
-						?>
-						<div class="seguimiento_pedido_detalle" style="background-color: <?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
-							<div class="pedido-detalle-header">
-								<?= 'Pedido '.$pedido->id.' - Cliente: '.$pedido->cliente->obtenerNombreCompleto() ?>
-								<hr/>
+			
+				foreach ($tarjetasTerminado as $pedidoZapato) {
+					$color = $ids_clientes[$pedidoZapato->pedido->id_clientes];
+					?>
+					<div class="seguimiento_pedido_detalle" style="background-color: <?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
+						<div class="pedido-detalle-header">
+							<?= 'Pedido '.$pedidoZapato->pedido->id.' - Cliente: '.$pedidoZapato->pedido->cliente->obtenerNombreCompleto() ?>
+							<hr/>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
+								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
+								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
 							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
-									<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
-									<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-								</div>
-								<div class="col-md-6">
-									<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
-									<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
-									<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<?php if($pedidoZapato->zapato->agujetaColor) { ?>
-										<p><?= 'Agujeta: '.$pedidoZapato->zapato->agujetaColor->agujeta->nombre ?></p>
-										<p><?= 'Color agujeta: '.$pedidoZapato->zapato->agujetaColor->color->color ?></p>
-									<?php } ?>
-								</div>
-								<div class="col-md-6">
-									<?php if($pedidoZapato->zapato->ojilloColor) { ?>
-										<p><?= 'Ojillos: '.$pedidoZapato->zapato->ojilloColor->ojillo->nombre ?></p>
-										<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
-									<?php } ?>
-								</div>
+							<div class="col-md-6">
+								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
+								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
+								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
 							</div>
 						</div>
-			<?php	}
-				}
-			} ?>
+						<div class="row">
+							<div class="col-md-6">
+								<?php if($pedidoZapato->zapato->agujetaColor) { ?>
+									<p><?= 'Agujeta: '.$pedidoZapato->zapato->agujetaColor->agujeta->nombre ?></p>
+									<p><?= 'Color agujeta: '.$pedidoZapato->zapato->agujetaColor->color->color ?></p>
+								<?php } ?>
+							</div>
+							<div class="col-md-6">
+								<?php if($pedidoZapato->zapato->ojilloColor) { ?>
+									<p><?= 'Ojillos: '.$pedidoZapato->zapato->ojilloColor->ojillo->nombre ?></p>
+									<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
+								<?php } ?>
+							</div>
+						</div>
+					</div>
+			<?php	
+				} ?>
 		</div>
 	</div>
 	<?php } ?>
 </div>
 <script type="text/javascript">
+	$(document).ready(function(){
+		$('.draggable-content').each(function(){
+			diferenciaAlto = $('.draggable-content').offset().top - $('.seguimiento_pedidos_panel').offset().top;
+			altoPadre = $('.seguimiento_pedidos_panel ').height()-diferenciaAlto+10;
+			//alert(parentHeight);
+			$(this).css('height', altoPadre);
+
+		});
+	});
 	$(function() {
 		$( ".primera-etapa" ).sortable({
-			connectWith: "div.primera-etapa",
+			connectWith: ".primera-etapa",
 			receive: function(event, ui) {
 			   actualizarEstatus($(this).parent().attr('id'), ui.item.data("id"));
 			}
@@ -285,7 +260,7 @@
 			}
 		});
 
-		$( ".pedidos_pendientes, .pedidos_corte, .pedidos_pespunte, .pedidos_ensuelado, .pedidos_terminado" ).disableSelection();
+		$( ".pedidos_pendientes, .pedidos_corte, .pedidos_pespunte, .pedidos_ensuelado, .pedidos_adorno, .pedidos_terminado" ).disableSelection();
 	});
 
 	function actualizarEstatus(idEtapa, idPedidoZapato)
@@ -303,6 +278,9 @@
 			break;
 			case 'ensuelado':
 				estatus = 'En ensuelado';
+			break;
+			case 'adorno':
+				estatus = 'En adorno';
 			break;
 			case 'terminado':
 				estatus = 'Terminado';
@@ -326,6 +304,14 @@
 	}
 
 	$('.search-panel button').click(function(){
+		search();
+	});
+
+	$('.search-panel input').change(function (){
+		search();
+	});
+
+	function search() {
 		var textSearch = accentFold($(".search-panel input").val()).toLowerCase();
 		if(textSearch.length>0){
 			$(".seguimiento_pedido_detalle").each(function(){
@@ -339,5 +325,24 @@
 		}else{
 			$(".seguimiento_pedido_detalle").show(500);
 		}
+	}
+
+	$('.detalle-cliente').click(function(){
+		var textSearch = accentFold($(this).text().trim()).toLowerCase();
+		$(".seguimiento_pedido_detalle").each(function(){
+			var textoProducto = accentFold($(this).text()).toLowerCase();
+			if(textSearch === 'todos') {
+				$(this).show(500);
+			}
+			else if(textoProducto.indexOf(textSearch)<0){
+				$(this).hide(500);
+			}else{
+				$(this).show(500);
+			}
+		});
+	});
+
+	$('.tarjeta-especial').click(function(){
+		alert($(this).data('especial'));
 	});
 </script>

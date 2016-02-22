@@ -13,6 +13,7 @@
  * @property integer $id_estatus_pedidos
  * @property string $prioridad
  * @property integer $descuento
+ * @property integer $gastos_envio
  * @property integer $estatus_pagos_id
  * @property string $fecha_creacion
  * @property string $fecha_modificacion
@@ -51,14 +52,15 @@ class Pedidos extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('id_clientes, fecha_pedido, id_formas_pago, total, id_estatus_pedidos, estatus_pagos_id', 'required'),
-			array('id_clientes, id_formas_pago, id_estatus_pedidos, descuento, estatus_pagos_id', 'numerical', 'integerOnly'=>true),
+			array('id_clientes, id_formas_pago, id_estatus_pedidos, estatus_pagos_id', 'numerical', 'integerOnly'=>true),
+			array('descuento, gastos_envio', 'numerical', 'integerOnly'=>true, 'min'=>0, 'max'=>100),
 			array('pagado', 'numerical'),
 			array('total', 'length', 'max'=>10),
 			array('prioridad', 'length', 'max'=>45),
 			array('fecha_entrega, total, fecha_creacion, fecha_modificacion', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_clientes, fecha_pedido, fecha_entrega, id_formas_pago, total, id_estatus_pedidos, prioridad, descuento, var_cliente_nombre, var_estatus, var_estatus_pago, var_forma_pago, estatus_pagos_id, pagado', 'safe', 'on'=>'search'),
+			array('id, id_clientes, fecha_pedido, fecha_entrega, id_formas_pago, total, id_estatus_pedidos, prioridad, descuento, gastos_envio, var_cliente_nombre, var_estatus, var_estatus_pago, var_forma_pago, estatus_pagos_id, pagado', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -95,6 +97,7 @@ class Pedidos extends CActiveRecord
 			'id_estatus_pedidos' => 'Estatus del pedidos',
 			'prioridad' => 'Prioridad',
 			'descuento' => 'Descuento(%)',
+			'gastos_envio' => 'Gastos de envío(%)',
 			'var_cliente_nombre' => 'Cliente',
 			'var_estatus' => 'Estatus',
 			'var_estatus_pago' => 'Estatus de pago',
@@ -134,6 +137,7 @@ class Pedidos extends CActiveRecord
 		$criteria->compare('id_estatus_pedidos',$this->id_estatus_pedidos);
 		$criteria->compare('prioridad',$this->prioridad,true);
 		$criteria->compare('descuento',$this->descuento);
+		$criteria->compare('gastos_envio',$this->gastos_envio);
 		$criteria->with = array('cliente', 'estatus', 'formaPago', 'estatusPago');
 		$criteria->compare("CONCAT(
 								cliente.nombre,' ',

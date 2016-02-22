@@ -210,6 +210,9 @@ class SiteController extends Controller
 			$estatus->nombre="En ensuelado";
 			$estatus->save();
 			$estatus = new EstatusZapatos;
+			$estatus->nombre="En adorno";
+			$estatus->save();
+			$estatus = new EstatusZapatos;
 			$estatus->nombre="Terminado";
 			$estatus->save();
 		}

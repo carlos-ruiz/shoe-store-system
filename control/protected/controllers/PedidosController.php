@@ -39,7 +39,7 @@ class PedidosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente', 'empezarpedido'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -148,12 +148,29 @@ class PedidosController extends Controller
 										}
 										$zapato->save();
 									}
+									$estatusZapato = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
+									$estatusZapatoCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
+									$cantidad_tipo_zapato = $cantidad;
+									while ($cantidad_tipo_zapato > 5) {
+										$pedidoZapato = new PedidosZapatos;
+										$pedidoZapato->id_pedidos = $model->id;
+										$pedidoZapato->id_zapatos = $zapato->id;
+										$pedidoZapato->cantidad_total = 5;
+										$pedidoZapato->id_estatus_zapatos = ($prioridad==1)?$estatusZapatoCorte->id:$estatusZapato->id;
+										$pedidoZapato->completos = 0;
+										$pedidoZapato->precio_unitario = $zapato->precio;
+										if(isset($datosPedido['especiales'][$id])){
+											$pedidoZapato->caracteristicas_especiales = $datosPedido['especiales'][$id];
+										}
+										$pedidoZapato->save();
+										$cantidad_tipo_zapato -= 5;
+									}
+
 									$pedidoZapato = new PedidosZapatos;
 									$pedidoZapato->id_pedidos = $model->id;
 									$pedidoZapato->id_zapatos = $zapato->id;
-									$pedidoZapato->cantidad_total = $cantidad;
-									$estatusZapato = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
-									$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
+									$pedidoZapato->cantidad_total = $cantidad_tipo_zapato;
+									$pedidoZapato->id_estatus_zapatos = ($prioridad==1)?$estatusZapatoCorte->id:$estatusZapato->id;
 									$pedidoZapato->completos = 0;
 									$pedidoZapato->precio_unitario = $zapato->precio;
 									if(isset($datosPedido['especiales'][$id])){
@@ -179,9 +196,20 @@ class PedidosController extends Controller
 							else if ($cantidad_pares_pedido >= 300) {
 								$model->descuento = 12;
 							}
-							if(isset($model->descuento) && $model->descuento > 0){
-								$total = $total*(1-$model->descuento/100);
+							$descuento_cliente = 0;
+							$descuento_pedido = 0;
+							$gastos = 0;
+							if (isset($_POST['Pedido']['descuento_cliente']) && $_POST['Pedido']['descuento_cliente'] > 0) {
+								$descuento_cliente = $_POST['Pedido']['descuento_cliente'];
 							}
+							if(isset($model->descuento) && $model->descuento > 0){
+								$descuento_pedido = $model->descuento;
+							}
+							if(isset($model->gastos_envio) && $model->gastos_envio > 0){
+								$gastos = $model->gastos_envio;
+							}
+							$descuento_total = $descuento_cliente + $descuento_pedido - $gastos;
+							$total = $total*(1-$descuento_total/100);
 							$model->total = $total;
 							if($pagado > 0){
 								$pago = new Pagos;
@@ -292,12 +320,28 @@ class PedidosController extends Controller
 										$zapato->id_suelas_colores = $datosPedido['suelacolor'][$id];
 										$zapato->save();
 									}
+									$estatusZapato = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
+									$estatusZapatoCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
+									$cantidad_tipo_zapato = $cantidad;
+									while ($cantidad_tipo_zapato > 5) {
+										$pedidoZapato = new PedidosZapatos;
+										$pedidoZapato->id_pedidos = $model->id;
+										$pedidoZapato->id_zapatos = $zapato->id;
+										$pedidoZapato->cantidad_total = 5;
+										$pedidoZapato->id_estatus_zapatos = ($prioridad==1)?$estatusZapatoCorte->id:$estatusZapato->id;
+										$pedidoZapato->completos = 0;
+										$pedidoZapato->precio_unitario = $zapato->precio;
+										if(isset($datosPedido['especiales'][$id])){
+											$pedidoZapato->caracteristicas_especiales = $datosPedido['especiales'][$id];
+										}
+										$pedidoZapato->save();
+										$cantidad_tipo_zapato -= 5;
+									}
 									$pedidoZapato = new PedidosZapatos;
 									$pedidoZapato->id_pedidos = $model->id;
 									$pedidoZapato->id_zapatos = $zapato->id;
-									$pedidoZapato->cantidad_total = $cantidad;
-									$estatusZapato = EstatusZapatos::model()->find('nombre=?', array('Pendiente'));
-									$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
+									$pedidoZapato->cantidad_total = $cantidad_tipo_zapato;
+									$pedidoZapato->id_estatus_zapatos = ($prioridad==1)?$estatusZapatoCorte->id:$estatusZapato->id;
 									$pedidoZapato->completos = 0;
 									$pedidoZapato->precio_unitario = $zapato->precio;
 									if(isset($datosPedido['especiales'][$id])){
@@ -323,9 +367,20 @@ class PedidosController extends Controller
 							else if ($cantidad_pares_pedido >= 300) {
 								$model->descuento = 12;
 							}
-							if(isset($model->descuento) && $model->descuento > 0){
-								$total = $total*(1-$model->descuento/100);
+							$descuento_cliente = 0;
+							$descuento_pedido = 0;
+							$gastos = 0;
+							if (isset($_POST['Pedido']['descuento_cliente']) && $_POST['Pedido']['descuento_cliente'] > 0) {
+								$descuento_cliente = $_POST['Pedido']['descuento_cliente'];
 							}
+							if(isset($model->descuento) && $model->descuento > 0){
+								$descuento_pedido = $model->descuento;
+							}
+							if(isset($model->gastos_envio) && $model->gastos_envio > 0){
+								$gastos = $model->gastos_envio;
+							}
+							$descuento_total = $descuento_cliente + $descuento_pedido - $gastos;
+							$total = $total*(1-$descuento_total/100);
 							$model->total = $total;
 							$model->save();
 
@@ -686,6 +741,12 @@ class PedidosController extends Controller
 		<?php } ?>
 	<?php	} 
 
+	/**
+	 * Consulta el descuento que se le aplica a cada cliente
+	 * @param id_clientes, cliente del que se busca el descuento
+	 * Los parametros son enviados por POST
+	 * @return porcentaje de descuento que tiene el cliente
+	 */
 	public function actionDescuentoPorCliente()
 	{
 		$id_clientes = $_POST['Pedidos']['id_clientes'];
@@ -932,7 +993,7 @@ class PedidosController extends Controller
 					'pedidos'=>$pedidos,
 				));
 				break;
-			case 'Empacador':
+			case 'Adornador':
 				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
 				));
@@ -1088,14 +1149,111 @@ class PedidosController extends Controller
 		}
 	}
 
+	/**
+	 * Muestra el avance en la fabricacion de los zapatos de todos los pedidos
+	 * que se estan haciendo, los pedidos pendientes no se muestran en esta 
+	 * seccion. 
+	 */
 	public function actionSeguimiento()
 	{
 		$this->subsection = 'seguimiento';
 		$estatusPedidoPendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
 		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos!=?', $estatusPedidoPendiente->id);
+
+		// Tarjetas de corte
+		$estatusZapatoCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
+		$pedidosZapatosCorte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+			array(
+				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'params' => array(
+					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusZapato' => $estatusZapatoCorte->id,
+					),
+				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
+				)
+			);
+
+		// Tarjetas de pespunte
+		$estatusZapatoPespunte = EstatusZapatos::model()->find('nombre=?', array('En pespunte'));
+		$pedidosZapatosPespunte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+			array(
+				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'params' => array(
+					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusZapato' => $estatusZapatoPespunte->id,
+					),
+				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
+				)
+			);
+
+		// Tarjetas de ensuelado
+		$estatusZapatoEnsuelado = EstatusZapatos::model()->find('nombre=?', array('En ensuelado'));
+		$pedidosZapatosEnsuelado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+			array(
+				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'params' => array(
+					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusZapato' => $estatusZapatoEnsuelado->id,
+					),
+				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
+				)
+			);
+		
+		// Tarjetas de Adornado
+		$estatusZapatoAdornado = EstatusZapatos::model()->find('nombre=?', array('En adorno'));
+		$pedidosZapatosAdornado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+			array(
+				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'params' => array(
+					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusZapato' => $estatusZapatoAdornado->id,
+					),
+				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
+				)
+			);
+		
+		// Tarjetas de terminado
+		$estatusZapatoTerminado = EstatusZapatos::model()->find('nombre=?', array('Terminado'));
+		$pedidosZapatosTerminado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+			array(
+				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'params' => array(
+					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusZapato' => $estatusZapatoTerminado->id,
+					),
+				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
+				)
+			);
 		
 		$this->render('seguimiento',array(
 			'pedidos'=>$pedidos,
+			'tarjetasCorte'=>$pedidosZapatosCorte,
+			'tarjetasPespunte'=>$pedidosZapatosPespunte,
+			'tarjetasEnsuelado'=>$pedidosZapatosEnsuelado,
+			'tarjetasAdornado'=>$pedidosZapatosAdornado,
+			'tarjetasTerminado'=>$pedidosZapatosTerminado,
 		));
+	}
+
+	/**
+	* Mandar a proceso un pedido y cambiar todos sus zapatos al departamento
+	* de corte, el pedido debe estar en estatus de pendiente para que la
+	* funcion actue.
+	* @param $id_pedido, id del pedido que se desea mandar a proceso.
+	*/
+	public function actionEmpezarPedido($id)
+	{
+		$pedido = $this->loadModel($id);
+		if ($pedido->estatus->nombre === 'Pendiente') {
+			$estatusEnCurso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
+			$estatusEnCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
+			foreach ($pedido->pedidosZapatos as $pedidoZapato) {
+				$pedidoZapato->id_estatus_zapatos = $estatusEnCorte->id;
+				$pedidoZapato->save();
+			}
+			$pedido->id_estatus_pedidos = $estatusEnCurso->id;
+			$pedido->save();
+			$this->redirect(array('admin'));
+		}
 	}
 }

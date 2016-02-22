@@ -31,6 +31,8 @@
 								"success"=>"function(data)
                                 {
                                 	$('#Cliente_descuento').attr('value',data);
+                                	calcularTotal();
+                                	calcularMontoPendiente();
                                 }"
 							),
 							"class" => "form-control",
@@ -378,7 +380,17 @@
 			<div class="form-group col-md-4">
 				<label class="control-label required" for="Pedidos_total">Descuento al cliente (%)</label>
 				<div class="input-group">
-					<input size="60" maxlength="128" class="form-control" disabled="disabled" name="Aux[descuento]" id="Cliente_descuento" type="text" value="<?= $descuentoCliente ?>">
+					<input size="60" maxlength="128" class="form-control" readonly="readonly" name="Pedido[descuento_cliente]" id="Cliente_descuento" type="text" value="<?= $descuentoCliente ?>">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8"></div>
+			<div class="form-group col-md-4 <?php if($form->error($model,'gastos_envio')!=''){ echo 'has-error'; }?>">
+				<?php echo $form->labelEx($model,'gastos_envio', array('class'=>'control-label')); ?>
+				<div class="input-group">
+					<?php echo $form->textField($model,'gastos_envio',array('size'=>60,'maxlength'=>128, 'class'=>'form-control')); ?>
+					<?php echo $form->error($model,'gastos_envio', array('class'=>'help-block')); ?>
 				</div>
 			</div>
 		</div>
@@ -439,13 +451,15 @@
 		total = parseFloat($('#Pedidos_total').val());
 		descuentoCliente = parseFloat($('#Cliente_descuento').val());
 		descuento = parseFloat($('#Pedidos_descuento').val());
+		gastos = parseFloat($('#Pedidos_gastos_envio').val());
 		subtotal = total;
-		if(descuento > 0){
-			subtotal = total/(1-descuento/100);
+		descuentoTotal = descuentoCliente+descuento-gastos;
+		if(descuentoTotal > 12){
+			descuentoCliente = 12-descuento;
+			$('#Cliente_descuento').attr("value", descuentoCliente);
+			descuentoTotal = 12;
 		}
-		if(descuentoCliente > 0){
-			subtotal = subtotal/(1-descuentoCliente/100);
-		}
+		subtotal = subtotal/(1-descuentoTotal/100);
 		$('#Pedidos_subtotal').val(subtotal.toFixed(2));
 
 
@@ -520,7 +534,8 @@
 	}
 
 	function actualizarColoresSuelas(){
-		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html);}});
+		jQuery.ajax({
+			'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html);}});
 	}
 
 	$('#boton_agregar_orden').click(function(){
@@ -571,6 +586,7 @@
 		}
 		
 	});
+
 	var valorAnterior;
 	$(document).on("focus",".input-cantidad", function(){
 		valorAnterior = $(this).val();
@@ -625,6 +641,11 @@
 		calcularMontoPendiente();
 	});
 
+	$(document).on("change","#Pedidos_gastos_envio", function(){
+		calcularTotal();
+		calcularMontoPendiente();
+	});
+
 	$(document).on("click","a.delete", function(){
 		id_modelos = $(this).parent().parent().find('.modelo').data('id');
 		id_suelas = $(this).parent().parent().find('.suela').data('id');
@@ -672,12 +693,14 @@
 		subtotal = $('#Pedidos_subtotal').val();
 		descuento = parseFloat($('#Pedidos_descuento').val());
 		descuentoCliente = parseFloat($('#Cliente_descuento').val());
-		if((descuento+descuentoCliente)>12){
+		gastos = parseFloat($('#Pedidos_gastos_envio').val());
+		descuentoTotal = descuentoCliente+descuento-gastos;
+		if(descuentoTotal>12){
 			descuentoCliente=12-descuento;
-			$('#Cliente_descuento').val(descuentoCliente);
+			$('#Cliente_descuento').attr("value", descuentoCliente);
+			descuentoTotal = 12;
 		}
-		total = subtotal*(1-descuento/100);
-		total = total*(1-descuentoCliente/100);
+		total = subtotal*(1-descuentoTotal/100);
 		$('#Pedidos_total').attr("value", total.toFixed(2));
 	}
 

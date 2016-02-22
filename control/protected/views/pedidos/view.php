@@ -36,6 +36,14 @@ $this->menu=array(
 		),
 		'descuento',
 		array(
+			'label'=>'Decuento por cliente (%)',
+			'value'=>$model->cliente->descuento,
+		),
+		array(
+			'name'=>'gastos_envio',
+			'value'=>$model->gastos_envio,
+		),
+		array(
 			'label'=>'Cantidad total',
 			'value'=>'$'.number_format($model->total, 2),
 		),

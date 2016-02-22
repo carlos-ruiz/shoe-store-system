@@ -3,7 +3,7 @@ data-position="right" class="navbar-default navbar-static-side">
     <div class="sidebar-collapse menu-scroll">
         <ul id="side-menu" class="nav">
             <div class="clearfix"></div>
-            <li class="<?php if($this->section == 'pedidos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/pedidos/seguimientoPedidos"><i class="fa fa-list-alt fa-fw">
+            <li class="<?php if($this->section == 'pedidos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/pedidos/seguimiento"><i class="fa fa-list-alt fa-fw">
                 <div class="icon-bg bg-orange"></div>
                 </i><span class="menu-title">Seguimiento de pedidos</span></a>
             </li>

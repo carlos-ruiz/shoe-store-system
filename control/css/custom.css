@@ -242,7 +242,7 @@ td.td-caracteristicas-especiales {
 }
 
 .seguimiento_pedido_detalle:hover {
-	background-color: #e0d9d9;
+	opacity: 0.8;
 }
 
 .draggable-content {
@@ -274,6 +274,7 @@ td.td-caracteristicas-especiales {
 	text-align: center;
 	font-weight: bold;
 	text-shadow: 1px 1px black;
+	cursor: pointer;
 }
 
 .seguimiento_pedido_detalle p {
@@ -284,4 +285,19 @@ td.td-caracteristicas-especiales {
 
 .pedido-detalle-header {
 	display: none;
+}
+
+.tarjeta-especial {
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    background-color: #AB3E3E;
+    padding: 3px;
+    border-radius: 4px;
+    color: white;
+    border: solid 1px black;
+}
+
+.tarjeta-especial:hover {
+	padding: 5px;
 }

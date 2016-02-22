@@ -85,7 +85,7 @@
         <div id="wrapper">
             <!--BEGIN SIDEBAR MENU-->
             <?php
-                $accesos = array('Cortador', 'Pespuntador', 'Ensuelador', 'Empacador'); 
+                $accesos = array('Cortador', 'Pespuntador', 'Ensuelador', 'Adornador'); 
                 if(Yii::app()->user->getState('perfil')=='Administrador'){
                     include_once("menu-admin.php");
                 }

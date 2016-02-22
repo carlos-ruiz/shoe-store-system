@@ -56,7 +56,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
     	'prioridad',
 		array(
 			'class'=>'CButtonColumn',
-			'template'=>'{view}{delete}{update}',
+			'template'=>'{view}{delete}{update}{empezar}',
 			'buttons'=>array(
 				'delete'=>array(
 					'visible'=>'$data->estatus->nombre == \'Pendiente\'',
@@ -64,6 +64,13 @@ $this->widget('zii.widgets.grid.CGridView', array(
 				'update'=>array(
 					'visible'=>'$data->estatus->nombre == \'Pendiente\'',
 				),
+				'empezar' => array(
+		            'label'=>'<span class="fa fa-play"></span>',
+		            'imageUrl'=>false,
+		            'options'=>array('title'=>'Empezar pedido'),
+		            'url'=>'Yii::app()->createUrl("pedidos/empezarpedido", array("id"=>$data->id))',
+		            'visible'=>'$data->estatus->nombre == \'Pendiente\'',
+		        ),
 			),
 		),
 	),
