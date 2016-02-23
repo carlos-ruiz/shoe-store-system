@@ -1014,17 +1014,78 @@ class PedidosController extends Controller
 	{
 		$pedidoZapato = PedidosZapatos::model()->findByPk($_POST['id']);
 		$estatusZapato = EstatusZapatos::model()->find('nombre=?', array($_POST['estatus']));
-		$estatusPedidoPendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
-		$estatusPedidoEnProceso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
 		$pedido = $pedidoZapato->pedido;
 
 		$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
-		if($pedidoZapato->save()){
-			if ($pedido->id_estatus_pedidos == $estatusPedidoPendiente->id) {
-				$pedido->id_estatus_pedidos = $estatusPedidoEnProceso->id;
+		$pedidoZapato->save();
+
+		if($_POST['estatus'] === 'Terminado'){
+			//Imprimir la etiqueta o etiquetas
+
+			$pedidoCompleto = true;
+			foreach ($pedido->pedidosZapatos as $pZapato) {
+				if ($pZapato->estatusZapato->nombre !== 'Terminado') {
+					$pedidoCompleto = false;
+					break;
+				}
+			}
+			if ($pedidoCompleto) {
+				$estatusPedidoTerminado = EstatusPedidos::model()->find('nombre=?', array('Terminado'));
+				$pedido->id_estatus_pedidos = $estatusPedidoTerminado->id;
 				$pedido->save();
 			}
+			$this->imprimirEtiquetasTarjeta($pedidoZapato->id);
 		}
+	}
+
+	/**
+	 * Generar e imprimir las etiquetas para un modelo de PedidosZapatos
+	 * (tarjeta en seguimiento de pedidos). Se manda directo a la impresora
+	 * @param $id, id del modelo(PedidosZapatos) a imprimir
+	 */
+	public function imprimirEtiquetasTarjeta($id)
+	{
+		$pedidoZapato = PedidosZapatos::model()->findByPk($id);
+		$pdf_path = dirname(__FILE__).DIRECTORY_SEPARATOR.'../../assets/pdfs/printCard.pdf';
+		$etiquetas = array();
+		$modelo = $pedidoZapato->zapato->modelo;
+		$datos = array('modelo'=>$modelo->nombre, 'color'=>$pedidoZapato->zapato->color->color, 'numero'=>$pedidoZapato->zapato->numero, 'foto'=>$modelo->imagen, 'codigo'=>$pedidoZapato->zapato->codigo_barras);
+		$altoPagina = 0;
+		for($i=0; $i<$pedidoZapato->cantidad_total;$i++){
+			array_push($etiquetas, $datos);
+			$altoPagina += 5.3;
+		}
+		$altoPagina += 0.2;
+		if(file_exists($pdf_path)) {
+			unlink($pdf_path);
+		}
+		$orientacion = 'p';
+		if ($altoPagina < 10) {
+			$orientacion = 'l';
+		}
+		$pdf = new ImprimirEtiquetasTarjeta($orientacion,'cm',array(10, $altoPagina));
+		$pdf->AddPage();
+		$pdf->contenido($etiquetas);
+		$pdf->Output($pdf_path, 'F');
+
+		$this->printPdf('BrotherDCP7055', $pdf_path);
+	}
+
+	/**
+	 * Manda a imprimir a la impresora especificada el archivo que se le envíe
+	 * @param $nombre_impresora, nombre de la impresora (panel de control)
+	 * @param $ruta_pdf, nombre del pdf a imprimir (incluir ruta)
+	 */
+	public function printPdf($nombre_impresora, $ruta_pdf) {
+		$folder_path = dirname(__FILE__).DIRECTORY_SEPARATOR
+		.'..'.DIRECTORY_SEPARATOR
+		.'..'.DIRECTORY_SEPARATOR
+		.'extensions'.DIRECTORY_SEPARATOR
+		.'jars';
+
+		$jar_directory = $folder_path.DIRECTORY_SEPARATOR.'*';
+		$command = "java -classpath ".$jar_directory." org.apache.pdfbox.PrintPDF -silentPrint -printerName ".$nombre_impresora." ".$ruta_pdf;
+		exec($command);
 	}
 
 	/**
@@ -1050,8 +1111,8 @@ class PedidosController extends Controller
 	}
 
 	/**
-	 * Actualizar los inventarios para descontar los materiales que se requieren
-	 * para completar el pedido especificado
+	 * Actualizar los inventarios para descontar los materiales que se 
+	 * requieren para completar el pedido especificado
 	 * @param $id_pedido, id del pedido a considerar
 	 * @return true si es correcto, string de errores si no lo es
 	 */

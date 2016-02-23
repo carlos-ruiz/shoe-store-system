@@ -110,6 +110,9 @@
 								<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
 							<?php } ?>
 							<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+							<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
+								<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
+							<?php } ?>
 						</div>
 					</div>
 				</div>
@@ -140,6 +143,9 @@
 								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
 								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
 								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
+									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
+								<?php } ?>
 							</div>
 						</div>
 					</div>
@@ -168,6 +174,9 @@
 								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
 								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
 								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
+									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
+								<?php } ?>
 							</div>
 						</div>
 					</div>
@@ -201,6 +210,9 @@
 								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
 								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
 								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
+									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
+								<?php } ?>
 							</div>
 						</div>
 						<div class="row">
