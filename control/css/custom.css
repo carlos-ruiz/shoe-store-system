@@ -208,28 +208,31 @@ td.td-caracteristicas-especiales {
 	max-width: 350px;
 }*/
 
-.pedidos_pendientes {
-	background-color: #f99494;
-}
-
 .pedidos_corte {
-	background-color: #eac4a8;
+	background-color: #f99494;
 	
 }
 
 .pedidos_pespunte {
-	background-color: #c9def0;
+	background-color: #eac4a8;
 	
 }
 
 .pedidos_ensuelado {
-	background-color: #e6e6c0;
+	background-color: #C9F0E7;
 	
 }
 
-.pedidos_terminado {
-	background-color: #c2ecb5;
+.pedidos_adorno {
+	background-color: #F3BBF7;
+}
 
+.pedidos_terminado {
+	background-color: #ECEAB5;
+}
+
+.pedidos_entregado {
+	background-color: #c2ecb5;
 }
 
 .seguimiento_pedido_detalle {
@@ -238,7 +241,7 @@ td.td-caracteristicas-especiales {
 	padding: 10px;
 	margin: 5px 0;
 	border: solid 2px #564C4C;
-	cursor: pointer;
+	cursor: move;
 }
 
 .seguimiento_pedido_detalle:hover {
@@ -260,6 +263,7 @@ td.td-caracteristicas-especiales {
 	border: solid 3px #988e8e;
 	border-radius: 10px;
 	margin: 2px;
+	min-width: 200px;
 }
 
 .tabla-seguimiento-pedido-cortador td{
@@ -288,17 +292,82 @@ td.td-caracteristicas-especiales {
 }
 
 .tarjeta-especial {
-    position: absolute;
-    bottom: 0;
-    right: 10px;
+    display: inline-block;
     background-color: #AB3E3E;
     padding: 3px;
     border-radius: 4px;
     color: white;
     border: solid 1px black;
+    opacity: 0.6;
+    cursor: pointer;
 }
 
 .tarjeta-especial:hover {
-	padding: 5px;
-    border: solid 2px black;
+	opacity: 1;
+}
+
+p.cantidad {
+	display: inline-block;
+}
+
+.btn-entregar {
+	margin-top: 5px;
+	padding: 10px;
+	background-color: #A3F1A5;
+	border: solid 1px white;
+	border-radius: 10px;
+	opacity: 0.8;
+	cursor: pointer;
+	display: inline-block;
+	color: black;
+	text-shadow: 1px 1px white;
+	font-weight: bold;
+}
+
+.btn-entregar:hover {
+	opacity: 1;
+}
+
+.etiquetas-faltantes {
+	font-size: 0;
+}
+
+.falta {
+	width: 20%;
+	padding: 10px;
+	box-sizing: border-box;
+	display: inline-block;
+	border-radius: 20px;
+	border: solid 5px rgb(201, 240, 231);
+	cursor: pointer;
+	opacity: 0.6;
+	font-size: 10pt;
+	text-align: center;
+	font-weight: bold;
+	color: white;
+	text-shadow: 2px 2px black;
+}
+
+.falta:hover {
+	opacity: 1;
+}
+
+.falta-1 {
+	background-color: #247927;
+}
+
+.falta-2 {
+	background-color: #267579;
+}
+
+.falta-3 {
+	background-color: #754E86;
+}
+
+.falta-4 {
+	background-color: #55695F;
+}
+
+.falta-5 {
+	background-color: red;
 }

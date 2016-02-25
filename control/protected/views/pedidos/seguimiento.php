@@ -33,10 +33,14 @@
 	<?php 
 		$ids_clientes = array();
 		$todos_color = rand_color();
+		$pedidosTerminados = array();
 		foreach ($pedidos as $pedido) {
 			if(!in_array($pedido->cliente->id, $ids_clientes)){
 				$color = rand_color();
 				$ids_clientes[$pedido->cliente->id] = $color;
+			}
+			if ($pedido->estatus->nombre === 'Terminado') {
+				array_push($pedidosTerminados, $pedido);
 			}
 		}
 	?>
@@ -70,7 +74,7 @@
 								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
 								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
 								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -109,7 +113,7 @@
 								<p><?= 'Ojillos: '.$pedidoZapato->zapato->ojilloColor->ojillo->nombre ?></p>
 								<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
 							<?php } ?>
-							<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+							<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
 							<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 								<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 							<?php } ?>
@@ -125,12 +129,22 @@
 	<div class="flex-item seguimiento_pedidos_panel pedidos_ensuelado" id="ensuelado">
 		<h3>Ensuelado</h3>
 		<hr/>
+		<?php if(Yii::app()->user->getState('perfil') === 'Ensuelador') { ?>
+		<div class="etiquetas-faltantes">
+			<h5>Pares faltantes</h5>
+			<div class="falta falta-1" data-faltantes="1">1</div>
+			<div class="falta falta-2" data-faltantes="2">2</div>
+			<div class="falta falta-3" data-faltantes="3">3</div>
+			<div class="falta falta-4" data-faltantes="4">4</div>
+			<div class="falta falta-5" data-faltantes="5">5</div>
+		</div>
+		<?php } ?>
 		<div class="draggable-content segunda-etapa tercera-etapa">
 			<?php 
 				foreach ($tarjetasEnsuelado as $pedidoZapato) {
 					$color = $ids_clientes[$pedidoZapato->pedido->id_clientes];
 					?>
-					<div class="seguimiento_pedido_detalle" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
+					<div class="seguimiento_pedido_detalle"  id="seguimiento_pedido_detalle_<?= $pedidoZapato->id ?>" style="background-color:<?= $color ?>" data-id="<?= $pedidoZapato->id ?>">
 						<div class="pedido-detalle-header">
 							<?= 'Pedido '.$pedidoZapato->pedido->id.' - Cliente: '.$pedidoZapato->pedido->cliente->obtenerNombreCompleto() ?>
 							<hr/>
@@ -142,7 +156,7 @@
 								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
 								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
 								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
-								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -173,7 +187,7 @@
 								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
 								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
 								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -190,8 +204,30 @@
 		<h3>Terminado</h3>
 		<hr/>
 		<div class="draggable-content cuarta-etapa">
-			<?php 
-			
+			<?php
+				foreach ($pedidosTerminados as $pedido) {
+					$color = $ids_clientes[$pedido->id_clientes]; ?>
+				<div class="seguimiento_pedido_detalle" style="background-color: <?= $color ?>">
+					<div class="row">
+						<div class="col-md-6">
+							<p>Cliente: <?= $pedido->cliente->obtenerNombreCompleto() ?></p>
+						</div>
+						<div class="col-md-6">
+							<p>Fecha de entrega: <?= $pedido->fecha_entrega ?></p>
+							<p>Fecha de pedido: <?= $pedido->fecha_pedido ?></p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<?php if(Yii::app()->user->getState('perfil') === 'Administrador'){ ?>
+							<a class="btn-entregar" href="<?= Yii::app()->request->baseUrl ?>/pedidos/entregarpedido/<?= $pedido->id ?>">Entregar</a>
+							<?php } ?>
+							<a class="btn-entregar" href="<?= Yii::app()->request->baseUrl ?>/pedidos/<?= $pedido->id ?>">Ver</a>
+						</div>
+					</div>
+				</div>
+			<?php
+				}
 				foreach ($tarjetasTerminado as $pedidoZapato) {
 					$color = $ids_clientes[$pedidoZapato->pedido->id_clientes];
 					?>
@@ -209,7 +245,7 @@
 							<div class="col-md-6">
 								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
 								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
-								<p><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -246,6 +282,7 @@
 
 		});
 	});
+
 	$(function() {
 		$( ".primera-etapa" ).sortable({
 			connectWith: ".primera-etapa",
@@ -272,7 +309,18 @@
 			}
 		});
 
-		$( ".pedidos_pendientes, .pedidos_corte, .pedidos_pespunte, .pedidos_ensuelado, .pedidos_adorno, .pedidos_terminado" ).disableSelection();
+		$(".etiquetas-faltantes div").draggable({ revert: true });
+		$(".pedidos_ensuelado .seguimiento_pedido_detalle").droppable({
+			activeClass: "ui-state-default",
+			hoverClass: "ui-state-hover",
+			drop: function(event, ui) {
+				idPedidoZapato = $(this).data('id');
+				faltantes = ui.draggable.data('faltantes');
+				definirFaltantes(idPedidoZapato, faltantes);
+			}
+	    });
+
+		$( ".pedidos_pendientes, .pedidos_corte, .pedidos_pespunte, .pedidos_ensuelado, .pedidos_adorno, .pedidos_terminado, .etiquetas-faltantes" ).disableSelection();
 	});
 
 	function actualizarEstatus(idEtapa, idPedidoZapato)
@@ -306,6 +354,20 @@
 			'data':{ 'estatus': estatus, 'id': idPedidoZapato },
 			'success':function(response){
 				console.log(response);
+			}
+		});
+	}
+
+	function definirFaltantes(idPedidoZapato, faltantes)
+	{
+		alert('faltan '+faltantes+"del pedidoZapato "+idPedidoZapato);
+		jQuery.ajax({
+			'url':'/controlbom/control/pedidos/actualizarFaltantes',
+			'type':'POST',
+			'cache':false,
+			'data':{ 'faltantes': faltantes, 'id': idPedidoZapato },
+			'success':function(response){
+				$('.seguimiento_pedido_detalle_'+idPedidoZapato).text(faltantes);
 			}
 		});
 	}

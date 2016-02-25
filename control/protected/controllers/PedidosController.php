@@ -39,7 +39,7 @@ class PedidosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente', 'empezarpedido'),
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente', 'empezarpedido', 'entregarPedido'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -238,11 +238,10 @@ class PedidosController extends Controller
 							$model->save();
 							$titulo = 'Aviso';
 							$mensaje = $respuesta;
+							$this->redirect(array('admin', 'mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
 						}
 					}
-					if (!isset($mensaje)) {
-						$this->redirect(array('view','id'=>$model->id));
-					}
+					$this->redirect(array('view','id'=>$model->id));
 				}
 			}catch(Exception $ex){
 				print_r($ex);
@@ -254,7 +253,6 @@ class PedidosController extends Controller
 			'model'=>$model,
 			'pedidoZapato'=>$pedidoZapato,
 		));
-		$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
 	}
 
 	/**
@@ -436,11 +434,10 @@ class PedidosController extends Controller
 							$model->save();
 							$titulo = 'Aviso';
 							$mensaje = $respuesta;
+							$this->redirect(array('admin', 'mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
 						}
 					}
-					if(!isset($mensaje)){
-						$this->redirect(array('view','id'=>$model->id));
-					}
+					$this->redirect(array('view','id'=>$model->id));
 				}
 			}catch(Exception $ex){
 				$transaction->rollback();
@@ -453,7 +450,6 @@ class PedidosController extends Controller
 			'model'=>$model,
 			'pedidoZapato'=>$pedidoZapato,
 		));
-		$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:"", 'destino'=>Yii::app()->request->baseurl.'/pedidos/admin'));
 	}
 
 	/**
@@ -513,6 +509,7 @@ class PedidosController extends Controller
 		$this->render('admin',array(
 			'model'=>$model,
 		));
+		$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>isset($_GET['mensaje'])?$_GET['mensaje']:"", 'titulo'=>isset($_GET['titulo'])?$_GET['titulo']:""));
 	}
 
 	/**
@@ -969,8 +966,9 @@ class PedidosController extends Controller
 	public function actionSeguimientoPedidos()
 	{
 		$this->subsection = 'seguimiento';
-		$estatusPedidoPendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
-		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos!=?', $estatusPedidoPendiente->id);
+		$estatusPedidoEnProceso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
+		$estatusPedidoTerminado = EstatusPedidos::model()->find('nombre=?', array('Terminado'));
+		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos=? OR id_estatus_pedidos=?', array($estatusPedidoEnProceso->id, $estatusPedidoTerminado->id));
 		$perfil = Yii::app()->user->getState('perfil');
 		switch ($perfil) {
 			case 'Administrador':
@@ -984,18 +982,128 @@ class PedidosController extends Controller
 				));
 				break;
 			case 'Pespuntador':
+				// Tarjetas de corte
+				$estatusZapatoCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
+				$pedidosZapatosCorte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoCorte->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
+						)
+					);
+
+				// Tarjetas de pespunte
+				$estatusZapatoPespunte = EstatusZapatos::model()->find('nombre=?', array('En pespunte'));
+				$pedidosZapatosPespunte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoPespunte->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
+						)
+					);
+
+				// Tarjetas de ensuelado
+				$estatusZapatoEnsuelado = EstatusZapatos::model()->find('nombre=?', array('En ensuelado'));
+				$pedidosZapatosEnsuelado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoEnsuelado->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
+						)
+					);
 				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
+					'tarjetasCorte'=>$pedidosZapatosCorte,
+					'tarjetasPespunte'=>$pedidosZapatosPespunte,
+					'tarjetasEnsuelado'=>$pedidosZapatosEnsuelado,
 				));
 				break;
 			case 'Ensuelador':
+				// Tarjetas de pespunte
+				$estatusZapatoPespunte = EstatusZapatos::model()->find('nombre=?', array('En pespunte'));
+				$pedidosZapatosPespunte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoPespunte->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
+						)
+					);
+
+				// Tarjetas de ensuelado
+				$estatusZapatoEnsuelado = EstatusZapatos::model()->find('nombre=?', array('En ensuelado'));
+				$pedidosZapatosEnsuelado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoEnsuelado->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
+						)
+					);
+				
+				// Tarjetas de Adornado
+				$estatusZapatoAdornado = EstatusZapatos::model()->find('nombre=?', array('En adorno'));
+				$pedidosZapatosAdornado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoAdornado->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
+						)
+					);
 				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
+					'tarjetasPespunte'=>$pedidosZapatosPespunte,
+					'tarjetasEnsuelado'=>$pedidosZapatosEnsuelado,
+					'tarjetasAdornado'=>$pedidosZapatosAdornado,
 				));
 				break;
 			case 'Adornador':
+				// Tarjetas de Adornado
+				$estatusZapatoAdornado = EstatusZapatos::model()->find('nombre=?', array('En adorno'));
+				$pedidosZapatosAdornado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoAdornado->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
+						)
+					);
+				
+				// Tarjetas de terminado
+				$estatusZapatoTerminado = EstatusZapatos::model()->find('nombre=?', array('Terminado'));
+				$pedidosZapatosTerminado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
+					array(
+						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+						'params' => array(
+							':estatusPedido' => $estatusPedidoEnProceso->id,
+							':estatusZapato' => $estatusZapatoTerminado->id,
+							),
+						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
+						)
+					);
+		
 				$this->render('seguimiento',array(
 					'pedidos'=>$pedidos,
+					'tarjetasAdornado'=>$pedidosZapatosAdornado,
+					'tarjetasTerminado'=>$pedidosZapatosTerminado,
 				));
 				break;
 		}
@@ -1136,7 +1244,8 @@ class PedidosController extends Controller
 
 				$inventario = Inventarios::model()->find($consulta, $parametros);
 				if (!isset($inventario)) {
-					$errores .= "No existen ".$materialApartado->tipoMaterial->tipo." con id: ".$materialApartado->id_articulo;
+					$datosArticulo = $this->obtenerDatosArticulo($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+					$errores .= "No existe(n) ".$datosArticulo['nombre'];
 					if (isset($materialApartado->color)) {
 						$errores .= ", color: ".$materialApartado->color->color; 
 					}
@@ -1152,7 +1261,8 @@ class PedidosController extends Controller
 					$inventario->cantidad_apartada -= $materialApartado->cantidad_apartada;
 					$inventario->save(); 
 				}else{
-					$errores .= "No hay suficiente ".$materialApartado->tipoMaterial->tipo." con id: ".$materialApartado->id_articulo;
+					$datosArticulo = $this->obtenerDatosArticulo($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+					$errores .= "No hay suficiente(s) ".$datosArticulo['nombre'];
 					if (isset($materialApartado->color)) {
 						$errores .= ", color: ".$materialApartado->color->color; 
 					}
@@ -1218,16 +1328,17 @@ class PedidosController extends Controller
 	public function actionSeguimiento()
 	{
 		$this->subsection = 'seguimiento';
-		$estatusPedidoPendiente = EstatusPedidos::model()->find('nombre=?', array('Pendiente'));
-		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos!=?', $estatusPedidoPendiente->id);
+		$estatusPedidoEnProceso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
+		$estatusPedidoTerminado = EstatusPedidos::model()->find('nombre=?', array('Terminado'));
+		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos=? OR id_estatus_pedidos=?', array($estatusPedidoEnProceso->id, $estatusPedidoTerminado->id));
 
 		// Tarjetas de corte
 		$estatusZapatoCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
 		$pedidosZapatosCorte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
 			array(
-				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
 				'params' => array(
-					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusPedido' => $estatusPedidoEnProceso->id,
 					':estatusZapato' => $estatusZapatoCorte->id,
 					),
 				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
@@ -1238,9 +1349,9 @@ class PedidosController extends Controller
 		$estatusZapatoPespunte = EstatusZapatos::model()->find('nombre=?', array('En pespunte'));
 		$pedidosZapatosPespunte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
 			array(
-				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
 				'params' => array(
-					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusPedido' => $estatusPedidoEnProceso->id,
 					':estatusZapato' => $estatusZapatoPespunte->id,
 					),
 				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
@@ -1251,9 +1362,9 @@ class PedidosController extends Controller
 		$estatusZapatoEnsuelado = EstatusZapatos::model()->find('nombre=?', array('En ensuelado'));
 		$pedidosZapatosEnsuelado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
 			array(
-				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
 				'params' => array(
-					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusPedido' => $estatusPedidoEnProceso->id,
 					':estatusZapato' => $estatusZapatoEnsuelado->id,
 					),
 				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
@@ -1264,9 +1375,9 @@ class PedidosController extends Controller
 		$estatusZapatoAdornado = EstatusZapatos::model()->find('nombre=?', array('En adorno'));
 		$pedidosZapatosAdornado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
 			array(
-				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
 				'params' => array(
-					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusPedido' => $estatusPedidoEnProceso->id,
 					':estatusZapato' => $estatusZapatoAdornado->id,
 					),
 				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
@@ -1277,9 +1388,9 @@ class PedidosController extends Controller
 		$estatusZapatoTerminado = EstatusZapatos::model()->find('nombre=?', array('Terminado'));
 		$pedidosZapatosTerminado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
 			array(
-				'condition' => 'pedido.id_estatus_pedidos != :estatusPedido AND id_estatus_zapatos = :estatusZapato',
+				'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
 				'params' => array(
-					':estatusPedido' => $estatusPedidoPendiente->id,
+					':estatusPedido' => $estatusPedidoEnProceso->id,
 					':estatusZapato' => $estatusZapatoTerminado->id,
 					),
 				'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
@@ -1297,24 +1408,45 @@ class PedidosController extends Controller
 	}
 
 	/**
-	* Mandar a proceso un pedido y cambiar todos sus zapatos al departamento
-	* de corte, el pedido debe estar en estatus de pendiente para que la
-	* funcion actue.
-	* @param $id_pedido, id del pedido que se desea mandar a proceso.
-	*/
+	 * Mandar a proceso un pedido y cambiar todos sus zapatos al
+	 * departamento de corte, el pedido debe estar en estatus de
+	 * pendiente para que la funcion actue.
+	 * @param $id, id del pedido que se desea mandar a proceso.
+	 */
 	public function actionEmpezarPedido($id)
 	{
 		$pedido = $this->loadModel($id);
 		if ($pedido->estatus->nombre === 'Pendiente') {
-			$estatusEnCurso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
-			$estatusEnCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
-			foreach ($pedido->pedidosZapatos as $pedidoZapato) {
-				$pedidoZapato->id_estatus_zapatos = $estatusEnCorte->id;
-				$pedidoZapato->save();
+			$respuestaActualizarInventarios = $this->actualizarInventario($id);
+			if ($respuestaActualizarInventarios !== 'true') {
+				$titulo = 'Aviso';
+				$mensaje = $respuestaActualizarInventarios;			
 			}
-			$pedido->id_estatus_pedidos = $estatusEnCurso->id;
-			$pedido->save();
-			$this->redirect(array('admin'));
+			else{
+				$estatusEnCurso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
+				$estatusEnCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
+				foreach ($pedido->pedidosZapatos as $pedidoZapato) {
+					$pedidoZapato->id_estatus_zapatos = $estatusEnCorte->id;
+					$pedidoZapato->save();
+				}
+				$pedido->id_estatus_pedidos = $estatusEnCurso->id;
+				$pedido->save();
+			}
+			$this->redirect(array('admin', 'mensaje'=>isset($mensaje)?$mensaje:"", 'titulo'=>isset($titulo)?$titulo:""));
 		}
+	}
+
+	/**
+	 * Entregar el pedido al cliente y quitar ya del seguimiento y tabla
+	 * de administración de pedidos.
+	 * @param $id, id del pedido que se entrega
+	 */
+	public function actionEntregarPedido($id)
+	{
+		$pedido = $this->loadModel($id);
+		$estatusPedidoEntregado = EstatusPedidos::model()->find('nombre=?', array('Entregado'));
+		$pedido->id_estatus_pedidos = $estatusPedidoEntregado->id;
+		$pedido->save();
+		$this->redirect(array('seguimiento'));
 	}
 }
