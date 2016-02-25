@@ -45,6 +45,11 @@
     	),
     	'cantidad_apartada',
     	'stock_minimo',
+    	array(
+	        'name'=>'var_total',
+	        'value'=>'$data->cantidad_existente - ($data->cantidad_apartada + $data->stock_minimo)',
+	        'cssClassExpression'=> '(($data->cantidad_existente - ($data->cantidad_apartada + $data->stock_minimo)<0) ? "under-stock" : "")',
+    	),
     	'unidad_medida',
     	'ultimo_precio',
 		// array(

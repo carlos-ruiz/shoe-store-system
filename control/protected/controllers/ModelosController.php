@@ -3,6 +3,7 @@
 class ModelosController extends Controller
 {
 	public $section = 'modelos';
+	public $subsection = '';
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -412,7 +413,8 @@ class ModelosController extends Controller
 
 	public function actionGenerarEtiqueta()
 	{
-		$this->section = 'etiquetas';
+		$this->section = 'extras';
+		$this->subsection = 'etiquetas';
 		$model = new Modelos('generarEtiqueta');
 		$model->nombre = 'nada';
 		if(isset($_POST['Modelos'])){

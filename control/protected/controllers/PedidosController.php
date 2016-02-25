@@ -39,7 +39,11 @@ class PedidosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente', 'empezarpedido', 'entregarPedido'),
+				'actions'=>array('actualizarFaltantes'),
+				'users'=>Usuarios::model()->obtenerPorPerfil('Ensuelador'),
+			),
+			array('allow', // allow admin user to perform 'admin' and 'delete' actions
+				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente', 'empezarpedido', 'entregarPedido', 'actualizarFaltantes'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -1125,11 +1129,14 @@ class PedidosController extends Controller
 		$pedido = $pedidoZapato->pedido;
 
 		$pedidoZapato->id_estatus_zapatos = $estatusZapato->id;
+		$pedidoZapato->completos = 0;
 		$pedidoZapato->save();
 
 		if($_POST['estatus'] === 'Terminado'){
 			//Imprimir la etiqueta o etiquetas
-
+			$pedidoZapato->completos = $pedidoZapato->cantidad_total;
+			$pedidoZapato->save();
+			
 			$pedidoCompleto = true;
 			foreach ($pedido->pedidosZapatos as $pZapato) {
 				if ($pZapato->estatusZapato->nombre !== 'Terminado') {
@@ -1259,7 +1266,18 @@ class PedidosController extends Controller
 				if ($inventario->cantidad_existente >= $materialApartado->cantidad_apartada) {
 					$inventario->cantidad_existente -= $materialApartado->cantidad_apartada;
 					$inventario->cantidad_apartada -= $materialApartado->cantidad_apartada;
-					$inventario->save(); 
+					$inventario->save();
+					if ($materialApartado->tipoMaterial->tipo === 'Materiales') {
+						$consultaMaterial = 'id_materiales=?';
+						$parametrosMaterial = array($materialApartado->id_articulo);
+						if (isset($materialApartado->id_colores)) {
+							$consultaMaterial .= ' AND id_colores=?';
+							array_push($parametrosMaterial, $materialApartado->id_colores);
+						}
+						$inventarioMaterial = InventarioMateriales::model()->find($consultaMaterial, $parametrosMaterial);
+						$inventarioMaterial->existencia = $inventario->cantidad_existente;
+						$inventarioMaterial->save();
+					}
 				}else{
 					$datosArticulo = $this->obtenerDatosArticulo($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
 					$errores .= "No hay suficiente(s) ".$datosArticulo['nombre'];
@@ -1271,6 +1289,8 @@ class PedidosController extends Controller
 					}
 					$errores .= ' en el inventario|';
 				}
+
+				$materialApartado->delete();
 			}
 			if (strlen($errores) > 0) {
 				$transaction->rollback();
@@ -1448,5 +1468,30 @@ class PedidosController extends Controller
 		$pedido->id_estatus_pedidos = $estatusPedidoEntregado->id;
 		$pedido->save();
 		$this->redirect(array('seguimiento'));
+	}
+
+	/**
+	 * Actualiza el numero de pares de faltantes que restan para terminar
+	 * una tarjeta (PedidosZapatos)
+	 * @param idPedidoZapato, id del modelo que se va a actualizar
+	 * @param faltantes, cantidad de pares pendientes de terminar
+	 * Los parametros se deben pasar por POST
+	 * @return número de pares faltantes, 'ERROR' si ocurrió algún error
+	 */
+	public function actionActualizarFaltantes()
+	{
+		if (isset($_POST)) {
+			$id = $_POST['id'];
+			$faltantes = $_POST['faltantes'];
+
+			$pedidoZapato = PedidosZapatos::model()->findByPk($id);
+			$pedidoZapato->completos = $pedidoZapato->cantidad_total - $faltantes;
+			if ($pedidoZapato->completos >= 0) {
+				$pedidoZapato->save();
+				echo $pedidoZapato->cantidad_total - $pedidoZapato->completos;
+				return;
+			}
+			echo "ERROR";
+		}
 	}
 }

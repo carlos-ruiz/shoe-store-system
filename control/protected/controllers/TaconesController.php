@@ -275,7 +275,7 @@ class TaconesController extends Controller
 		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Tacones'));
 		$tacones = Tacones::model()->findAll();
 		if (isset($_POST['Inventario'])) {
-			if (isset($_POST['Tacones']['stock_minimo'])) {
+			if (isset($_POST['Tacones']['stock_minimo_general'])) {
 				$stock_minimo_suelas = $_POST['Tacones']['stock_minimo'];
 			}
 			if (isset($_POST['Inventario']['taconColor'])) {
@@ -308,7 +308,7 @@ class TaconesController extends Controller
 						}
 					}
 				}
-				$this->redirect(array('admin'));
+				$this->redirect(array('inventarios/admin'));
 			}
 		}
 		$this->render('add_stock',array(

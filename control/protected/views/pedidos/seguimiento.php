@@ -74,7 +74,7 @@
 								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
 								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
 								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.($pedidoZapato->cantidad_total - $pedidoZapato->completos) ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -113,7 +113,7 @@
 								<p><?= 'Ojillos: '.$pedidoZapato->zapato->ojilloColor->ojillo->nombre ?></p>
 								<p><?= 'Color ojillos: '.$pedidoZapato->zapato->ojilloColor->color->color ?></p>
 							<?php } ?>
-							<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+							<p class="cantidad"><?= 'Cantidad: '.($pedidoZapato->cantidad_total - $pedidoZapato->completos) ?></p>
 							<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 								<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 							<?php } ?>
@@ -131,7 +131,7 @@
 		<hr/>
 		<?php if(Yii::app()->user->getState('perfil') === 'Ensuelador') { ?>
 		<div class="etiquetas-faltantes">
-			<h5>Pares faltantes</h5>
+			<div class="pares-faltantes-titulo">Pares faltantes</div>
 			<div class="falta falta-1" data-faltantes="1">1</div>
 			<div class="falta falta-2" data-faltantes="2">2</div>
 			<div class="falta falta-3" data-faltantes="3">3</div>
@@ -156,7 +156,7 @@
 								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
 								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
 								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
-								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.($pedidoZapato->cantidad_total - $pedidoZapato->completos) ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -187,7 +187,7 @@
 								<p><?= 'Modelo: '.$pedidoZapato->zapato->modelo->nombre ?></p>
 								<p><?= 'Color: '.$pedidoZapato->zapato->color->color ?></p>
 								<p><?= 'Número: '.$pedidoZapato->zapato->numero ?></p>
-								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.($pedidoZapato->cantidad_total - $pedidoZapato->completos) ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -245,7 +245,7 @@
 							<div class="col-md-6">
 								<p><?= 'Suela: '.$pedidoZapato->zapato->suelaColor->suela->nombre ?></p>
 								<p><?= 'Color suela: '.$pedidoZapato->zapato->suelaColor->color->color ?></p>
-								<p class="cantidad"><?= 'Cantidad: '.$pedidoZapato->cantidad_total ?></p>
+								<p class="cantidad"><?= 'Cantidad: '.($pedidoZapato->cantidad_total - $pedidoZapato->completos) ?></p>
 								<?php if(isset($pedidoZapato->caracteristicas_especiales)){ ?>
 									<div class="tarjeta-especial" data-especial="<?= $pedidoZapato->caracteristicas_especiales ?>">Especial</div>
 								<?php } ?>
@@ -360,14 +360,17 @@
 
 	function definirFaltantes(idPedidoZapato, faltantes)
 	{
-		alert('faltan '+faltantes+"del pedidoZapato "+idPedidoZapato);
 		jQuery.ajax({
 			'url':'/controlbom/control/pedidos/actualizarFaltantes',
 			'type':'POST',
 			'cache':false,
 			'data':{ 'faltantes': faltantes, 'id': idPedidoZapato },
 			'success':function(response){
-				$('.seguimiento_pedido_detalle_'+idPedidoZapato).text(faltantes);
+				if (response === 'ERROR') {
+					alerta('La cantidad total es menor que la cantidad faltante', 'ERROR');
+					return;
+				}
+				$('#seguimiento_pedido_detalle_'+idPedidoZapato).find('.cantidad').text('Cantidad: '+faltantes);
 			}
 		});
 	}

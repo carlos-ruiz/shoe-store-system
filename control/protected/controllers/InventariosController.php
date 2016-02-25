@@ -109,7 +109,6 @@ class InventariosController extends Controller
 						$existente->stock_minimo = $model->stock_minimo;
 						$existente->save();
 						$model->existencia = $existente->existencia;
-						$model->stock_minimo = $existente->stock_minimo;
 					}else{
 						$model->existencia = $model->cantidad;
 						$model->save();
@@ -129,7 +128,7 @@ class InventariosController extends Controller
 				$inventario->cantidad_existente = $model->existencia;
 				$inventario->save();
 			}
-			$this->redirect(array('index'));
+			$this->redirect(array('admin'));
 		}
 		$this->render('agregar_material', array('model'=>$model));
 	}

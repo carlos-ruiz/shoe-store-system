@@ -53,10 +53,6 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-blue"></div>
                 </i><span class="menu-title">Insumos</span></a>
             </li>
-            <li class="<?php if($this->section == 'etiquetas'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/modelos/generarEtiqueta"><i class="fa fa-tag fa-fw">
-                <div class="icon-bg bg-red"></div>
-                </i><span class="menu-title">Etiquetas</span></a>
-            </li>
             <li class="<?php if($this->section == 'inventarios'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/inventarios/admin"><i class="fa fa-cubes fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Inventarios</span></a>
@@ -65,6 +61,11 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Extras</span></a>
                 <ul class="submenu">
+                    <li class="<?php if($this->section == 'extras' && $this->subsection == 'etiquetas'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/modelos/generarEtiqueta"><i class="fa fa-tag fa-fw">
+                        <div class="icon-bg bg-red"></div>
+                        </i><span class="menu-title">Etiquetas</span></a>
+                    </li>
                     <li class="<?php if(isset($this->subsection) && $this->subsection == 'formas_pago'){ echo 'submenu-active'; } ?>">
                         <a href="<?= Yii::app()->request->baseUrl; ?>/formasPago/admin">
                             <i class="fa fa-credit-card fa-fw">
@@ -73,36 +74,12 @@ data-position="right" class="navbar-default navbar-static-side">
                             <span class="menu-title">Formas de pago</span>
                         </a>
                     </li>
-                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'estatus_pedido'){ echo 'submenu-active'; } ?>">
-                        <a href="<?= Yii::app()->request->baseUrl; ?>/estatusPedidos/admin">
-                            <i class="fa fa-hourglass-start fa-fw">
-                                <div class="icon-bg bg-red"></div>
-                            </i>
-                            <span class="menu-title">Estatus de pedidos</span>
-                        </a>
-                    </li>
-                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'estatus_pagos'){ echo 'submenu-active'; } ?>">
-                        <a href="<?= Yii::app()->request->baseUrl; ?>/estatusPagos/admin">
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'costos'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/zapatos/costos">
                             <i class="fa fa-money fa-fw">
                                 <div class="icon-bg bg-red"></div>
                             </i>
-                            <span class="menu-title">Estatus de pagos</span>
-                        </a>
-                    </li>
-                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'estatus_zapatos'){ echo 'submenu-active'; } ?>">
-                        <a href="<?= Yii::app()->request->baseUrl; ?>/estatusZapatos/admin">
-                            <i class="fa fa-cart-arrow-down fa-fw">
-                                <div class="icon-bg bg-red"></div>
-                            </i>
-                            <span class="menu-title">Estatus de zapatos</span>
-                        </a>
-                    </li>
-                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'perfiles_usuarios'){ echo 'submenu-active'; } ?>">
-                        <a href="<?= Yii::app()->request->baseUrl; ?>/perfilesUsuarios/admin">
-                            <i class="fa fa-users fa-fw">
-                                <div class="icon-bg bg-red"></div>
-                            </i>
-                            <span class="menu-title">Perfiles de usuarios</span>
+                            <span class="menu-title">Costos por modelo</span>
                         </a>
                     </li>
                     <li class="<?php if(isset($this->subsection) && $this->subsection == 'zapatos'){ echo 'submenu-active'; } ?>">

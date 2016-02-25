@@ -371,3 +371,10 @@ p.cantidad {
 .falta-5 {
 	background-color: red;
 }
+
+.pares-faltantes-titulo {
+	color: #716969;
+    text-shadow: 1px 1px #FfFFFF;
+    font-weight: bold;
+    font-size: 11pt;
+}

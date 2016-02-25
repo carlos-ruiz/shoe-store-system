@@ -145,8 +145,11 @@ $this->menu=array(
 									$id_color = $pedidoZapato->zapato->color->id;
 									$caracteristicas_especiales = $pedidoZapato->caracteristicas_especiales;
 								}
-								
-								$zapatosDiferentes[$contador][''.$pedidoZapato->zapato->numero] = $pedidoZapato->cantidad_total;
+								if(!isset($zapatosDiferentes[$contador][''.$pedidoZapato->zapato->numero])){
+									$zapatosDiferentes[$contador][''.$pedidoZapato->zapato->numero] = 0;
+
+								}
+								$zapatosDiferentes[$contador][''.$pedidoZapato->zapato->numero] += $pedidoZapato->cantidad_total;
 							}
 						?>
 

@@ -23,6 +23,7 @@ class Inventarios extends CActiveRecord
 {
 	public $var_tipo_articulo;
 	public $var_color;
+	public $var_total;
 
 	/**
 	 * @return string the associated database table name
@@ -47,7 +48,7 @@ class Inventarios extends CActiveRecord
 			array('ultimo_precio', 'length', 'max'=>7),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_tipos_articulos_inventario, id_articulo, nombre_articulo, numero, id_colores, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, stock_minimo, var_tipo_articulo, var_color', 'safe', 'on'=>'search'),
+			array('id, id_tipos_articulos_inventario, id_articulo, nombre_articulo, numero, id_colores, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, stock_minimo, var_tipo_articulo, var_color, var_total', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -91,6 +92,7 @@ class Inventarios extends CActiveRecord
 			'var_color' => 'Color',
 			'nombre_articulo' => 'Artículo',
 			'stock_minimo' => 'Cantidad mínima',
+			'var_total' => 'Total',
 		);
 	}
 
@@ -126,6 +128,7 @@ class Inventarios extends CActiveRecord
 		$criteria->with = array('tipoArticulo', 'color');
 		$criteria->compare('tipoArticulo.tipo', $this->var_tipo_articulo, true);
 		$criteria->compare('color.color', $this->var_color, true);
+		$criteria->compare('cantidad_existente - (cantidad_apartada + t.stock_minimo)', $this->var_total);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -137,6 +140,10 @@ class Inventarios extends CActiveRecord
 		        	'var_tipo_articulo'=>array(
 		                'asc'=>'tipoArticulo.tipo',
 		                'desc'=>'tipoArticulo.tipo DESC',
+		            ),
+		            'var_total'=>array(
+		            	'asc'=>'cantidad_existente - (cantidad_apartada + t.stock_minimo)',
+		            	'desc'=>'cantidad_existente - (cantidad_apartada + t.stock_minimo) DESC',
 		            ),
 		            'nombre_articulo',
 		            'numero',

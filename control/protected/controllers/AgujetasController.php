@@ -283,6 +283,7 @@ class AgujetasController extends Controller
 					}
 				}
 			}
+			$this->redirect(array('inventarios/admin'));
 		}
 
 		$this->render('add_stock_agujetas_ojillos', 

@@ -38,7 +38,7 @@ class ZapatosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo','actualizarPrecio'),
+				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo','actualizarPrecio', 'costos'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -285,5 +285,10 @@ class ZapatosController extends Controller
         $zapato->precio = $precio;
         $zapato->save();
         echo $precio;
+	}
+
+	public function actionCostos()
+	{
+		$this->render('costos');
 	}
 }

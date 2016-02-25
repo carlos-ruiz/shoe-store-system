@@ -263,7 +263,7 @@ class SuelasController extends Controller
 		$suelas = Suelas::model()->findAll();
 
 		if (isset($_POST['Inventario'])) {
-			if (isset($_POST['Suelas']['stock_minimo'])) {
+			if (isset($_POST['Suelas']['stock_minimo_general'])) {
 				$stock_minimo_suelas = $_POST['Suelas']['stock_minimo'];
 			}
 
@@ -297,7 +297,7 @@ class SuelasController extends Controller
 						}
 					}
 				}
-				$this->redirect(array('admin'));
+				$this->redirect(array('inventarios/admin'));
 			}
 		}
 		$this->render('add_stock',array(
