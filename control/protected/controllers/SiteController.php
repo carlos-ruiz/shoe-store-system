@@ -40,7 +40,7 @@ class SiteController extends Controller
 		}
 
 		if (!Yii::app()->user->isGuest && Yii::app()->user->getState('perfil') != 'Administrador') {
-			$this->redirect(array('pedidos/seguimientopedidos'));
+			$this->redirect(array('pedidos/seguimiento'));
 		}
 
 		$model=new LoginForm;

@@ -35,7 +35,7 @@ class PedidosController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('seguimientoPedidos', 'actualizarEstatusZapatos', 'seguimiento'),
+				'actions'=>array('actualizarEstatusZapatos', 'seguimiento'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -963,158 +963,6 @@ class PedidosController extends Controller
 	}
 
 	/**
-	 * Busca todos los pedidos que ya estan en proceso para mostrar los detalles
-	 * de las tareas a realizar para finalizar el pedido
-	 * @return muestra la vista de tareas que se estan haciendo y que quedan por hacer
-	 */
-	public function actionSeguimientoPedidos()
-	{
-		$this->subsection = 'seguimiento';
-		$estatusPedidoEnProceso = EstatusPedidos::model()->find('nombre=?', array('En proceso'));
-		$estatusPedidoTerminado = EstatusPedidos::model()->find('nombre=?', array('Terminado'));
-		$pedidos = Pedidos::model()->findAll('id_estatus_pedidos=? OR id_estatus_pedidos=?', array($estatusPedidoEnProceso->id, $estatusPedidoTerminado->id));
-		$perfil = Yii::app()->user->getState('perfil');
-		switch ($perfil) {
-			case 'Administrador':
-				$this->render('seguimiento',array(
-					'pedidos'=>$pedidos,
-				));
-				break;
-			case 'Cortador':
-				$this->render('seguimiento',array(
-					'pedidos'=>$pedidos,
-				));
-				break;
-			case 'Pespuntador':
-				// Tarjetas de corte
-				$estatusZapatoCorte = EstatusZapatos::model()->find('nombre=?', array('En corte'));
-				$pedidosZapatosCorte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoCorte->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
-						)
-					);
-
-				// Tarjetas de pespunte
-				$estatusZapatoPespunte = EstatusZapatos::model()->find('nombre=?', array('En pespunte'));
-				$pedidosZapatosPespunte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoPespunte->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
-						)
-					);
-
-				// Tarjetas de ensuelado
-				$estatusZapatoEnsuelado = EstatusZapatos::model()->find('nombre=?', array('En ensuelado'));
-				$pedidosZapatosEnsuelado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoEnsuelado->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
-						)
-					);
-				$this->render('seguimiento',array(
-					'pedidos'=>$pedidos,
-					'tarjetasCorte'=>$pedidosZapatosCorte,
-					'tarjetasPespunte'=>$pedidosZapatosPespunte,
-					'tarjetasEnsuelado'=>$pedidosZapatosEnsuelado,
-				));
-				break;
-			case 'Ensuelador':
-				// Tarjetas de pespunte
-				$estatusZapatoPespunte = EstatusZapatos::model()->find('nombre=?', array('En pespunte'));
-				$pedidosZapatosPespunte = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoPespunte->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
-						)
-					);
-
-				// Tarjetas de ensuelado
-				$estatusZapatoEnsuelado = EstatusZapatos::model()->find('nombre=?', array('En ensuelado'));
-				$pedidosZapatosEnsuelado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoEnsuelado->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
-						)
-					);
-				
-				// Tarjetas de Adornado
-				$estatusZapatoAdornado = EstatusZapatos::model()->find('nombre=?', array('En adorno'));
-				$pedidosZapatosAdornado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoAdornado->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
-						)
-					);
-				$this->render('seguimiento',array(
-					'pedidos'=>$pedidos,
-					'tarjetasPespunte'=>$pedidosZapatosPespunte,
-					'tarjetasEnsuelado'=>$pedidosZapatosEnsuelado,
-					'tarjetasAdornado'=>$pedidosZapatosAdornado,
-				));
-				break;
-			case 'Adornador':
-				// Tarjetas de Adornado
-				$estatusZapatoAdornado = EstatusZapatos::model()->find('nombre=?', array('En adorno'));
-				$pedidosZapatosAdornado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoAdornado->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero, zapato.id_suelas_colores',
-						)
-					);
-				
-				// Tarjetas de terminado
-				$estatusZapatoTerminado = EstatusZapatos::model()->find('nombre=?', array('Terminado'));
-				$pedidosZapatosTerminado = PedidosZapatos::model()->with('pedido', 'zapato')->findAll(
-					array(
-						'condition' => 'pedido.id_estatus_pedidos = :estatusPedido AND id_estatus_zapatos = :estatusZapato',
-						'params' => array(
-							':estatusPedido' => $estatusPedidoEnProceso->id,
-							':estatusZapato' => $estatusZapatoTerminado->id,
-							),
-						'order' => 'zapato.id_modelos, zapato.id_colores, zapato.numero',
-						)
-					);
-		
-				$this->render('seguimiento',array(
-					'pedidos'=>$pedidos,
-					'tarjetasAdornado'=>$pedidosZapatosAdornado,
-					'tarjetasTerminado'=>$pedidosZapatosTerminado,
-				));
-				break;
-		}
-		
-	}
-
-	/**
 	 * Actualiza el estatus de los zapatos que corresponden a algún pedido,
 	 * y que ha sido cambiado por el usuario en la vista de tareas.
 	 * @param id, id del modelo PedidosZapatos que se va a actualizar
@@ -1183,7 +1031,7 @@ class PedidosController extends Controller
 		$pdf->contenido($etiquetas);
 		$pdf->Output($pdf_path, 'F');
 
-		$this->printPdf('BrotherDCP7055', $pdf_path);
+		$this->imprimirPdf('BrotherDCP7055', $pdf_path);
 	}
 
 	/**
@@ -1191,7 +1039,7 @@ class PedidosController extends Controller
 	 * @param $nombre_impresora, nombre de la impresora (panel de control)
 	 * @param $ruta_pdf, nombre del pdf a imprimir (incluir ruta)
 	 */
-	public function printPdf($nombre_impresora, $ruta_pdf) {
+	public function imprimirPdf($nombre_impresora, $ruta_pdf) {
 		$folder_path = dirname(__FILE__).DIRECTORY_SEPARATOR
 		.'..'.DIRECTORY_SEPARATOR
 		.'..'.DIRECTORY_SEPARATOR

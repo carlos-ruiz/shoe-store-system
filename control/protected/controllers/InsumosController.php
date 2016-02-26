@@ -3,6 +3,7 @@
 class InsumosController extends Controller
 {
 	public $section = 'insumos';
+	public $subsection;
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
@@ -36,7 +37,7 @@ class InsumosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
+				'actions'=>array('admin','delete', 'gastosOperativos'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -169,5 +170,58 @@ class InsumosController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	/**
+	 * Control de todos los gastos diferentes a materias primas
+	 * como luz, agua, gasolinas, viaticos, etc.
+	 */
+	public function actionGastosOperativos()
+	{
+		$this->section = 'extras';
+		$this->subsection = 'gastosoperativos';
+		$gastos = GastosOperativos::model()->findAll();
+		$costoPar = CostoPar::model()->find();
+		if(isset($_POST['GastosOperativos'])){
+			foreach ($gastos as $gasto) {
+				$gasto->delete();
+			}
+			if (isset($_POST['GastosOperativos']['existentes'])) {
+				$existentes = $_POST['GastosOperativos']['existentes'];
+				foreach ($existentes as $existente) {
+					$gastoNuevo = new GastosOperativos;
+					$gastoNuevo->concepto = $existente['concepto'];
+					$gastoNuevo->costo = $existente['costo'];
+					$gastoNuevo->save();
+				}
+			}
+			if (isset($_POST['GastosOperativos']['nuevo'])) {
+				$nuevos = $_POST['GastosOperativos']['nuevo'];
+				foreach ($nuevos as $nuevo) {
+					$gastoNuevo = new GastosOperativos;
+					$gastoNuevo->concepto = $nuevo['concepto'];
+					$gastoNuevo->costo = $nuevo['costo'];
+					$gastoNuevo->save();
+				}
+			}
+
+			if (isset($_POST['TotalPares'])) {
+				if(!isset($costoPar)){
+					$costoPar = new CostoPar;
+				}
+				$costoPar->pares_mes = $_POST['TotalPares']['mes'];
+				$costoPar->costo_par = $_POST['TotalPares']['gasto_par'];
+				$costoPar->save();
+
+			}
+
+			$this->redirect(array('gastosOperativos'));
+		}
+
+		$this->render('gastos', array(
+			'gastos'=>$gastos,
+			'total_pares'=>(isset($costoPar))?$costoPar->pares_mes:0,
+			)
+		);
 	}
 }

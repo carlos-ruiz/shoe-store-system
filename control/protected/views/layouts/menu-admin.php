@@ -82,6 +82,14 @@ data-position="right" class="navbar-default navbar-static-side">
                             <span class="menu-title">Costos por modelo</span>
                         </a>
                     </li>
+                    <li class="<?php if(isset($this->subsection) && $this->subsection == 'gastosoperativos'){ echo 'submenu-active'; } ?>">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/insumos/gastosOperativos">
+                            <i class="fa fa-money fa-fw">
+                                <div class="icon-bg bg-red"></div>
+                            </i>
+                            <span class="menu-title">Gastos operativos</span>
+                        </a>
+                    </li>
                     <li class="<?php if(isset($this->subsection) && $this->subsection == 'zapatos'){ echo 'submenu-active'; } ?>">
                         <a href="<?= Yii::app()->request->baseUrl; ?>/zapatos/admin">
                             <i class="fa fa-usd fa-fw">

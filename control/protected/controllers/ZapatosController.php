@@ -289,6 +289,174 @@ class ZapatosController extends Controller
 
 	public function actionCostos()
 	{
-		$this->render('costos');
+		/*$zapatosDiferentes = Zapatos::model()->with(
+			array(
+				'suelaColor.suela'=>array(
+					'alias'=>'s'),
+				'agujetaColor.agujeta'=>array(
+					'alias'=>'a'),
+				'ojilloColor.ojillo'=>array(
+					'alias'=>'o'),
+				)
+			)->findAll(
+				array(
+					'group'=>'id_modelos, s.id, a.id, o.id',
+					)
+				);
+		*/
+		$zapatosDiferentes = array();
+		$modelos = Modelos::model()->findAll();
+		$tipoArticuloSuela = TiposArticulosInventario::model()->find("tipo='Suelas'");
+		foreach ($modelos as $modelo) {
+			$costo_total_extrachico = 0;
+			$costo_total_chico = 0;
+			$costo_total_mediano = 0;
+			$costo_total_grande = 0;
+
+			$cantidad_agujetas = array();
+			$cantidad_ojillos = array();
+
+			//Costos de materiales
+			foreach ($modelo->modelosMateriales as $modeloMaterial) {
+				if($modeloMaterial->material->nombre === 'Agujetas'){
+					$cantidad_agujetas['extrachico'] = $modeloMaterial->cantidad_extrachico;
+					$cantidad_agujetas['chico'] = $modeloMaterial->cantidad_chico;
+					$cantidad_agujetas['mediano'] = $modeloMaterial->cantidad_mediano;
+					$cantidad_agujetas['grande'] = $modeloMaterial->cantidad_grande;
+				}
+				else if($modeloMaterial->material->nombre === 'Ojillos'){
+					$cantidad_ojillos['extrachico'] = $modeloMaterial->cantidad_extrachico;
+					$cantidad_ojillos['chico'] = $modeloMaterial->cantidad_chico;
+					$cantidad_ojillos['mediano'] = $modeloMaterial->cantidad_mediano;
+					$cantidad_ojillos['grande'] = $modeloMaterial->cantidad_grande;
+				}
+				else{
+					$precio_material = 0;
+					foreach ($modeloMaterial->material->inventarioMateriales as $inventarioMaterial) {
+						if($inventarioMaterial->ultimo_precio > $precio_material)
+							$precio_material = $inventarioMaterial->ultimo_precio;
+					}
+					$costo_total_extrachico += $modeloMaterial->cantidad_extrachico * $precio_material;
+					$costo_total_chico += $modeloMaterial->cantidad_chico * $precio_material;
+					$costo_total_mediano += $modeloMaterial->cantidad_mediano * $precio_material;
+					$costo_total_grande += $modeloMaterial->cantidad_grande * $precio_material;
+				}
+			}
+
+			//Costos de suelas
+			foreach ($modelo->modelosSuelas as $modeloSuela) {
+				$datos = array();
+				$datos['modelo'] = $modelo->nombre;
+				$datos['suela'] = $modeloSuela->suela->nombre;
+
+				$inventario_extrachico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=12 AND numero<18', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
+
+				if (isset($inventario_extrachico)) {
+					$costo_total_extrachico += $inventario_extrachico->ultimo_precio;
+				}
+
+				$inventario_chico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=18 AND numero<22', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
+				if (isset($inventario_chico)) {
+					$costo_total_chico += $inventario_chico->ultimo_precio;
+				}
+
+				$inventario_mediano = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=22 AND numero<25', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
+				if (isset($inventario_mediano)) {
+					$costo_total_mediano += $inventario_mediano->ultimo_precio;
+				}
+
+				$inventario_grande = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=25 AND numero<32', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
+				if (isset($inventario_grande)) {
+					$costo_total_grande += $inventario_grande->ultimo_precio;
+				}
+
+				//Costos agujetas
+				if (sizeof($cantidad_agujetas)>0) {
+					$tipoArticuloAgujetas = TiposArticulosInventario::model()->find("tipo='Agujetas'");
+					$agujetasPredeterminadas = ModelosMaterialesPredeterminados::model()->with(array(
+							'modeloColor.modelo'=>array('alias'=>'m'),
+							'suelaColor.suela'=>array('alias'=>'s'),
+						))->find('m.id=? AND s.id=? AND id_agujetas_colores>0', array($modelo->id, $modeloSuela->id_suelas));
+					if (!isset($agujetasPredeterminadas)) {
+						$agujetasPredeterminadas = ModelosMaterialesPredeterminados::model()->with(array(
+							'modeloColor.modelo'=>array('alias'=>'m'),
+						))->find('m.id=? AND id_agujetas_colores>0', array($modelo->id));
+					}
+					if (isset($agujetasPredeterminadas)) {
+						$inventarioAgujetas = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=?', array($tipoArticuloAgujetas->id, $agujetasPredeterminadas->agujetaColor->id_agujetas));
+						if(isset($inventarioAgujetas)){
+							$costo_total_extrachico += $cantidad_agujetas['extrachico'] * $inventarioAgujetas->ultimo_precio;
+							$costo_total_chico += $cantidad_agujetas['chico'] * $inventarioAgujetas->ultimo_precio;
+							$costo_total_mediano += $cantidad_agujetas['mediano'] * $inventarioAgujetas->ultimo_precio;
+							$costo_total_grande += $cantidad_agujetas['grande'] * $inventarioAgujetas->ultimo_precio;
+						}
+					}
+				}
+
+				//Costos ojillos
+				if (sizeof($cantidad_ojillos)>0) {
+					$tipoArticuloOjillos = TiposArticulosInventario::model()->find("tipo='Ojillos'");
+					$ojillosPredeterminados = ModelosMaterialesPredeterminados::model()->with(array(
+							'modeloColor.modelo'=>array('alias'=>'m'),
+							'suelaColor.suela'=>array('alias'=>'s'),
+						))->find('m.id=? AND s.id=? AND id_ojillos_colores>0', array($modelo->id, $modeloSuela->id_suelas));
+					if (!isset($ojillosPredeterminados)) {
+						$ojillosPredeterminados = ModelosMaterialesPredeterminados::model()->with(array(
+							'modeloColor.modelo'=>array('alias'=>'m'),
+						))->find('m.id=? AND id_ojillos_colores>0', array($modelo->id));
+					}
+					if (isset($ojillosPredeterminados)) {
+						$inventarioOjillos = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=?', array($tipoArticuloOjillos->id, $ojillosPredeterminados->ojillosColor->id_ojillos));
+						if(isset($inventarioOjillos)){
+							$costo_total_extrachico += $cantidad_ojillos['extrachico'] * $inventarioOjillos->ultimo_precio;
+							$costo_total_chico += $cantidad_ojillos['chico'] * $inventarioOjillos->ultimo_precio;
+							$costo_total_mediano += $cantidad_ojillos['mediano'] * $inventarioOjillos->ultimo_precio;
+							$costo_total_grande += $cantidad_ojillos['grande'] * $inventarioOjillos->ultimo_precio;
+						}
+					}
+				}
+
+				//Costos tacones
+				$tipoArticuloTacones = TiposArticulosInventario::model()->find("tipo='Tacones'");
+				$taconesPredeterminados = ModelosMaterialesPredeterminados::model()->with(array(
+						'modeloColor.modelo'=>array('alias'=>'m'),
+						'suelaColor.suela'=>array('alias'=>'s'),
+					))->find('m.id=? AND s.id=? AND id_tacones_colores>0', array($modelo->id, $modeloSuela->id_suelas));
+				if (isset($taconesPredeterminados)) {
+					$id_tacon = $taconesPredeterminados->taconColor->id_tacones;
+					$inventario_extrachico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=12 AND numero<18', array($tipoArticuloTacones->id, $id_tacon));
+
+					if (isset($inventario_extrachico)) {
+						$costo_total_extrachico += $inventario_extrachico->ultimo_precio;
+					}
+
+					$inventario_chico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=18 AND numero<22', array($tipoArticuloTacones->id, $id_tacon));
+					if (isset($inventario_chico)) {
+						$costo_total_chico += $inventario_chico->ultimo_precio;
+					}
+
+					$inventario_mediano = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=22 AND numero<25', array($tipoArticuloTacones->id, $id_tacon));
+					if (isset($inventario_mediano)) {
+						$costo_total_mediano += $inventario_mediano->ultimo_precio;
+					}
+
+					$inventario_grande = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=25 AND numero<32', array($tipoArticuloTacones->id, $id_tacon));
+					if (isset($inventario_grande)) {
+						$costo_total_grande += $inventario_grande->ultimo_precio;
+					}
+				}
+
+				$datos['extrachico'] = $costo_total_extrachico;
+				$datos['chico'] = $costo_total_chico;
+				$datos['mediano'] = $costo_total_mediano;
+				$datos['grande'] = $costo_total_grande;
+				array_push($zapatosDiferentes, $datos);
+			}
+		}
+		
+		$this->render('costos', array(
+				'zapatosDiferentes'=>$zapatosDiferentes,
+			)
+		);
 	}
 }
