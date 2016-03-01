@@ -35,6 +35,8 @@ class InventariosController extends Controller
 	
 	public function actionIndex()
 	{
+		$this->inicializarInventarios();
+		$this->redirect(array('admin'));
 		$inventarioMateriales = InventarioMateriales::model()->findAll();
 		$inventarioInsumos = InventarioInsumos::model()->findAll();
 		$inventarioTerminados = InventarioZapatosTerminados::model()->findAll();
@@ -263,6 +265,27 @@ class InventariosController extends Controller
 					</div>
 				</div>
 				';
+			}
+		}
+	}
+
+	public function inicializarInventarios()
+	{
+		if (Inventarios::model()->count() == 0) {
+			$tipoMateriales = TiposArticulosInventario::model()->find('tipo="Materiales"');
+			$material = Materiales::model()->find("nombre='Transfer'");
+			for($i=12; $i < 32 ; $i = $i + 0.5){
+				$inventario = new Inventarios;
+				$inventario->id_tipos_articulos_inventario = $tipoMateriales->id;
+				$inventario->id_articulo = $material->id;
+				$inventario->nombre_articulo = $material->nombre;
+				$inventario->numero = $i;
+				$inventario->cantidad_existente = 0;
+				$inventario->cantidad_apartada = 0;
+				$inventario->unidad_medida = $material->unidad_medida;
+				$inventario->ultimo_precio = 0;
+				$inventario->stock_minimo = 0;
+				$inventario->save();
 			}
 		}
 	}

@@ -276,6 +276,11 @@ class SiteController extends Controller
 			$material->unidad_medida = 'Millares';
 			$material->activo = 1;
 			$material->save();
+			$material = new Materiales;
+			$material->nombre = 'Transfer';
+			$material->unidad_medida = 'Pares';
+			$material->activo = 1;
+			$material->save();
 		}
 	}
 }

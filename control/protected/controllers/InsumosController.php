@@ -212,7 +212,6 @@ class InsumosController extends Controller
 				$costoPar->pares_mes = $_POST['TotalPares']['mes'];
 				$costoPar->costo_par = $_POST['TotalPares']['gasto_par'];
 				$costoPar->save();
-
 			}
 
 			$this->redirect(array('gastosOperativos'));

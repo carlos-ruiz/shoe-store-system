@@ -307,6 +307,8 @@ class ZapatosController extends Controller
 		$zapatosDiferentes = array();
 		$modelos = Modelos::model()->findAll();
 		$tipoArticuloSuela = TiposArticulosInventario::model()->find("tipo='Suelas'");
+		$gastosOperativosPar = CostoPar::model()->find();
+
 		foreach ($modelos as $modelo) {
 			$costo_total_extrachico = 0;
 			$costo_total_chico = 0;
@@ -342,6 +344,11 @@ class ZapatosController extends Controller
 					$costo_total_grande += $modeloMaterial->cantidad_grande * $precio_material;
 				}
 			}
+
+			$aux_total_extrachico = $costo_total_extrachico;
+			$aux_total_chico = $costo_total_chico;
+			$aux_total_mediano = $costo_total_mediano;
+			$aux_total_grande = $costo_total_grande;
 
 			//Costos de suelas
 			foreach ($modelo->modelosSuelas as $modeloSuela) {
@@ -446,10 +453,23 @@ class ZapatosController extends Controller
 					}
 				}
 
+				if (isset($gastosOperativosPar)) {
+					if(!$gastosOperativosPar->costo_par>0){
+						$gastosOperativosPar->costo_par = 0;
+					}
+					$costo_total_extrachico += $gastosOperativosPar->costo_par;
+					$costo_total_chico += $gastosOperativosPar->costo_par;
+					$costo_total_mediano += $gastosOperativosPar->costo_par;
+					$costo_total_grande += $gastosOperativosPar->costo_par;
+				}
 				$datos['extrachico'] = $costo_total_extrachico;
 				$datos['chico'] = $costo_total_chico;
 				$datos['mediano'] = $costo_total_mediano;
 				$datos['grande'] = $costo_total_grande;
+				$costo_total_extrachico = $aux_total_extrachico;
+				$costo_total_chico = $aux_total_chico;
+				$costo_total_mediano = $aux_total_mediano;
+				$costo_total_grande = $aux_total_grande;
 				array_push($zapatosDiferentes, $datos);
 			}
 		}

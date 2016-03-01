@@ -4,10 +4,10 @@
 ?>
 
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<h1>Inventarios</h1>
 	</div>
-	<div class="col-md-6 text-right">
+	<div class="col-md-8 text-right">
 		<div class="inline-block">
 			<h5>Agregar al inventario</h5>
 			<?php echo CHtml::link('<i class="fa fa-plus"></i> Suelas', array('suelas/agregarInventario'), array('class'=>'btn btn-red-stripped')); ?>

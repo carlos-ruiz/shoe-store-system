@@ -837,6 +837,9 @@ class PedidosController extends Controller
 					$materialApartado->id_pedidos = $pedido->id;
 					$materialApartado->cantidad_apartada = 0;
 				}
+				if ($modeloMaterial->material->nombre === 'Transfer') {
+					$materialApartado->numero = $numero_zapato;
+				}
 
 				$materialApartado->cantidad_apartada += $cantidad_a_descontar;
 				$materialApartado->fecha_actualizacion = date('Y-m-d H:i:s');

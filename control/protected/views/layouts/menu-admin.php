@@ -49,10 +49,6 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-blue"></div>
                 </i><span class="menu-title">Materiales</span></a>
             </li>
-            <li class="<?php if($this->section == 'insumos'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/insumos/admin"><i class="fa fa-cogs fa-fw">
-                <div class="icon-bg bg-blue"></div>
-                </i><span class="menu-title">Insumos</span></a>
-            </li>
             <li class="<?php if($this->section == 'inventarios'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/inventarios/admin"><i class="fa fa-cubes fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Inventarios</span></a>

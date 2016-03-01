@@ -26,6 +26,7 @@
 							<tr>
 								<th>Concepto</th>
 								<th>Costo</th>
+								<th></th>
 							</tr>
 						</thead>
 						<tbody id="body_table">
@@ -36,6 +37,9 @@
 									</td>
 									<td>
 										<input class="form-control input-costo" type='number' min='0' step='0.50' name="GastosOperativos[existentes][<?= $gasto->id ?>][costo]" value="<?= $gasto->costo ?>" required />
+									</td>
+									<td>
+										<a class="delete" title="Borrar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Borrar"></a>
 									</td>
 								</tr>
 							<?php }	?>
@@ -95,6 +99,7 @@
 		tr = "<tr>";
 		tr += "<td><input class='form-control' type='text' name=\"GastosOperativos[nuevo]["+rows+"][concepto]\" value='' required/></td>";
 		tr += "<td><input class='form-control input-costo' type='number' min='0' step='0.50' name=\"GastosOperativos[nuevo]["+rows+"][costo]\" value='' required /></td>";
+		tr += "<td><a class='delete' title='Borrar' href='javascript:void(0);'><img src='/controlbom/control/images/icons/delete.png' alt='Borrar'></a></td>";
 		tr += "</tr>";
 		$('#body_table').append(tr);
 	});
@@ -102,6 +107,11 @@
 	jQuery('body').on('change','.input-costo',function(){
 		calcularCosto();
 		return false;
+	});
+
+	jQuery('body').on('click','.delete',function(){
+		$(this).parent().parent().remove();
+		calcularCosto();
 	});
 
 	$('#total_pares').change(function(){
