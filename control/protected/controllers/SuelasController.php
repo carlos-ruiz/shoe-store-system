@@ -94,6 +94,10 @@ class SuelasController extends Controller
 					$suelaNumero->id_suelas = $model->id;
 					$suelaNumero->save();
 				}
+				$suelaNumero = new SuelasNumeros;
+				$suelaNumero->numero = 0;
+				$suelaNumero->id_suelas = $model->id;
+				$suelaNumero->save();
 				$this->redirect(array('view','id'=>$model->id));
 			}
 		}
@@ -173,6 +177,11 @@ class SuelasController extends Controller
 							$suelaNumero->id_suelas = $model->id;
 							$suelaNumero->save();
 						}
+						$suelaNumero = new SuelasNumeros;
+						$suelaNumero->numero = 0;
+						$suelaNumero->id_suelas = $model->id;
+						$suelaNumero->save();
+						
 						$transaction->commit();
 						$this->redirect(array('view','id'=>$model->id));
 					}

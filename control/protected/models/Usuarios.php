@@ -39,7 +39,7 @@ class Usuarios extends CActiveRecord
 		return array(
 			array('usuario, contrasenia, creacion, ultima_modificacion, id_perfiles_usuarios', 'required'),
 			array('confirmarContrasenia', 'required', 'on'=>'createForm'),
-			array('contrasenia', 'compare', 'compareAttribute' => 'confirmarContrasenia'),
+			array('contrasenia', 'compare', 'compareAttribute' => 'confirmarContrasenia', 'on' => 'createForm'),
 			array('id_perfiles_usuarios', 'numerical', 'integerOnly'=>true),
 			array('usuario', 'length', 'max'=>45),
 			array('contrasenia, confirmarContrasenia', 'length', 'max'=>256),

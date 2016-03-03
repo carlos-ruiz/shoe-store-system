@@ -64,7 +64,7 @@
 										</td>
 										<td>Millares</td>
 										<td>
-											<input class="input-precio" type="number" name="Inventario[agujeta][<?= $time ?>][precio]" min="0" max="9999" step="0.5" value="<?= $precioActual ?>"/>
+											<input class="input-precio" type="number" name="Inventario[agujeta][<?= $time ?>][precio]" min="0" max="9999" step="0.001" value="<?= $precioActual ?>"/>
 										</td>
 									</tr>
 							<?php
@@ -100,7 +100,7 @@
 										</td>
 										<td>Millares</td>
 										<td>
-											<input class="input-precio" type="number" name="Inventario[ojillo][<?= $time ?>][precio]" min="0" max="9999" step="0.5" value="<?= $precioActual ?>"/>
+											<input class="input-precio" type="number" name="Inventario[ojillo][<?= $time ?>][precio]" min="0" max="9999" step="0.001" value="<?= $precioActual ?>"/>
 										</td>
 									</tr>
 							<?php
