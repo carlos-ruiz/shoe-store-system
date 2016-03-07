@@ -65,7 +65,29 @@ class InventariosController extends Controller
 		if(isset($_POST['InventarioMateriales'])){
 			$model->attributes = $_POST['InventarioMateriales'];
 			$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Materiales'));
-			if (isset($_POST['MaterialesColores'])) {
+			$material = Materiales::model()->findByPk($model->id_materiales);
+			if (isset($material) && $material->nombre === 'Transfer' && isset($_POST['Transfer'])) {
+				foreach ($_POST['Transfer']['cantidad'] as $numero => $cantidad) {
+					if(isset($cantidad) && $cantidad > 0){
+						$existente = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero=?', array($tipoArticulo->id, $material->id, $numero));
+						if (!isset($existente)) {
+							$existente = new Inventarios;
+							$existente->id_tipos_articulos_inventario = $tipoArticulo->id;
+							$existente->id_articulo = $material->id;
+							$existente->nombre_articulo = $material->nombre;
+							$existente->numero = $numero;
+							$existente->cantidad_existente = 0;
+							$existente->cantidad_apartada = 0;
+							$existente->unidad_medida = $material->unidad_medida;
+						}
+						$existente->cantidad_existente += $cantidad;
+						$existente->ultimo_precio = $_POST['Transfer']['precio'][''.$numero];
+						$existente->stock_minimo = $_POST['Transfer']['stock_minimo'][''.$numero];
+						$existente->save();
+					}
+				}
+			}
+			else if (isset($_POST['MaterialesColores'])) {
 				foreach ($_POST['MaterialesColores']['cantidad'] as $id_color => $cantidad) {
 					$inventarioMaterial = InventarioMateriales::model()->find('id_materiales=? AND id_colores=?', array($model->id_materiales, $id_color));
 					if (isset($inventarioMaterial)) {
@@ -193,7 +215,61 @@ class InventariosController extends Controller
 		if (isset($_POST['InventarioMateriales']['id_materiales'])) {
 			$id_material = $_POST['InventarioMateriales']['id_materiales'];
 			$material = Materiales::model()->findByPk($id_material);
-			if (isset($material->colores) && sizeof($material->colores) > 0) {
+			if($material->nombre === 'Transfer'){
+				echo '
+					<div class="panel panel-red panel-ordenes">
+						<div class="panel-heading">Agregar a inventario</div>
+						<div class="panel-body">
+							<table class="table table-hover table-striped ordenes-pedido-table without-padding-table" id="table_configurar_numeros" summary="Tabla de configuracion de número de suela que lleva cada modelo.">
+								<thead>
+									<tr>
+										<th>Material</th>
+										<th>Número</th>
+										<th>Cantidad</th>
+										<th>Unidad de medida</th>
+										<th>Precio</th>
+										<th>Cantidad mínima en bodega</th>
+									</tr>
+								</thead>
+								<tbody id="ordenes_table">';
+								$tipoMateriales = TiposArticulosInventario::model()->find('tipo="Materiales"');
+								for ($i=12; $i < 32; $i = $i + 0.5) {
+									$inventarioMaterial = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero=?', array($tipoMateriales->id, $id_material, $i));
+									$stock_minimo = 0;
+									$precio = 0;
+									if (isset($inventarioMaterial)) {
+										$stock_minimo = $inventarioMaterial->stock_minimo;
+										$precio = $inventarioMaterial->ultimo_precio;
+									}
+									echo '
+										<tr>
+											<td>'.$material->nombre.'</td>
+											<td>'.$i.'</td>
+											<td><input type="text" name="Transfer[cantidad]['.$i.']" /></td>
+											<td>'.$material->unidad_medida.'</td>
+											<td><input type="text" value="'.$precio.'" name="Transfer[precio]['.$i.']" class="input-precio" /></td>
+											<td><input type="text" value="'.$stock_minimo.'" name="Transfer[stock_minimo]['.$i.']" class="input-stock" /></td>
+										</tr>
+									';
+								}
+				echo '
+									<tr>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td><div id="mismo_precio" class="btn red">Mismo precio</div></td>
+									<td><div id="mismo_stock" class="btn red">Mismo stock</div></td>
+									</tr>
+				';
+				echo '
+								</tbody>
+							</table>
+						</div>
+					</div>
+				';
+			}
+			else if (isset($material->colores) && sizeof($material->colores) > 0) {
 				echo '
 					<div class="panel panel-red panel-ordenes">
 						<div class="panel-heading">Agregar a inventario</div>

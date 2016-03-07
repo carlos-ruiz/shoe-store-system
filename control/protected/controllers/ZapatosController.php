@@ -338,6 +338,7 @@ class ZapatosController extends Controller
 						if($inventarioMaterial->ultimo_precio > $precio_material)
 							$precio_material = $inventarioMaterial->ultimo_precio;
 					}
+					
 					$costo_total_extrachico += $modeloMaterial->cantidad_extrachico * $precio_material;
 					$costo_total_chico += $modeloMaterial->cantidad_chico * $precio_material;
 					$costo_total_mediano += $modeloMaterial->cantidad_mediano * $precio_material;
@@ -349,7 +350,7 @@ class ZapatosController extends Controller
 			$aux_total_chico = $costo_total_chico;
 			$aux_total_mediano = $costo_total_mediano;
 			$aux_total_grande = $costo_total_grande;
-
+			
 			//Costos de suelas
 			foreach ($modelo->modelosSuelas as $modeloSuela) {
 				$datos = array();
@@ -473,7 +474,7 @@ class ZapatosController extends Controller
 				array_push($zapatosDiferentes, $datos);
 			}
 		}
-		
+
 		$this->render('costos', array(
 				'zapatosDiferentes'=>$zapatosDiferentes,
 			)

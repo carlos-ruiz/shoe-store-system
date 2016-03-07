@@ -81,6 +81,7 @@ class ModelosMaterialesPredeterminados extends CActiveRecord
 			'ojillosColor' => array(self::BELONGS_TO, 'OjillosColores', 'id_ojillos_colores'),
 			'suelaColor' => array(self::BELONGS_TO, 'SuelasColores', 'id_suelas_colores'),
 			'taconColor' => array(self::BELONGS_TO, 'TaconesColores', 'id_tacones_colores'),
+			'materialesColoresPredeterminados' => array(self::HAS_MANY, 'MaterialesColoresPredeterminados', 'id_modelos_materiales_predeterminados'),
 		);
 	}
 

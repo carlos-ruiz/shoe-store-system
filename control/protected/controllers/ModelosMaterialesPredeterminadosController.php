@@ -37,7 +37,7 @@ class ModelosMaterialesPredeterminadosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'coloresPorSuela', 'coloresPorAgujeta', 'coloresPorOjillo', 'revisarSiTieneAgujetas', 'revisarSiSuelaTieneTacon', 'taconesPorSuela', 'coloresPorTacon'),
+				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'coloresPorSuela', 'coloresPorAgujeta', 'coloresPorOjillo', 'revisarSiTieneAgujetas', 'revisarSiSuelaTieneTacon', 'taconesPorSuela', 'coloresPorTacon', 'materialesDeColores'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -93,11 +93,26 @@ class ModelosMaterialesPredeterminadosController extends Controller
 			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?' , $model->id_modelos_colores);
 			
 			if (isset($configuracionExistente)) {
+				foreach ($configuracionExistente->materialesColoresPredeterminados as $mcp) {
+					$mcp->delete();
+				}
 				$configuracionExistente->delete();
 			}
 
-			if($model->save())
+			if($model->save()){
+				if (isset($_POST['ModelosMaterialesPredeterminados']['MaterialesColores'])) {
+					$materialesColores = $_POST['ModelosMaterialesPredeterminados']['MaterialesColores'];
+
+					foreach ($materialesColores as $id_material => $id_color) {
+						$materialColoresPredeterminados = new MaterialesColoresPredeterminados;
+						$materialColoresPredeterminados->id_modelos_materiales_predeterminados = $model->id;
+						$materialColoresPredeterminados->id_materiales = $id_material;
+						$materialColoresPredeterminados->id_colores = $id_color;
+						$materialColoresPredeterminados->save();
+					}
+				}
 				$this->redirect(array('admin'));
+			}
 		}
 
 		$this->render('create',array(
@@ -136,7 +151,7 @@ class ModelosMaterialesPredeterminadosController extends Controller
 
 		if(isset($_POST['ModelosMaterialesPredeterminados']))
 		{
-			$transaction = Yii::app()->db->beginTransaction();
+			// $transaction = Yii::app()->db->beginTransaction();
 			$datos = $_POST['ModelosMaterialesPredeterminados'];
 			$model->attributes=$_POST['ModelosMaterialesPredeterminados'];
 			$modeloColor = ModelosColores::model()->find('id_modelos=:modelo AND id_colores=:color', array('modelo'=>$datos['id_modelos'], 'color'=>$datos['id_color_modelo']));
@@ -159,14 +174,34 @@ class ModelosMaterialesPredeterminadosController extends Controller
 			
 			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=? AND id!=?' , array($model->id_modelos_colores, $model->id));
 			if (isset($configuracionExistente)) {
+				foreach ($configuracionExistente->materialesColoresPredeterminados as $mcp) {
+					$mcp->delete();
+				}
 				$configuracionExistente->delete();
 			}
 
+			$materialesColoresPredeterminados = MaterialesColoresPredeterminados::model()->findAll('id_modelos_materiales_predeterminados=?', array($model->id));
+			
+			foreach ($materialesColoresPredeterminados as $mcp) {
+				$mcp->delete();
+			}
+
 			if($model->save()){
-				$transaction->commit();
+				if (isset($_POST['ModelosMaterialesPredeterminados']['MaterialesColores'])) {
+					$materialesColores = $_POST['ModelosMaterialesPredeterminados']['MaterialesColores'];
+
+					foreach ($materialesColores as $id_material => $id_color) {
+						$materialColoresPredeterminados = new MaterialesColoresPredeterminados;
+						$materialColoresPredeterminados->id_modelos_materiales_predeterminados = $model->id;
+						$materialColoresPredeterminados->id_materiales = $id_material;
+						$materialColoresPredeterminados->id_colores = $id_color;
+						$materialColoresPredeterminados->save();
+					}
+				}
+				// $transaction->commit();
 				$this->redirect(array('admin'));
 			}else{
-				$transaction->rollback();
+				// $transaction->rollback();
 			}
 		}
 
@@ -329,5 +364,32 @@ class ModelosMaterialesPredeterminadosController extends Controller
 		$ojillosColores = OjillosColores::model()->findAll('id_ojillos=?', array($id_ojillo));
 		foreach($ojillosColores as $data)
 			echo "<option value=\"{$data->color->id}\">{$data->color->color}</option>";
+	}
+
+	public function actionMaterialesDeColores()
+	{
+		$modelo = Modelos::model()->findByPk($_POST['id_modelo']);
+		if (!isset($modelo)) {
+			echo "";
+			return;
+		}
+		foreach ($modelo->modelosMateriales as $modeloMaterial) {
+			if (isset($modeloMaterial->material->colores) && sizeof($modeloMaterial->material->colores) > 0) {
+				echo '
+					<div class="form-group col-md-3 ">
+						<label class="control-label required" for="material_'.$modeloMaterial->id_materiales.'">'.$modeloMaterial->material->nombre.' <span class="required">*</span></label>
+						<div class="input-group">
+							<select class="form-control" name="ModelosMaterialesPredeterminados[MaterialesColores]['.$modeloMaterial->id_materiales.']" id="material_'.$modeloMaterial->id_materiales.'" required>
+								<option value="">Seleccione una opción</option>';
+								foreach ($modeloMaterial->material->colores as $materialColor) {
+									echo '<option value="'.$materialColor->id_colores.'">'.$materialColor->color->color.'</option>';
+								}
+				echo '
+							</select>
+						</div>
+					</div>
+				';
+			}
+		}
 	}
 }

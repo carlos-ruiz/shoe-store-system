@@ -188,17 +188,23 @@ class PedidosController extends Controller
 						}
 						if($total > 0){
 							$model->descuento = 0;
-							if ($cantidad_pares_pedido >= 6 && $cantidad_pares_pedido < 100) {
+							if ($cantidad_pares_pedido >= 6 && $cantidad_pares_pedido < 13) {
+								$model->descuento = 3;
+							}
+							else if ($cantidad_pares_pedido >= 13 && $cantidad_pares_pedido < 51) {
+								$model->descuento = 5;
+							}
+							else if ($cantidad_pares_pedido >= 51 && $cantidad_pares_pedido < 101) {
 								$model->descuento = 6;
 							}
-							else if ($cantidad_pares_pedido >= 100 && $cantidad_pares_pedido < 200) {
+							else if ($cantidad_pares_pedido >= 101 && $cantidad_pares_pedido < 151) {
+								$model->descuento = 7;
+							}
+							else if ($cantidad_pares_pedido >= 151 && $cantidad_pares_pedido < 201) {
 								$model->descuento = 8;
 							}
-							else if ($cantidad_pares_pedido >= 200 && $cantidad_pares_pedido < 300) {
+							else if ($cantidad_pares_pedido >= 201) {
 								$model->descuento = 10;
-							}
-							else if ($cantidad_pares_pedido >= 300) {
-								$model->descuento = 12;
 							}
 							$descuento_cliente = 0;
 							$descuento_pedido = 0;
@@ -357,17 +363,23 @@ class PedidosController extends Controller
 						}
 						if($total > 0){
 							$model->descuento = 0;
-							if ($cantidad_pares_pedido >= 6 && $cantidad_pares_pedido < 100) {
+							if ($cantidad_pares_pedido >= 6 && $cantidad_pares_pedido < 13) {
+								$model->descuento = 3;
+							}
+							else if ($cantidad_pares_pedido >= 13 && $cantidad_pares_pedido < 51) {
+								$model->descuento = 5;
+							}
+							else if ($cantidad_pares_pedido >= 51 && $cantidad_pares_pedido < 101) {
 								$model->descuento = 6;
 							}
-							else if ($cantidad_pares_pedido >= 100 && $cantidad_pares_pedido < 200) {
+							else if ($cantidad_pares_pedido >= 101 && $cantidad_pares_pedido < 151) {
+								$model->descuento = 7;
+							}
+							else if ($cantidad_pares_pedido >= 151 && $cantidad_pares_pedido < 201) {
 								$model->descuento = 8;
 							}
-							else if ($cantidad_pares_pedido >= 200 && $cantidad_pares_pedido < 300) {
+							else if ($cantidad_pares_pedido >= 201) {
 								$model->descuento = 10;
-							}
-							else if ($cantidad_pares_pedido >= 300) {
-								$model->descuento = 12;
 							}
 							$descuento_cliente = 0;
 							$descuento_pedido = 0;
@@ -687,7 +699,10 @@ class PedidosController extends Controller
 
 			$numerosPosibles = array();
 			foreach ($modeloNumeros as $modeloNumero) {
-				array_push($numerosPosibles, $modeloNumero->numero);
+				$modeloSuelaNumero = ModelosSuelasNumeros::model()->with(array('suelaNumero'))->find('id_modelos_numeros=? AND suelaNumero.id_suelas=?', array($modeloNumero->id, $suela->id));
+				if (isset($modeloSuelaNumero) && $modeloSuelaNumero->suelaNumero->numero > 0) {
+					array_push($numerosPosibles, $modeloNumero->numero);
+				}
 			}
 			$zapatosConPrecio = ZapatoPrecios::model()->findAll('id_modelos=? AND id_suelas=?', array($modelo->id, $suela->id));
 			if (!isset($zapatosConPrecio) || sizeof($zapatosConPrecio)<1) {
@@ -832,7 +847,11 @@ class PedidosController extends Controller
 					$materialApartado->id_tipos_articulos_inventario = $tipoArticulo->id;
 					$materialApartado->id_articulo = $modeloMaterial->id_materiales;
 					if($materialTieneColores){
-						$materialApartado->id_colores = $pedidoZapato->zapato->id_colores;
+						//Aqui va lo del control de materiales con color para checar de la tabla de predeterminados
+						$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($pedidoZapato->zapato->id_modelos, $pedidoZapato->zapato->id_colores));
+						$modeloMaterialPredeterminado = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?', array($modeloColor->id));
+						$materialColorPredeterminado = MaterialesColoresPredeterminados::model()->find('id_modelos_materiales_predeterminados=? AND id_materiales=?', array($modeloMaterialPredeterminado->id, $modeloMaterial->id_materiales));
+						$materialApartado->id_colores = $materialColorPredeterminado->id_colores;
 					}
 					$materialApartado->id_pedidos = $pedido->id;
 					$materialApartado->cantidad_apartada = 0;
@@ -1131,14 +1150,14 @@ class PedidosController extends Controller
 					}
 				}else{
 					$datosArticulo = $this->obtenerDatosArticulo($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
-					$errores .= "No hay suficiente(s) ".$datosArticulo['nombre'];
+					$errores .= "- No hay suficiente(s) ".$datosArticulo['nombre'];
 					if (isset($materialApartado->color)) {
 						$errores .= ", color: ".$materialApartado->color->color; 
 					}
 					if (isset($materialApartado->numero)) {
 						$errores .= ", numero: ".$materialApartado->numero; 
 					}
-					$errores .= ' en el inventario|';
+					$errores .= ' en el inventario<br/>';
 				}
 
 				$materialApartado->delete();

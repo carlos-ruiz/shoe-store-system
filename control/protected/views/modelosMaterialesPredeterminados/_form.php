@@ -148,6 +148,28 @@
 			</div>
 		</div>
 
+		<div class="row col-md-12">
+			<h4>Materiales de colores</h4>
+			<hr/>
+		</div>
+		<div class="row" id="materiales_con_color">
+			<?php if(isset($model->materialesColoresPredeterminados) && sizeof($model->materialesColoresPredeterminados)){ ?>
+				<?php foreach ($model->materialesColoresPredeterminados as $mcp) { ?>
+					<div class="form-group col-md-3 ">
+						<label class="control-label required" for="material_<?= $mcp->id_materiales ?>" ><?= $mcp->material->material->nombre ?><span class="required">*</span></label>
+						<div class="input-group">
+							<select class="form-control" name="ModelosMaterialesPredeterminados[MaterialesColores][<?= $mcp->id_materiales ?>]" id="material_<?= $mcp->id_materiales ?>" required>
+								<option value="">Seleccione una opción</option>
+								<?php foreach ($mcp->material->material->colores as $materialColor) { ?>
+									<option value="<?= $materialColor->id_colores ?>" <?= ($materialColor->id_colores==$mcp->id_colores)?'selected':'' ?>><?= $materialColor->color->color ?></option>
+								<?php } ?>
+							</select>
+						</div>
+					</div>
+				<?php } ?>
+			<?php } ?>
+		</div>
+
 		<div class="row">
 			<div class="form-group col-md-12">
 				<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped')); ?>
@@ -180,7 +202,13 @@
 
 	jQuery(function($) {
 		jQuery('body').on('change','#ModelosMaterialesPredeterminados_id_modelos',function(){
-			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#ModelosMaterialesPredeterminados_id_color_modelo").html(html);}});
+			id_modelo = $(this).val();
+			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),
+				'success':function(html){
+					jQuery("#ModelosMaterialesPredeterminados_id_color_modelo").html(html);
+					actualizarMaterialesDeColores(id_modelo);
+				}
+			});
 			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 					jQuery("#ModelosMaterialesPredeterminados_id_suelas").html(html);
 					actualizarDatosDependientesDeSuela();
@@ -244,5 +272,17 @@
 	function actualizarDatosDependientesDeTacon(){
 		//Actualizando los colores disponibles del tacón
 		jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#ModelosMaterialesPredeterminados_id_color_tacon").html(html);}});
+	}
+
+	function actualizarMaterialesDeColores(id_modelo){
+		jQuery.ajax({
+			'url':'/controlbom/control/modelosmaterialespredeterminados/materialesDeColores',
+			'type':'POST',
+			'cache':false,
+			'data':{'id_modelo':id_modelo},
+			'success':function(response){
+				jQuery("#materiales_con_color").html(response);
+			}
+		});
 	}
 </script>

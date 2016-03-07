@@ -53,3 +53,24 @@
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->
+
+<script type="text/javascript">
+	$(document).on("click","#mismo_precio", function(){
+		precio_inicial = -1;
+		$('.input-precio').each(function(){
+			if (precio_inicial < 0) {
+				precio_inicial = $(this).val();
+			}
+			$(this).val(precio_inicial);
+		});
+	});
+	$(document).on("click","#mismo_stock", function(){
+		stock_inicial = -1;
+		$('.input-stock').each(function(){
+			if (stock_inicial < 0) {
+				stock_inicial = $(this).val();
+			}
+			$(this).val(stock_inicial);
+		});
+	});
+</script>

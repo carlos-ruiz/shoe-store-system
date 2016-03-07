@@ -457,10 +457,10 @@
 		gastos = parseFloat($('#Pedidos_gastos_envio').val());
 		subtotal = total;
 		descuentoTotal = descuentoCliente+descuento-gastos;
-		if(descuentoTotal > 12){
-			descuentoCliente = 12-descuento;
+		if(descuentoTotal > 10){
+			descuentoCliente = 10-descuento;
 			$('#Cliente_descuento').attr("value", descuentoCliente);
-			descuentoTotal = 12;
+			descuentoTotal = 10;
 		}
 		subtotal = subtotal/(1-descuentoTotal/100);
 		$('#Pedidos_subtotal').val(subtotal.toFixed(2));
@@ -698,10 +698,10 @@
 		descuentoCliente = parseFloat($('#Cliente_descuento').val());
 		gastos = parseFloat($('#Pedidos_gastos_envio').val());
 		descuentoTotal = descuentoCliente+descuento-gastos;
-		if(descuentoTotal>12){
-			descuentoCliente=12-descuento;
+		if(descuentoTotal>10){
+			descuentoCliente=10-descuento;
 			$('#Cliente_descuento').attr("value", descuentoCliente);
-			descuentoTotal = 12;
+			descuentoTotal = 10;
 		}
 		total = subtotal*(1-descuentoTotal/100);
 		$('#Pedidos_total').attr("value", total.toFixed(2));
@@ -787,17 +787,23 @@
 		if (cantidad_pares < 6) {
 			$('#Pedidos_descuento').val(0);
 		}
-		else if (cantidad_pares >= 6 && cantidad_pares < 100) {
+		else if (cantidad_pares >= 6 && cantidad_pares < 13) {
+			$('#Pedidos_descuento').val(3);
+		}
+		else if (cantidad_pares >= 13 && cantidad_pares < 51) {
+			$('#Pedidos_descuento').val(5);
+		}
+		else if (cantidad_pares >= 51 && cantidad_pares < 101) {
 			$('#Pedidos_descuento').val(6);
 		}
-		else if (cantidad_pares >= 100 && cantidad_pares < 200) {
+		else if (cantidad_pares >= 101 && cantidad_pares < 151) {
+			$('#Pedidos_descuento').val(7);
+		}
+		else if (cantidad_pares >= 151 && cantidad_pares < 201) {
 			$('#Pedidos_descuento').val(8);
 		}
-		else if (cantidad_pares >= 200 && cantidad_pares < 300) {
+		else if (cantidad_pares >= 201) {
 			$('#Pedidos_descuento').val(10);
-		}
-		else if (cantidad_pares >= 300) {
-			$('#Pedidos_descuento').val(12);
 		}
 	}
 
