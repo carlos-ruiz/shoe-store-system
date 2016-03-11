@@ -33,6 +33,15 @@ $this->menu=array(
         ),
 		array(
 			'class'=>'CButtonColumn',
+			'template'=>'{view}{delete}{update}{duplicar}',
+			'buttons'=>array(
+				'duplicar' => array(
+		            'label'=>'<span class="fa fa-play"></span>',
+		            'imageUrl'=>false,
+		            'options'=>array('title'=>'Duplicar'),
+		            'url'=>'Yii::app()->createUrl("modelos/duplicar", array("id"=>$data->id))',
+		        ),
+			),
 		),
 	),
 )); ?>

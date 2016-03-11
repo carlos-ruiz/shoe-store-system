@@ -37,7 +37,7 @@ class ModelosController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin'),
+				'actions'=>array('admin', 'duplicar'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -452,5 +452,49 @@ class ModelosController extends Controller
 		$list = ModelosNumeros::model()->findAll("id_modelos=?",array($_POST["Modelos"]["id"]));
 		foreach($list as $data)
 			echo "<option value=\"{$data->id}\">{$data->numero}</option>";
+	}
+
+	public function actionDuplicar($id)
+	{
+		$modelo = $this->loadModel($id);
+		$nuevo = new Modelos;
+		$nuevo->nombre = $modelo->nombre.' copia';
+		$nuevo->imagen = $modelo->imagen;
+		$nuevo->save();
+
+		foreach ($modelo->modelosColores as $modeloColor) {
+			$mcNuevo = new ModelosColores;
+			$mcNuevo->id_modelos = $nuevo->id;
+			$mcNuevo->id_colores = $modeloColor->id_colores;
+			$mcNuevo->save();
+		}
+
+		foreach ($modelo->modelosMateriales as $modeloMaterial) {
+			$mmNuevo = new ModelosMateriales;
+			$mmNuevo->id_modelos = $nuevo->id;
+			$mmNuevo->id_materiales = $modeloMaterial->id_materiales;
+			$mmNuevo->cantidad_extrachico = $modeloMaterial->cantidad_extrachico;
+			$mmNuevo->cantidad_chico = $modeloMaterial->cantidad_chico;
+			$mmNuevo->cantidad_mediano = $modeloMaterial->cantidad_mediano;
+			$mmNuevo->cantidad_grande = $modeloMaterial->cantidad_grande;
+			$mmNuevo->unidad_medida = $modeloMaterial->unidad_medida;
+			$mmNuevo->save();
+		}
+
+		foreach ($modelo->modelosNumeros as $mn) {
+			$mnNuevo = new ModelosNumeros;
+			$mnNuevo->id_modelos = $nuevo->id;
+			$mnNuevo->numero = $mn->numero;
+			$mnNuevo->save();
+		}
+
+		foreach ($modelo->modelosSuelas as $ms) {
+			$msNuevo = new ModelosSuelas;
+			$msNuevo->id_modelos = $nuevo->id;
+			$msNuevo->id_suelas = $ms->id_suelas;
+			$msNuevo->save();
+		}
+
+		$this->redirect(array('view', $nuevo->id));
 	}
 }

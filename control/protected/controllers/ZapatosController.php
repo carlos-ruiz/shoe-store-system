@@ -289,21 +289,6 @@ class ZapatosController extends Controller
 
 	public function actionCostos()
 	{
-		/*$zapatosDiferentes = Zapatos::model()->with(
-			array(
-				'suelaColor.suela'=>array(
-					'alias'=>'s'),
-				'agujetaColor.agujeta'=>array(
-					'alias'=>'a'),
-				'ojilloColor.ojillo'=>array(
-					'alias'=>'o'),
-				)
-			)->findAll(
-				array(
-					'group'=>'id_modelos, s.id, a.id, o.id',
-					)
-				);
-		*/
 		$zapatosDiferentes = array();
 		$modelos = Modelos::model()->findAll();
 		$tipoArticuloSuela = TiposArticulosInventario::model()->find("tipo='Suelas'");
@@ -345,7 +330,7 @@ class ZapatosController extends Controller
 					$costo_total_grande += $modeloMaterial->cantidad_grande * $precio_material;
 				}
 			}
-
+			
 			$aux_total_extrachico = $costo_total_extrachico;
 			$aux_total_chico = $costo_total_chico;
 			$aux_total_mediano = $costo_total_mediano;
@@ -357,25 +342,34 @@ class ZapatosController extends Controller
 				$datos['modelo'] = $modelo->nombre;
 				$datos['suela'] = $modeloSuela->suela->nombre;
 
+				$hay_suela_extrachico = false;
+				$hay_suela_chico = false;
+				$hay_suela_mediano = false;
+				$hay_suela_grande = false;
+
 				$inventario_extrachico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=12 AND numero<18', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
 
 				if (isset($inventario_extrachico)) {
 					$costo_total_extrachico += $inventario_extrachico->ultimo_precio;
+					$hay_suela_extrachico = true;
 				}
 
 				$inventario_chico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=18 AND numero<22', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
 				if (isset($inventario_chico)) {
 					$costo_total_chico += $inventario_chico->ultimo_precio;
+					$hay_suela_chico = true;
 				}
 
 				$inventario_mediano = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=22 AND numero<25', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
 				if (isset($inventario_mediano)) {
 					$costo_total_mediano += $inventario_mediano->ultimo_precio;
+					$hay_suela_mediano = true;
 				}
 
 				$inventario_grande = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=25 AND numero<32', array($tipoArticuloSuela->id, $modeloSuela->id_suelas));
 				if (isset($inventario_grande)) {
 					$costo_total_grande += $inventario_grande->ultimo_precio;
+					$hay_suela_grande = true;
 				}
 
 				//Costos agujetas
@@ -463,10 +457,19 @@ class ZapatosController extends Controller
 					$costo_total_mediano += $gastosOperativosPar->costo_par;
 					$costo_total_grande += $gastosOperativosPar->costo_par;
 				}
+				if(!$hay_suela_extrachico)
+					$costo_total_extrachico = 0;
+				if(!$hay_suela_chico)
+					$costo_total_chico = 0;
+				if(!$hay_suela_mediano)
+					$costo_total_mediano = 0;
+				if(!$hay_suela_grande)
+					$costo_total_grande = 0;
 				$datos['extrachico'] = $costo_total_extrachico;
 				$datos['chico'] = $costo_total_chico;
 				$datos['mediano'] = $costo_total_mediano;
 				$datos['grande'] = $costo_total_grande;
+				
 				$costo_total_extrachico = $aux_total_extrachico;
 				$costo_total_chico = $aux_total_chico;
 				$costo_total_mediano = $aux_total_mediano;

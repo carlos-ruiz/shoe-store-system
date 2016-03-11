@@ -37,7 +37,7 @@ class Modelos extends CActiveRecord
 			array('nombre', 'required'),
 			array('nombre', 'unique'),
 			array('nombre', 'length', 'max'=>128),
-			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => false, 'on' => 'insert'),
+			// array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => false, 'on' => 'insert'),
 			array('imagen', 'file', 'types'=>'jpg, gif, png', 'safe' => false, 'allowEmpty' => true, 'on' => 'update'),
 			array('id, numero, id_colores', 'required', 'on' => 'generarEtiqueta'),
 			array('nombre, imagen', 'safe', 'on'=>'generarEtiqueta'),
