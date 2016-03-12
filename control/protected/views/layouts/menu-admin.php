@@ -95,7 +95,7 @@ data-position="right" class="navbar-default navbar-static-side">
                         </a>
                     </li>
                     <li class="<?php if(isset($this->subsection) && $this->subsection == 'numeros_suelas_modelos'){ echo 'submenu-active'; } ?>">
-                        <a href="<?= Yii::app()->request->baseUrl; ?>/modelossuelasnumeros/admin">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/modelosSuelasNumeros/admin">
                             <i class="fa fa-sort-numeric-asc fa-fw">
                                 <div class="icon-bg bg-red"></div>
                             </i>
@@ -103,7 +103,7 @@ data-position="right" class="navbar-default navbar-static-side">
                         </a>
                     </li>
                     <li class="<?php if(isset($this->subsection) && $this->subsection == 'numeros_suelas_tacones'){ echo 'submenu-active'; } ?>">
-                        <a href="<?= Yii::app()->request->baseUrl; ?>/suelastaconesnumeros/admin">
+                        <a href="<?= Yii::app()->request->baseUrl; ?>/suelasTaconesNumeros/admin">
                             <i class="fa fa-sort-numeric-desc fa-fw">
                                 <div class="icon-bg bg-red"></div>
                             </i>
@@ -112,7 +112,7 @@ data-position="right" class="navbar-default navbar-static-side">
                     </li>
                 </ul>
             </li>
-            <li class="<?php if($this->section == 'modelos_materiales_default'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/modelosmaterialespredeterminados/admin"><i class="fa fa-puzzle-piece fa-fw">
+            <li class="<?php if($this->section == 'modelos_materiales_default'){ echo 'active'; } ?>"><a href="<?= Yii::app()->request->baseUrl; ?>/modelosMaterialesPredeterminados/admin"><i class="fa fa-puzzle-piece fa-fw">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Definición de zapatos</span></a>
             </li>

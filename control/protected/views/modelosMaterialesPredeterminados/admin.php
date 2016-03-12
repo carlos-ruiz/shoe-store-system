@@ -16,7 +16,7 @@ $this->menu=array(
 <h1>Materiales que lleva cada modelo normalmente</h1>
 
 <div class="text-right">
-	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nuevo', array('modelosmaterialespredeterminados/create'), array('class'=>'btn btn-red-stripped')); ?>
+	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nuevo', array('modelosMaterialesPredeterminados/create'), array('class'=>'btn btn-red-stripped')); ?>
 </div>
 
 <?php $this->widget('zii.widgets.grid.CGridView', array(

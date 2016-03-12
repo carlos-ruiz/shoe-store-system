@@ -36,7 +36,7 @@ $this->menu=array(
 			'template'=>'{view}{delete}{update}{duplicar}',
 			'buttons'=>array(
 				'duplicar' => array(
-		            'label'=>'<span class="fa fa-play"></span>',
+		            'label'=>'<span class="fa fa-clone"></span>',
 		            'imageUrl'=>false,
 		            'options'=>array('title'=>'Duplicar'),
 		            'url'=>'Yii::app()->createUrl("modelos/duplicar", array("id"=>$data->id))',
