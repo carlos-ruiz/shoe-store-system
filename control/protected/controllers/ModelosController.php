@@ -28,16 +28,8 @@ class ModelosController extends Controller
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'delete', 'generarEtiqueta', 'coloresPorModelo', 'numerosPorModelo'),
-				'users'=>array('@'),
-			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin', 'duplicar'),
+				'actions'=>array('index','view','create','update','admin', 'duplicar','delete', 'generarEtiqueta', 'coloresPorModelo', 'numerosPorModelo'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -495,6 +487,6 @@ class ModelosController extends Controller
 			$msNuevo->save();
 		}
 
-		$this->redirect(array('view', $nuevo->id));
+		$this->redirect(array('update', 'id'=>$nuevo->id));
 	}
 }

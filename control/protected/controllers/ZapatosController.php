@@ -29,16 +29,8 @@ class ZapatosController extends Controller
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
-				'users'=>array('@'),
-			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo','actualizarPrecio', 'costos'),
+				'actions'=>array('index','view','create','update','admin','delete', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo','actualizarPrecio', 'costos'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -425,26 +417,39 @@ class ZapatosController extends Controller
 						'suelaColor.suela'=>array('alias'=>'s'),
 					))->find('m.id=? AND s.id=? AND id_tacones_colores>0', array($modelo->id, $modeloSuela->id_suelas));
 				if (isset($taconesPredeterminados)) {
+				// echo "hay tacon";
 					$id_tacon = $taconesPredeterminados->taconColor->id_tacones;
 					$inventario_extrachico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=12 AND numero<18', array($tipoArticuloTacones->id, $id_tacon));
 
 					if (isset($inventario_extrachico)) {
+						// echo "<br/>extrachico<br/>";
+						// echo "antes: ".$costo_total_extrachico;
 						$costo_total_extrachico += $inventario_extrachico->ultimo_precio;
+						// echo "despues: ".$costo_total_extrachico;
 					}
 
 					$inventario_chico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=18 AND numero<22', array($tipoArticuloTacones->id, $id_tacon));
 					if (isset($inventario_chico)) {
+						// echo "<br/>chico<br/>";
+// echo "antes: ".$costo_total_chico;
 						$costo_total_chico += $inventario_chico->ultimo_precio;
+// echo "despues: ".$costo_total_chico;
 					}
 
 					$inventario_mediano = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=22 AND numero<25', array($tipoArticuloTacones->id, $id_tacon));
 					if (isset($inventario_mediano)) {
+						// echo "<br/>mediano<br/>";
+// echo "antes: ".$costo_total_mediano;
 						$costo_total_mediano += $inventario_mediano->ultimo_precio;
+// echo "despues: ".$costo_total_mediano;
 					}
 
 					$inventario_grande = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=25 AND numero<32', array($tipoArticuloTacones->id, $id_tacon));
 					if (isset($inventario_grande)) {
+						// echo "<br/>grande<br/>";
+// echo "antes: ".$costo_total_grande;
 						$costo_total_grande += $inventario_grande->ultimo_precio;
+// echo "despues: ".$costo_total_grande;
 					}
 				}
 

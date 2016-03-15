@@ -30,10 +30,6 @@ class PedidosController extends Controller
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
-				'users'=>array('*'),
-			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
 				'actions'=>array('actualizarEstatusZapatos', 'seguimiento'),
 				'users'=>array('@'),
@@ -43,7 +39,7 @@ class PedidosController extends Controller
 				'users'=>Usuarios::model()->obtenerPorPerfil('Ensuelador'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente', 'empezarpedido', 'entregarPedido', 'actualizarFaltantes'),
+				'actions'=>array('index', 'view', 'create','update', 'admin','delete', 'obtenerModelos', 'suelasPorModelo', 'coloresPorModelo', 'numerosPorModelo', 'agregarOrden', 'coloresPorSuela', 'revisarSiTieneAgujetas', 'coloresPorAgujeta', 'coloresPorOjillo', 'materialesPredeterminados', 'imprimirEtiquetasPedido', 'descuentoPorCliente', 'empezarpedido', 'entregarPedido', 'actualizarFaltantes'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users

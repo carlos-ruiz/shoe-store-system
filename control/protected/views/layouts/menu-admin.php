@@ -57,7 +57,7 @@ data-position="right" class="navbar-default navbar-static-side">
                 <div class="icon-bg bg-red"></div>
                 </i><span class="menu-title">Extras</span></a>
                 <ul class="submenu">
-                    <li class="<?php if($this->section == 'extras' && $this->subsection == 'etiquetas'){ echo 'submenu-active'; } ?>">
+                    <li class="<?php if($this->section == 'extras' && isset($this->subsection) && $this->subsection == 'etiquetas'){ echo 'submenu-active'; } ?>">
                         <a href="<?= Yii::app()->request->baseUrl; ?>/modelos/generarEtiqueta"><i class="fa fa-tag fa-fw">
                         <div class="icon-bg bg-red"></div>
                         </i><span class="menu-title">Etiquetas</span></a>

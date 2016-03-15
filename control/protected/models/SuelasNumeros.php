@@ -48,6 +48,7 @@ class SuelasNumeros extends CActiveRecord
 		return array(
 			'modelosNumeros' => array(self::MANY_MANY, 'ModelosNumeros', 'modelos_suelas_numeros(id_suelas_numeros, id_modelos_numeros)'),
 			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
+			'suelasTaconesNumeros' => array(self::HAS_MANY, 'SuelasTaconesNumeros', 'id_suelas_numeros'),
 		);
 	}
 
