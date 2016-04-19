@@ -417,7 +417,7 @@ class ZapatosController extends Controller
 						'suelaColor.suela'=>array('alias'=>'s'),
 					))->find('m.id=? AND s.id=? AND id_tacones_colores>0', array($modelo->id, $modeloSuela->id_suelas));
 				if (isset($taconesPredeterminados)) {
-				// echo "hay tacon";
+					// echo "hay tacon";
 					$id_tacon = $taconesPredeterminados->taconColor->id_tacones;
 					$inventario_extrachico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=12 AND numero<18', array($tipoArticuloTacones->id, $id_tacon));
 
@@ -431,25 +431,25 @@ class ZapatosController extends Controller
 					$inventario_chico = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=18 AND numero<22', array($tipoArticuloTacones->id, $id_tacon));
 					if (isset($inventario_chico)) {
 						// echo "<br/>chico<br/>";
-// echo "antes: ".$costo_total_chico;
+						// echo "antes: ".$costo_total_chico;
 						$costo_total_chico += $inventario_chico->ultimo_precio;
-// echo "despues: ".$costo_total_chico;
+						// echo "despues: ".$costo_total_chico;
 					}
 
 					$inventario_mediano = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=22 AND numero<25', array($tipoArticuloTacones->id, $id_tacon));
 					if (isset($inventario_mediano)) {
 						// echo "<br/>mediano<br/>";
-// echo "antes: ".$costo_total_mediano;
+						// echo "antes: ".$costo_total_mediano;
 						$costo_total_mediano += $inventario_mediano->ultimo_precio;
-// echo "despues: ".$costo_total_mediano;
+						// echo "despues: ".$costo_total_mediano;
 					}
 
 					$inventario_grande = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero>=25 AND numero<32', array($tipoArticuloTacones->id, $id_tacon));
 					if (isset($inventario_grande)) {
 						// echo "<br/>grande<br/>";
-// echo "antes: ".$costo_total_grande;
+						// echo "antes: ".$costo_total_grande;
 						$costo_total_grande += $inventario_grande->ultimo_precio;
-// echo "despues: ".$costo_total_grande;
+						// echo "despues: ".$costo_total_grande;
 					}
 				}
 
@@ -462,13 +462,20 @@ class ZapatosController extends Controller
 					$costo_total_mediano += $gastosOperativosPar->costo_par;
 					$costo_total_grande += $gastosOperativosPar->costo_par;
 				}
-				if(!$hay_suela_extrachico)
+
+				// Comprobando si existe modelos en todos los numeros
+				$modelos_extrachico = ModelosNumeros::model()->find('id_modelos=? AND numero >= 12 AND numero < 18', array($modelo->id));
+				$modelos_chico = ModelosNumeros::model()->find('id_modelos=? AND numero >= 18 AND numero < 22', array($modelo->id));
+				$modelos_mediano = ModelosNumeros::model()->find('id_modelos=? AND numero >= 22 AND numero < 25', array($modelo->id));
+				$modelos_grande = ModelosNumeros::model()->find('id_modelos=? AND numero >= 25 AND numero < 32', array($modelo->id));
+
+				if(!$hay_suela_extrachico || !isset($modelos_extrachico))
 					$costo_total_extrachico = 0;
-				if(!$hay_suela_chico)
+				if(!$hay_suela_chico || !isset($modelos_chico))
 					$costo_total_chico = 0;
-				if(!$hay_suela_mediano)
+				if(!$hay_suela_mediano || !isset($modelos_mediano))
 					$costo_total_mediano = 0;
-				if(!$hay_suela_grande)
+				if(!$hay_suela_grande || !isset($modelos_grande))
 					$costo_total_grande = 0;
 				$datos['extrachico'] = $costo_total_extrachico;
 				$datos['chico'] = $costo_total_chico;
