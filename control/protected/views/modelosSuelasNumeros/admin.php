@@ -53,10 +53,13 @@ foreach ($modelos as $modelo) {
 						</tr>
 					</thead>
 					<tbody id="ordenes_table">
-						<?php foreach ($zapatosDiferentes as $index => $row) { 
-							$time = microtime();
-							$time = str_replace(' ', '', $time);
-							$time = str_replace('.', '', $time);
+						<?php 
+						$indice_valor = 0;
+						foreach ($zapatosDiferentes as $index => $row) { 
+							// $time = microtime();
+							// $time = str_replace(' ', '', $time);
+							// $time = str_replace('.', '', $time);
+							$time = $indice_valor++;
 							$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($row['id_modelo']));
 							$numerosPosibles = array();
 							foreach ($modeloNumeros as $modeloNumero) {
@@ -106,7 +109,6 @@ foreach ($modelos as $modelo) {
 									</select>
 								<?php }
 								else { ?>
-									<!-- <input class="input-cantidad" type="text" name="Configuracion[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" disabled value='--' /> -->
 									--
 								<?php } ?>
 								</td>
