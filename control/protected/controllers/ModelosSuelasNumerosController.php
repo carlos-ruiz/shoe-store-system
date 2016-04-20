@@ -46,10 +46,8 @@ class ModelosSuelasNumerosController extends Controller
 		if (isset($_POST['Configuracion'])) {
 			$datos = $_POST['Configuracion'];
 			if (isset($datos['modelo'])) {
-				$modelosSuelasNumerosTodos = ModelosSuelasNumeros::model()->findAll();
-				foreach ($modelosSuelasNumerosTodos as $msn) {
-					$msn->delete();
-				}
+				ModelosSuelasNumeros::model()->deleteAll();
+
 				foreach ($datos['modelo'] as $clave => $id_modelo) {
 					foreach ($datos['numeros'][$clave] as $numero_modelo => $id_suela_numero) {
 						if (isset($id_suela_numero)) {
