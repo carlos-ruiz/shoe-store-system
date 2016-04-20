@@ -42,7 +42,7 @@ foreach ($modelos as $modelo) {
 		<div class="panel panel-red panel-ordenes">
 			<div class="panel-heading">Configurar números</div>
 			<div class="panel-body">
-				<table class="table table-hover table-striped ordenes-pedido-table without-padding-table" id="table_configurar_numeros" summary="Tabla de configuracion de número de suela que lleva cada modelo.">
+				<table class="table table-hover table-striped ordenes-pedido-table without-padding-table table-bordered-tds" id="table_configurar_numeros" summary="Tabla de configuracion de número de suela que lleva cada modelo.">
 					<thead>
 						<tr>
 							<th>Modelo</th>
@@ -106,7 +106,8 @@ foreach ($modelos as $modelo) {
 									</select>
 								<?php }
 								else { ?>
-									<input class="input-cantidad" type="text" name="Configuracion[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" disabled value='--' />
+									<!-- <input class="input-cantidad" type="text" name="Configuracion[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" disabled value='--' /> -->
+									--
 								<?php } ?>
 								</td>
 							<?php } ?>

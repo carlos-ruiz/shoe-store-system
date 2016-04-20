@@ -378,3 +378,7 @@ p.cantidad {
     font-weight: bold;
     font-size: 11pt;
 }
+
+.table-bordered-tds td{
+	border: solid 1px #DADADA;
+}
