@@ -56,9 +56,6 @@ foreach ($modelos as $modelo) {
 						<?php 
 						$indice_valor = 0;
 						foreach ($zapatosDiferentes as $index => $row) { 
-							// $time = microtime();
-							// $time = str_replace(' ', '', $time);
-							// $time = str_replace('.', '', $time);
 							$time = $indice_valor++;
 							$modeloNumeros = ModelosNumeros::model()->findAll('id_modelos=?', array($row['id_modelo']));
 							$numerosPosibles = array();
@@ -76,8 +73,6 @@ foreach ($modelos as $modelo) {
 									<?= $row['suela'] ?>
 									<?php
 										$suelaNumeros = SuelasNumeros::model()->findAll('id_suelas=?', array($row['id_suela']));
-										// $msn = ModelosSuelasNumeros::model()->with(array('suelaNumero.suela'=>array('alias'=>'suelas', 'condition'=>'suelas.id='.$row['id_suela'])))->findAll();
-										
 									?>
 									
 									<input type="hidden" name="Configuracion[suela][<?= $time ?>]" value="<?= $row['id_suela'] ?>">
@@ -122,7 +117,28 @@ foreach ($modelos as $modelo) {
 	</div>
 	<div class="row">
 		<div class="form-group">
-			<?php echo CHtml::submitButton('Guardar cambios', array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::submitButton('Guardar cambios', array('class'=>'btn btn-red-stripped', 'onclick'=>'mostrarCargando();')); ?>
 		</div>
 	</div>
 <?php $this->endWidget(); ?>
+
+<div class="loading-panel">
+	<div class="loading-gif">
+		<img src="<?= Yii::app()->request->baseUrl ?>/images/icons/loading_red.gif">
+		<h4>Cargando, por favor espere...</h4>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function mostrarCargando() {
+		width = $('.loading-gif').outerWidth();
+		height = $('.loading-gif').outerHeight();
+		windowHeight = $( window ).height();
+		alto = (windowHeight-height)/2;
+		left = ($('#wrapper').width()-width)/2;
+		
+		$('.loading-gif').css('top',alto);
+		$('.loading-gif').css('left',left);
+		$('.loading-panel').show(500);
+	}
+</script>
