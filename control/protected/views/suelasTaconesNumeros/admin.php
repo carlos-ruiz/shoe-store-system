@@ -117,7 +117,28 @@ foreach ($suelas as $suela) {
 	</div>
 	<div class="row">
 		<div class="form-group">
-			<?php echo CHtml::submitButton('Guardar cambios', array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::submitButton('Guardar cambios', array('class'=>'btn btn-red-stripped', 'onclick'=>'mostrarCargando();')); ?>
 		</div>
 	</div>
 <?php $this->endWidget(); ?>
+
+<div class="loading-panel">
+	<div class="loading-gif">
+		<img src="<?= Yii::app()->request->baseUrl ?>/images/icons/loading_red.gif">
+		<h4>Cargando, por favor espere...</h4>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function mostrarCargando() {
+		width = $('.loading-gif').outerWidth();
+		height = $('.loading-gif').outerHeight();
+		windowHeight = $( window ).height();
+		alto = (windowHeight-height)/2;
+		left = ($('#wrapper').width()-width)/2;
+		
+		$('.loading-gif').css('top',alto);
+		$('.loading-gif').css('left',left);
+		$('.loading-panel').show(500);
+	}
+</script>
