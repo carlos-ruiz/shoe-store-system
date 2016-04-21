@@ -77,12 +77,11 @@ class PedidosController extends Controller
 
 		if(isset($_POST['Pedidos']))
 		{
-			// print_r($_POST);
-			// return;
 			$transaction = Yii::app()->db->beginTransaction();
 			try{
 				$model->attributes=$_POST['Pedidos'];
 				$prioridad = $_POST['Pedidos']['prioridad'];
+				
 				$formaDePagoSeleccionada = $model->id_formas_pago;
 				$model->prioridad = 'NORMAL';
 				if($prioridad == 1){
@@ -117,7 +116,7 @@ class PedidosController extends Controller
 				}
 				$model->estatus_pagos_id = $estatusDePago->id;
 				$cantidad_pares_pedido = 0;
-
+				
 				if($model->validate() && $model->save()){
 					if (isset($_POST['Pedido'])) {
 						$datosPedido = $_POST['Pedido'];
@@ -668,8 +667,6 @@ class PedidosController extends Controller
 	public function actionAgregarOrden()
 	{
 		if (isset($_POST)) {
-			// print_r($_POST);
-			// return;
 			$modelo = Modelos::model()->findByPk($_POST['id_modelos']);
 			$color = Colores::model()->findByPk($_POST['id_colores']);
 			$suela = Suelas::model()->findByPk($_POST['id_suelas']);
@@ -804,6 +801,9 @@ class PedidosController extends Controller
 			$cantidad_agujetas = 0;
 
 			// Agregar a apartados los materiales
+			$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Materiales'));
+			$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($pedidoZapato->zapato->id_modelos, $pedidoZapato->zapato->id_colores));
+			$modeloMaterialPredeterminado = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?', array($modeloColor->id));
 			foreach ($modelo->modelosMateriales as $modeloMaterial) {
 				$cantidad_a_descontar = 0;
 				unset($materialApartado);
@@ -829,11 +829,12 @@ class PedidosController extends Controller
 					continue;
 				}
 
-				$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Materiales'));
 				$materialTieneColores = (MaterialesColores::model()->count('id_materiales=?', array($modeloMaterial->id_materiales)) > 0)?true:false;
 
 				if($materialTieneColores){
-					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id, $pedidoZapato->zapato->id_colores));
+					$materialColorPredeterminado = MaterialesColoresPredeterminados::model()->find('id_modelos_materiales_predeterminados=? AND id_materiales=?', array($modeloMaterialPredeterminado->id, $modeloMaterial->id_materiales));
+				
+					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id, $materialColorPredeterminado->id_colores));
 				}
 				if(!$materialTieneColores && !isset($materialApartado)){
 					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id));
@@ -842,11 +843,7 @@ class PedidosController extends Controller
 					$materialApartado = new MaterialesApartadosPedido;
 					$materialApartado->id_tipos_articulos_inventario = $tipoArticulo->id;
 					$materialApartado->id_articulo = $modeloMaterial->id_materiales;
-					if($materialTieneColores){
-						//Aqui va lo del control de materiales con color para checar de la tabla de predeterminados
-						$modeloColor = ModelosColores::model()->find('id_modelos=? AND id_colores=?', array($pedidoZapato->zapato->id_modelos, $pedidoZapato->zapato->id_colores));
-						$modeloMaterialPredeterminado = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?', array($modeloColor->id));
-						$materialColorPredeterminado = MaterialesColoresPredeterminados::model()->find('id_modelos_materiales_predeterminados=? AND id_materiales=?', array($modeloMaterialPredeterminado->id, $modeloMaterial->id_materiales));
+					if($materialTieneColores){					
 						$materialApartado->id_colores = $materialColorPredeterminado->id_colores;
 					}
 					$materialApartado->id_pedidos = $pedido->id;

@@ -53,7 +53,7 @@ $this->menu=array(
 		<h3>Materiales</h3>
 		<ul>
 			<?php foreach ($model->modelosMateriales as $material) { ?>
-				<li><?= $material->material->nombre ?>
+				<li><?= $material->material->nombre.' ('.$material->material->unidad_medida.')' ?>
 					<ul>
 						<li>Extrachico: <?= $material->cantidad_extrachico.' '.$material->unidad_medida ?></li>
 						<li>Chico: <?= $material->cantidad_chico.' '.$material->unidad_medida ?></li>

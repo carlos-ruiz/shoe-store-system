@@ -37,6 +37,7 @@
 							),
 							"class" => "form-control",
 							"empty"=>array(''=>"Seleccione una opci&oacute;n"),
+							"required"=>"required",
 						);
 					?>
 					<?php echo $form->dropDownList($model,'id_clientes', Clientes::model()->obtenerClientes(), $htmlOptions); ?>
@@ -63,7 +64,7 @@
 			<div class="form-group col-md-4 <?php if($form->error($model,'id_formas_pago')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'id_formas_pago', array('class'=>'control-label')); ?>
 				<div class="input-group">
-					<?php echo $form->dropDownList($model,'id_formas_pago', FormasPago::model()->obtenerFormasPago(), array('class' => 'form-control',"empty"=>array('0'=>"Seleccione una opci&oacute;n"))); ?>
+					<?php echo $form->dropDownList($model,'id_formas_pago', FormasPago::model()->obtenerFormasPago(), array('class' => 'form-control',"empty"=>array(''=>"Seleccione una opci&oacute;n"), "required"=>"required",)); ?>
 					<?php echo $form->error($model,'id_formas_pago', array('class'=>'help-block')); ?>
 				</div>
 			</div>
@@ -439,7 +440,7 @@
 		</div>
 
 		<div class="form-group">
-			<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::submitButton($model->isNewRecord ? 'Guardar' : 'Actualizar', array('class'=>'btn btn-red-stripped', 'onclick'=>'return validar()')); ?>
 		</div>
 	</div>	
 
@@ -805,6 +806,15 @@
 		else if (cantidad_pares >= 201) {
 			$('#Pedidos_descuento').val(10);
 		}
+	}
+
+	function validar() {
+		subtotal = $('#Pedidos_subtotal').val();
+		if (parseFloat(subtotal) <= 0) {
+			alerta('Debe agregar mínimo un par de zapatos al pedido', "Error");
+			return false;
+		}
+		return true;
 	}
 
 	$(document).keypress(function(e){

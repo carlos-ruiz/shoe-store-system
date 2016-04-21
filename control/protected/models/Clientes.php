@@ -47,6 +47,7 @@ class Clientes extends CActiveRecord
 			array('razon_social', 'length', 'max'=>512),
 			array('telefono, celular', 'length', 'max'=>45),
 			array('correo_electronico', 'length', 'max'=>128),
+			array('correo_electronico','email'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, nombre, apellido_paterno, apellido_materno, rfc, razon_social, id_tipo_cliente, id_direcciones, telefono, celular, correo_electronico', 'safe', 'on'=>'search'),

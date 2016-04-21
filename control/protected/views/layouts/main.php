@@ -105,7 +105,7 @@
                 <!--BEGIN FOOTER-->
                 <div id="footer">
                     <div class="copyright">
-                        <a href="http://bom.com.mx">2015 © Botas y Botines BOM</a></div>
+                        <a href="http://calzadobom.com" target="_blank"><?= date('Y') ?> © Botas y Botines BOM</a></div>
                 </div>
                 <!--END FOOTER-->
             </div>
