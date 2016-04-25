@@ -97,7 +97,7 @@ foreach ($modelos as $modelo) {
 													),
 												))->find();
 									?>
-									<select name="Configuracion[numeros][<?= $time ?>][<?= $i; ?>]">
+									<select name="Configuracion[numeros][<?= $time ?>][<?= $i; ?>]" title="<?= $i ?>">
 										<?php foreach ($suelaNumeros as $suelaNumero) { ?>
 											<option value="<?= $suelaNumero->id ?>" <?php echo (isset($msn->suelaNumero) && $msn->suelaNumero->numero==$suelaNumero->numero)?"selected":""; ?>><?= $suelaNumero->numero ?></option>
 										<?php } ?>

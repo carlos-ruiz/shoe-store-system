@@ -44,21 +44,27 @@ class ModelosSuelasNumerosController extends Controller
 		$modelos = Modelos::model()->findAll();
 
 		if (isset($_POST['Configuracion'])) {
-			$datos = $_POST['Configuracion'];
-			if (isset($datos['modelo'])) {
-				ModelosSuelasNumeros::model()->deleteAll();
+			$transaction = Yii::app()->db->beginTransaction();
+			try{
+				$datos = $_POST['Configuracion'];
+				if (isset($datos['modelo'])) {
+					ModelosSuelasNumeros::model()->deleteAll();
 
-				foreach ($datos['modelo'] as $clave => $id_modelo) {
-					foreach ($datos['numeros'][$clave] as $numero_modelo => $id_suela_numero) {
-						if (isset($id_suela_numero)) {
-							$modeloNumero = ModelosNumeros::model()->find('id_modelos=? AND numero=?', array($id_modelo, $numero_modelo));
-							$modeloSuelaNumero = new ModelosSuelasNumeros;
-							$modeloSuelaNumero->id_modelos_numeros = $modeloNumero->id;
-							$modeloSuelaNumero->id_suelas_numeros = $id_suela_numero;
-							$modeloSuelaNumero->save();
+					foreach ($datos['modelo'] as $clave => $id_modelo) {
+						foreach ($datos['numeros'][$clave] as $numero_modelo => $id_suela_numero) {
+							if (isset($id_suela_numero)) {
+								$modeloNumero = ModelosNumeros::model()->find('id_modelos=? AND numero=?', array($id_modelo, $numero_modelo));
+								$modeloSuelaNumero = new ModelosSuelasNumeros;
+								$modeloSuelaNumero->id_modelos_numeros = $modeloNumero->id;
+								$modeloSuelaNumero->id_suelas_numeros = $id_suela_numero;
+								$modeloSuelaNumero->save();
+							}
 						}
 					}
+					$transaction->commit();
 				}
+			}catch(Exception $ex){
+				$transaction->rollback();
 			}
 		}
 		$this->render('admin', array(

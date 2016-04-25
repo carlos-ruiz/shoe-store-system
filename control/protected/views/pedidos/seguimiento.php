@@ -1,12 +1,13 @@
 <script type="text/javascript">
-	// window.onload = setupRefresh;
+	 /*window.onload = setupRefresh;
 
-	// function setupRefresh() {
-	// 	setTimeout("refreshPage();", 30000); // milliseconds
-	// }
-	// function refreshPage() {
-	// 	window.location = location.href;
-	// }
+	 function setupRefresh() {
+	 	setTimeout("refreshPage();", 30000); // milliseconds
+	 }
+	 */
+	 function refreshPage() {
+	 	window.location = location.href;
+	 }
 </script>
 
 <?php
@@ -29,6 +30,7 @@
 	</div>
 </div>
 <hr/>
+<button class="btn btn-red" onclick="refreshPage();">Recargar</button>
 <div class="row">
 	<?php 
 		$ids_clientes = array();
@@ -55,7 +57,7 @@
 </div>
 <!-- style="width: 1600px;" -->
 <div class="row flex-parent">
-	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Pespuntador', 'Administrador'))) { ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_corte" id="corte">
 		<h3>Corte</h3>
 		<hr/>
@@ -86,7 +88,7 @@
 		</div>
 	</div>
 	<?php } ?>
-	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Pespuntador', 'Ensuelador', 'Administrador'))) { ?>
+	<?php if (in_array(Yii::app()->user->getState('perfil'), array('Cortador', 'Pespuntador', 'Administrador'))) { ?>
 	<div class="flex-item seguimiento_pedidos_panel pedidos_pespunte" id="pespunte">
 		<h3>Pespunte</h3>
 		<hr/>

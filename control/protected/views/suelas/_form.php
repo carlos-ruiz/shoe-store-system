@@ -58,7 +58,7 @@
 						array_push($numerosSeleccionados, $suelaNumero->numero);
 					}
 				?>
-				<?php for ($i=12; $i < 32 ; $i++) { ?>
+				<?php for ($i=12; $i < 33 ; $i++) { ?>
 				<div class="form-group col-md-4 align-right">
 					<label for="SuelasNumeros_numero_<?= $i; ?>"><?= $i; ?></label>
 					<div class="input-group inline-block">

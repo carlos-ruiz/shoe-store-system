@@ -85,6 +85,11 @@ class TaconesController extends Controller
 					$suelaTacon->id_tacones = $model->id;
 					$suelaTacon->save();
 				}
+				$taconNumero = new TaconesNumeros;
+				$taconNumero->numero = 0;
+				$taconNumero->id_tacones = $model->id;
+				$taconNumero->save();
+
 				$this->redirect(array('view','id'=>$model->id));
 			}
 		}
@@ -137,7 +142,7 @@ class TaconesController extends Controller
 						}
 					}
 					foreach ($model->taconesNumeros as $taconNumero) {
-						if(!in_array($taconNumero->numero, $ids_numeros_seleccionados)){
+						if(!in_array($taconNumero->numero, $ids_numeros_seleccionados) && $taconNumero->numero!=0){
 							foreach ($taconNumero->suelasTaconesNumeros as $suelaTaconNumero) {
 								$suelaTaconNumero->delete();
 							}
@@ -172,6 +177,13 @@ class TaconesController extends Controller
 						$suelaNumero->numero = $numero;
 						$suelaNumero->id_tacones = $model->id;
 						$suelaNumero->save();
+					}
+					$taconNumeroCero = TaconesNumeros::model()->find('numero="0" AND id_tacones=?', array($model->id));
+					if (!isset($taconNumeroCero)) {
+						$taconNumero = new TaconesNumeros;
+						$taconNumero->numero = 0;
+						$taconNumero->id_tacones = $model->id;
+						$taconNumero->save();
 					}
 					foreach ($ids_suelas_seleccioandas as $id_suela) {
 						$suelaTacon = new SuelasTacones;

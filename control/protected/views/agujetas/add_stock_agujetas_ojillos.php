@@ -57,12 +57,12 @@
 											<input type="hidden" name="Inventario[agujeta][<?= $time ?>][id_color]" value="<?= $agujetaColor->color->id ?>">
 										</td>
 										<td>
-											<input class="input-cantidad" type="number" name="Inventario[agujeta][<?= $time ?>][cantidad]" min="0" max="9999" step="0.1" value="0"/>
+											<input class="input-cantidad" type="number" name="Inventario[agujeta][<?= $time ?>][cantidad]" min="0" value="0"/>
 										</td>
 										<td>
-											<input class="input-stock" type="number" name="Inventario[agujeta][<?= $time ?>][stock]" min="0" max="9999" step="0.1" value="<?= $stock ?>"/>
+											<input class="input-stock" type="number" name="Inventario[agujeta][<?= $time ?>][stock]" min="0" value="<?= $stock ?>"/>
 										</td>
-										<td>Millares</td>
+										<td>Piezas</td>
 										<td>
 											<input class="input-precio" type="number" name="Inventario[agujeta][<?= $time ?>][precio]" min="0" max="9999" step="0.001" value="<?= $precioActual ?>"/>
 										</td>
@@ -93,12 +93,12 @@
 											<input type="hidden" name="Inventario[ojillo][<?= $time ?>][id_color]" value="<?= $ojilloColor->color->id ?>">
 										</td>
 										<td>
-											<input class="input-cantidad" type="number" name="Inventario[ojillo][<?= $time ?>][cantidad]" min="0" max="9999" step="0.1" value="0"/>
+											<input class="input-cantidad" type="number" name="Inventario[ojillo][<?= $time ?>][cantidad]" min="0" value="0"/>
 										</td>
 										<td>
-											<input class="input-stock" type="number" name="Inventario[ojillo][<?= $time ?>][stock]" min="0" max="9999" step="0.1" value="<?= $stock ?>"/>
+											<input class="input-stock" type="number" name="Inventario[ojillo][<?= $time ?>][stock]" min="0" value="<?= $stock ?>"/>
 										</td>
-										<td>Millares</td>
+										<td>Piezas</td>
 										<td>
 											<input class="input-precio" type="number" name="Inventario[ojillo][<?= $time ?>][precio]" min="0" max="9999" step="0.001" value="<?= $precioActual ?>"/>
 										</td>

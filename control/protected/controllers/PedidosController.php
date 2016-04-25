@@ -478,6 +478,23 @@ class PedidosController extends Controller
 			}
 			if ($model->estatus->nombre == 'Pendiente') {
 				foreach ($model->materialesApartados as $materialApartado) {
+					$query = "id_tipos_articulos_inventario=? AND id_articulo=?";
+					$params = array($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+					if (isset($materialApartado->id_colores)) {
+						$query .= " AND id_colores=?";
+						array_push($params, $materialApartado->id_colores);
+					}
+					if (isset($materialApartado->numero)) {
+						$query .= " AND numero=?";
+						array_push($params, $materialApartado->numero);
+					}
+					$inventario = Inventarios::model()->find($query, $params);
+					if (isset($inventario)) {
+						if ($inventario->cantidad_apartada > 0) {
+							$inventario->cantidad_apartada -= $materialApartado->cantidad_apartada;
+							$inventario->save();
+						}
+					}
 					$materialApartado->delete();
 				}
 				foreach ($model->pagos as $pago) {

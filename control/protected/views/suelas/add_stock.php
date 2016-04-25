@@ -40,7 +40,7 @@
 							<tr>
 								<th>Suela</th>
 								<th>Color</th>
-								<?php for ($i=12; $i < 32 ; $i++) { ?>
+								<?php for ($i=12; $i < 33 ; $i++) { ?>
 								<th><?= $i ?></th>
 								<?php } ?>
 							</tr>
@@ -64,7 +64,7 @@
 									<td class="color" data-id="<?= $row['id_color'] ?>">
 										<?= $row['color'] ?>
 									</td>
-									<?php for ($i=12; $i < 32; $i++) { ?>
+									<?php for ($i=12; $i < 33; $i++) { ?>
 										<td data-numero="<?= $i ?>">
 											<input class="input-cantidad" type="text" name="Inventario[numeros][<?= $time ?>][<?= $i ?>]" size="1" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'";} ?>/>
 										</td>

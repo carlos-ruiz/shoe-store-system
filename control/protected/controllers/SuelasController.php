@@ -149,7 +149,7 @@ class SuelasController extends Controller
 						}
 					}
 					foreach ($model->suelaNumeros as $suelaNumero) {
-						if(!in_array($suelaNumero->numero, $numeros_actuales)){
+						if(!in_array($suelaNumero->numero, $numeros_actuales) && $suelaNumero->numero!=0){
 							foreach ($suelaNumero->suelasTaconesNumeros as $stn) {
 								$stn->delete();
 							}
@@ -172,10 +172,13 @@ class SuelasController extends Controller
 							$suelaNumero->id_suelas = $model->id;
 							$suelaNumero->save();
 						}
-						$suelaNumero = new SuelasNumeros;
-						$suelaNumero->numero = 0;
-						$suelaNumero->id_suelas = $model->id;
-						$suelaNumero->save();
+						$suelaNumeroCero = SuelasNumeros::model()->find('numero=? AND id_suelas=?', array($suelaNumero->numero, $model->id));
+						if (!isset($suelaNumeroCero)) {
+							$suelaNumero = new SuelasNumeros;
+							$suelaNumero->numero = 0;
+							$suelaNumero->id_suelas = $model->id;
+							$suelaNumero->save();
+						}
 						
 						$transaction->commit();
 						$this->redirect(array('view','id'=>$model->id));
@@ -361,7 +364,7 @@ class SuelasController extends Controller
 				}
 			}
 			elseif ($tipo_precio == 'precio_grande') {
-				if($suelaNumero->numero >= 25 && $suelaNumero->numero < 32){
+				if($suelaNumero->numero >= 25 && $suelaNumero->numero < 33){
 					$inventario->ultimo_precio = $precio;
 				}
 			}
