@@ -25,7 +25,7 @@
 					<?php
 						$htmlOptions = array(
 							"class" => "form-control",
-							"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+							"empty"=>array(''=>"Seleccione una opci&oacute;n"),
 						);
 					?>
 					<?php echo $form->dropDownList($model,'id_modelos',Modelos::model()->obtenerModelos(), $htmlOptions); ?>
@@ -50,7 +50,7 @@
 										"update"=>"#ModelosMaterialesPredeterminados_id_color_suela"
 									),
 									"class" => "form-control input-medium select2me",
-									"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+									"empty"=>array(''=>"Seleccione una opci&oacute;n"),
 								);
 					?>
 					<?php echo $form->dropDownList($model,'id_suelas', Modelos::model()->obtenerSuelas(isset($model->id_modelos)?$model->id_modelos:0), $htmlOptionsAjax); ?>
@@ -66,6 +66,7 @@
 			</div>
 		</div>
 
+
 		<div class="row" id="agujetas_ojillos_panel">
 			<div class="form-group col-md-3 <?php if($form->error($model,'id_agujetas')!=''){ echo 'has-error'; }?>">
 				<?php echo $form->labelEx($model,'id_agujetas', array('class'=>'control-label')); ?>
@@ -78,7 +79,7 @@
 										"update"=>"#ModelosMaterialesPredeterminados_id_color_agujetas"
 									),
 									"class" => "form-control input-medium select2me",
-									"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+									"empty"=>array(''=>"Seleccione una opci&oacute;n"),
 								);
 					?>
 					<?php echo $form->dropDownList($model,'id_agujetas',CHtml::listData(Agujetas::model()->findAll(), 'id', 'nombre'), $htmlOptionsAjax); ?>
@@ -104,7 +105,7 @@
 										"update"=>"#ModelosMaterialesPredeterminados_id_color_ojillos"
 									),
 									"class" => "form-control input-medium select2me",
-									"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+									"empty"=>array(''=>"Seleccione una opci&oacute;n"),
 								);
 					?>
 					<?php echo $form->dropDownList($model,'id_ojillos',CHtml::listData(Ojillos::model()->findAll(), 'id', 'nombre'), $htmlOptionsAjax); ?>
@@ -132,7 +133,7 @@
 										"update"=>"#ModelosMaterialesPredeterminados_id_color_tacon"
 									),
 									"class" => "form-control input-medium select2me",
-									"empty"=>array('0'=>"Seleccione una opci&oacute;n"),
+									"empty"=>array(''=>"Seleccione una opci&oacute;n"),
 								);
 					?>
 					<?php echo $form->dropDownList($model,'id_tacones', SuelasTacones::model()->obtenerTaconesPorSuela(isset($model->id_suelas)?$model->id_suelas:0), $htmlOptionsAjax); ?>
@@ -203,32 +204,37 @@
 	jQuery(function($) {
 		jQuery('body').on('change','#ModelosMaterialesPredeterminados_id_modelos',function(){
 			id_modelo = $(this).val();
-			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),
-				'success':function(html){
-					jQuery("#ModelosMaterialesPredeterminados_id_color_modelo").html(html);
-					actualizarMaterialesDeColores(id_modelo);
-				}
-			});
-			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
-					jQuery("#ModelosMaterialesPredeterminados_id_suelas").html(html);
-					actualizarDatosDependientesDeSuela();
-				}
-			});
-			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiTieneAgujetas','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
-					if (html == 'true') {
-						$('#agujetas_ojillos_panel').show(500);
-						modeloTieneAgujetas = true;
+			if (id_modelo > 0) {
+				jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),
+					'success':function(html){
+						jQuery("#ModelosMaterialesPredeterminados_id_color_modelo").html(html);
+						actualizarMaterialesDeColores(id_modelo);
 					}
-					else{
-						$('#agujetas_ojillos_panel').hide(500);
-						$('#ModelosMaterialesPredeterminados_id_agujetas').val(0);
-						$('#ModelosMaterialesPredeterminados_id_color_agujetas').val(0);
-						$('#ModelosMaterialesPredeterminados_id_ojillos').val(0);
-						$('#ModelosMaterialesPredeterminados_id_color_ojillos').val(0);
-						modeloTieneAgujetas = false;
+				});
+				jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+						jQuery("#ModelosMaterialesPredeterminados_id_suelas").html(html);
+						actualizarDatosDependientesDeSuela();
 					}
-				}
-			});
+				});
+				jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiTieneAgujetas','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+						if (html == 'true') {
+							$('#agujetas_ojillos_panel').show(500);
+							modeloTieneAgujetas = true;
+						}
+						else{
+							$('#agujetas_ojillos_panel').hide(500);
+							$('#ModelosMaterialesPredeterminados_id_agujetas').val(0);
+							$('#ModelosMaterialesPredeterminados_id_color_agujetas').val(0);
+							$('#ModelosMaterialesPredeterminados_id_ojillos').val(0);
+							$('#ModelosMaterialesPredeterminados_id_color_ojillos').val(0);
+							modeloTieneAgujetas = false;
+						}
+					}
+				});
+			}
+			else{
+				restablecerSelectsPrincipales();
+			}
 			return false;
 		});
 
@@ -284,5 +290,15 @@
 				jQuery("#materiales_con_color").html(response);
 			}
 		});
+	}
+
+	function restablecerSelectsPrincipales(){
+		$('#ModelosMaterialesPredeterminados_id_color_modelo').html('<option value>Seleccione una opción</option>');
+		$('#ModelosMaterialesPredeterminados_id_suelas').html('<option value>Seleccione una opción</option>');
+		$('#ModelosMaterialesPredeterminados_id_color_suela').html('<option value>Seleccione una opción</option>');
+		$('#agujetas_ojillos_panel').hide(500);
+		$('#tacones_panel').hide(500);
+		$('#materiales_con_color').html('');
+		$('#materiales_con_color').hide(500);
 	}
 </script>

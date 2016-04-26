@@ -234,7 +234,7 @@ class AgujetasController extends Controller
 			if(isset($_POST['Inventario']['agujeta'])){
 				$tipoArticulo = TiposArticulosInventario::model()->find('tipo="Agujetas"');
 				foreach ($_POST['Inventario']['agujeta'] as $clave => $datos) {
-					if($datos['cantidad'] > 0){
+					if($datos['cantidad'] >= 0){
 						$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=?', array($tipoArticulo->id, $datos['id'], $datos['id_color']));
 						if (!isset($inventario)) {
 							$inventario = new Inventarios;
@@ -244,7 +244,7 @@ class AgujetasController extends Controller
 							$inventario->id_colores = $datos['id_color'];
 							$inventario->cantidad_existente = 0;
 							$inventario->cantidad_apartada = 0;
-							$inventario->unidad_medida = 'Millares';
+							$inventario->unidad_medida = 'Piezas';
 						}
 						$inventario->ultimo_precio = $datos['precio'];
 						$inventario->stock_minimo = $datos['stock'];
@@ -256,7 +256,7 @@ class AgujetasController extends Controller
 			if(isset($_POST['Inventario']['ojillo'])){
 				$tipoArticulo = TiposArticulosInventario::model()->find('tipo="Ojillos"');
 				foreach ($_POST['Inventario']['ojillo'] as $clave => $datos) {
-					if($datos['cantidad'] > 0){
+					if($datos['cantidad'] >= 0){
 						$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=?', array($tipoArticulo->id, $datos['id'], $datos['id_color']));
 						if (!isset($inventario)) {
 							$inventario = new Inventarios;
@@ -266,7 +266,7 @@ class AgujetasController extends Controller
 							$inventario->id_colores = $datos['id_color'];
 							$inventario->cantidad_existente = 0;
 							$inventario->cantidad_apartada = 0;
-							$inventario->unidad_medida = 'Millares';
+							$inventario->unidad_medida = 'Piezas';
 						}
 						$inventario->ultimo_precio = $datos['precio'];
 						$inventario->stock_minimo = $datos['stock'];

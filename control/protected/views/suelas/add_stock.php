@@ -66,7 +66,10 @@
 									</td>
 									<?php for ($i=12; $i < 33; $i++) { ?>
 										<td data-numero="<?= $i ?>">
-											<input class="input-cantidad" type="text" name="Inventario[numeros][<?= $time ?>][<?= $i ?>]" size="1" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'";} ?>/>
+										<?php if(in_array($i, $numerosPosibles)) { ?>
+											<input class="input-cantidad" title="<?= $i ?>" type="text" name="Inventario[numeros][<?= $time ?>][<?= $i ?>]" size="1" <?php echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'"; ?>/>
+										<?php }
+										else{ echo " - ";} ?>
 										</td>
 									<?php } ?>
 								</tr>

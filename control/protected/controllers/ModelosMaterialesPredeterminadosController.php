@@ -63,7 +63,34 @@ class ModelosMaterialesPredeterminadosController extends Controller
 		if(isset($_POST['ModelosMaterialesPredeterminados']))
 		{
 			$datos = $_POST['ModelosMaterialesPredeterminados'];
-			$model->attributes=$_POST['ModelosMaterialesPredeterminados'];
+			// print_r($datos);
+			// return;
+			// $model->attributes=$_POST['ModelosMaterialesPredeterminados'];
+			$model->id_modelos = $datos['id_modelos'];
+			$model->id_color_modelo = $datos['id_color_modelo'];
+			$model->id_suelas = $datos['id_suelas'];
+			$model->id_color_suela = $datos['id_color_suela'];
+			if (isset($datos['id_tacones'])) {
+				$model->id_tacones = $datos['id_tacones'];
+				$model->id_color_tacon = $datos['id_color_tacon'];
+			}
+			if (isset($datos['id_agujetas'])) {
+				$model->id_agujetas = $datos['id_agujetas'];
+				$model->id_color_agujetas = $datos['id_color_agujetas'];
+				$model->id_ojillos = $datos['id_ojillos'];
+				$model->id_color_ojillos = $datos['id_color_ojillos'];
+			}
+			if (!$datos['id_modelos']>0 || 
+				!$datos['id_color_modelo']>0 ||
+				!$datos['id_suelas']>0 ||
+				!$datos['id_color_suela']>0) {
+				$model->validate();
+				$this->render('create',array(
+					'model'=>$model,
+				));
+				return;
+			}
+
 			$modeloColor = ModelosColores::model()->find('id_modelos=:modelo AND id_colores=:color', array('modelo'=>$datos['id_modelos'], 'color'=>$datos['id_color_modelo']));
 			$suelaColor = SuelasColores::model()->find('id_suelas=:suela AND id_colores=:color', array('suela'=>$datos['id_suelas'], 'color'=>$datos['id_color_suela']));
 			$model->id_modelos_colores = $modeloColor->id;
@@ -82,7 +109,7 @@ class ModelosMaterialesPredeterminadosController extends Controller
 				$model->id_ojillos_colores = $ojillosColor->id;
 			}
 
-			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?' , $model->id_modelos_colores);
+			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?', array($model->id_modelos_colores));
 			
 			if (isset($configuracionExistente)) {
 				foreach ($configuracionExistente->materialesColoresPredeterminados as $mcp) {

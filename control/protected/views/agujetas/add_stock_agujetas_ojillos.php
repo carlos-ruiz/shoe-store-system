@@ -57,14 +57,14 @@
 											<input type="hidden" name="Inventario[agujeta][<?= $time ?>][id_color]" value="<?= $agujetaColor->color->id ?>">
 										</td>
 										<td>
-											<input class="input-cantidad" type="number" name="Inventario[agujeta][<?= $time ?>][cantidad]" min="0" value="0"/>
+											<input class="input-cantidad" type="number" name="Inventario[agujeta][<?= $time ?>][cantidad]" min="0" required value="0"/>
 										</td>
 										<td>
-											<input class="input-stock" type="number" name="Inventario[agujeta][<?= $time ?>][stock]" min="0" value="<?= $stock ?>"/>
+											<input class="input-stock" type="number" name="Inventario[agujeta][<?= $time ?>][stock]" min="0" value="<?= $stock ?>" required/>
 										</td>
 										<td>Piezas</td>
 										<td>
-											<input class="input-precio" type="number" name="Inventario[agujeta][<?= $time ?>][precio]" min="0" max="9999" step="0.001" value="<?= $precioActual ?>"/>
+											<input class="input-precio" type="number" name="Inventario[agujeta][<?= $time ?>][precio]" min="0" max="9999" step="0.001" value="<?= $precioActual ?>" required/>
 										</td>
 									</tr>
 							<?php
