@@ -56,6 +56,7 @@ class ModelosMaterialesPredeterminadosController extends Controller
 	public function actionCreate()
 	{
 		$model=new ModelosMaterialesPredeterminados('nuevo');
+		$errores = '';
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -109,6 +110,22 @@ class ModelosMaterialesPredeterminadosController extends Controller
 				$model->id_ojillos_colores = $ojillosColor->id;
 			}
 
+			if ($this->revisarSiTieneAgujetas($model->id_modelos) && (!isset($model->id_agujetas_colores) || !isset($model->id_ojillos_colores))) {
+				$errores .= 'Debe especificar las agujetas y ojillos<br/>';
+			}
+			if ($this->revisarSiSuelaTieneTacon($model->id_suelas) && !isset($model->id_tacones_colores)) {
+				$errores .= 'Debe especificar el tacón<br/>';
+			}
+
+			if (strlen($errores)>0) {
+				$model = new ModelosMaterialesPredeterminados('nuevo');
+				$this->render('create',array(
+					'model'=>$model,
+				));
+				$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>$errores, 'titulo'=>"Error"));
+				return;
+			}
+
 			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=?', array($model->id_modelos_colores));
 			
 			if (isset($configuracionExistente)) {
@@ -146,6 +163,7 @@ class ModelosMaterialesPredeterminadosController extends Controller
 	 */
 	public function actionUpdate($id)
 	{
+		$errores = '';
 		$model=$this->loadModel($id);
 
 		$model->id_modelos = $model->modeloColor->id_modelos;
@@ -172,7 +190,30 @@ class ModelosMaterialesPredeterminadosController extends Controller
 		{
 			// $transaction = Yii::app()->db->beginTransaction();
 			$datos = $_POST['ModelosMaterialesPredeterminados'];
-			$model->attributes=$_POST['ModelosMaterialesPredeterminados'];
+			$model->id_modelos = $datos['id_modelos'];
+			$model->id_color_modelo = $datos['id_color_modelo'];
+			$model->id_suelas = $datos['id_suelas'];
+			$model->id_color_suela = $datos['id_color_suela'];
+			if (isset($datos['id_tacones'])) {
+				$model->id_tacones = $datos['id_tacones'];
+				$model->id_color_tacon = $datos['id_color_tacon'];
+			}
+			if (isset($datos['id_agujetas'])) {
+				$model->id_agujetas = $datos['id_agujetas'];
+				$model->id_color_agujetas = $datos['id_color_agujetas'];
+				$model->id_ojillos = $datos['id_ojillos'];
+				$model->id_color_ojillos = $datos['id_color_ojillos'];
+			}
+			if (!$datos['id_modelos']>0 || 
+				!$datos['id_color_modelo']>0 ||
+				!$datos['id_suelas']>0 ||
+				!$datos['id_color_suela']>0) {
+				$model->validate();
+				$this->render('update',array(
+					'model'=>$model,
+				));
+				return;
+			}
 			$modeloColor = ModelosColores::model()->find('id_modelos=:modelo AND id_colores=:color', array('modelo'=>$datos['id_modelos'], 'color'=>$datos['id_color_modelo']));
 			$suelaColor = SuelasColores::model()->find('id_suelas=:suela AND id_colores=:color', array('suela'=>$datos['id_suelas'], 'color'=>$datos['id_color_suela']));
 			$model->id_modelos_colores = $modeloColor->id;
@@ -189,6 +230,21 @@ class ModelosMaterialesPredeterminadosController extends Controller
 			if (isset($datos['id_ojillos']) && $datos['id_ojillos'] && isset($datos['id_color_ojillos']) && $datos['id_color_ojillos']) {
 				$ojillosColor = OjillosColores::model()->find('id_ojillos=? AND id_colores=?', array($datos['id_ojillos'], $datos['id_color_ojillos']));
 				$model->id_ojillos_colores = $ojillosColor->id;
+			}
+
+			if ($this->revisarSiTieneAgujetas($model->id_modelos) && (!isset($model->id_agujetas_colores) || !isset($model->id_ojillos_colores))) {
+				$errores .= 'Debe especificar las agujetas y ojillos<br/>';
+			}
+			if ($this->revisarSiSuelaTieneTacon($model->id_suelas) && !isset($model->id_tacones_colores)) {
+				$errores .= 'Debe especificar el tacón<br/>';
+			}
+
+			if (strlen($errores)>0) {
+				$this->render('update',array(
+					'model'=>$model,
+				));
+				$this->renderPartial('/layouts/_modal-alert', array('mensaje'=>$errores, 'titulo'=>"Error"));
+				return;
 			}
 			
 			$configuracionExistente = ModelosMaterialesPredeterminados::model()->find('id_modelos_colores=? AND id!=?' , array($model->id_modelos_colores, $model->id));
@@ -350,25 +406,45 @@ class ModelosMaterialesPredeterminadosController extends Controller
 	public function actionRevisarSiTieneAgujetas()
 	{
 		$id_modelo = $_POST['ModelosMaterialesPredeterminados']['id_modelos'];
+		if($this->revisarSiTieneAgujetas($id_modelo)){
+			echo "true";
+		}
+		else{
+			echo "false";
+		}
+	}
+
+	public function revisarSiTieneAgujetas($id_modelo)
+	{
 		$modelo = Modelos::model()->findByPk($id_modelo);
 		$materialAgujeta = Materiales::model()->find('nombre=?', array('Agujetas'));
 		$materialOjillos = Materiales::model()->find('nombre=?', array('Ojillos'));
 		$modeloMaterial = ModelosMateriales::model()->find('id_modelos=? AND (id_materiales=? OR id_materiales=? )', array($modelo->id, $materialAgujeta->id, $materialOjillos->id));
 		if (isset($modeloMaterial)) {
-			echo 'true';
+			return true;
 		}else{
-			echo 'false';
+			return false;
 		}
 	}
 
 	public function actionRevisarSiSuelaTieneTacon()
 	{
 		$id_suela = $_POST['ModelosMaterialesPredeterminados']['id_suelas'];
+		if($this->revisarSiSuelaTieneTacon($id_suela)){
+			echo "true";
+		}
+		else{
+			echo "false";
+		}
+	}
+
+	public function revisarSiSuelaTieneTacon($id_suela)
+	{
 		$suelaTacones = SuelasTacones::model()->find('id_suelas=?', array($id_suela));
 		if (isset($suelaTacones)) {
-			echo 'true';
+			return true;
 		}else{
-			echo 'false';
+			return false;
 		}
 	}
 

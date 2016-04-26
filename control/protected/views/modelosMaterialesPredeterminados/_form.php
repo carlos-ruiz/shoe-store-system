@@ -186,19 +186,45 @@
 	var modeloTieneAgujetas = false;
 	var suelaTieneTacon = false;
 
+
 	$(document).ready(function(){
-		id_agujeta = $('#ModelosMaterialesPredeterminados_id_agujetas').val();
-		id_color_agujeta = $('#ModelosMaterialesPredeterminados_id_color_agujetas').val();
-		id_ojillo = $('#ModelosMaterialesPredeterminados_id_ojillos').val();
-		id_color_ojillo = $('#ModelosMaterialesPredeterminados_id_color_ojillos').val();
-		id_tacon = $('#ModelosMaterialesPredeterminados_id_tacones').val();
-		id_color_tacon = $('#ModelosMaterialesPredeterminados_id_color_tacon').val();
-		if (id_agujeta>0 && id_color_agujeta>0 && id_ojillo>0 && id_color_ojillo) {
-			$('#agujetas_ojillos_panel').css('display', 'block');
+		id_modelo = $('#ModelosMaterialesPredeterminados_id_modelos').val();
+		if (id_modelo > 0) {
+			jQuery.ajax({
+				'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiTieneAgujetas',
+				'type':'POST',
+				'cache':false,
+				'data':jQuery("#modelos-materiales-predeterminados-form").serialize(),
+				'success':function(html){
+						if (html == 'true') {
+							$('#agujetas_ojillos_panel').show(500);
+							modeloTieneAgujetas = true;
+						}
+					}
+				});
 		}
-		if (id_tacon>0 && id_color_tacon>0) {
-			$('#tacones_panel').css('display', 'block');
+		id_suela = $('#ModelosMaterialesPredeterminados_id_suelas').val();
+		if (id_suela > 0) {
+			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiSuelaTieneTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){
+					if (html == 'true') {
+						$('#tacones_panel').show(500);
+						suelaTieneTacon = true;
+					}
+				}
+			});
 		}
+		// id_agujeta = $('#ModelosMaterialesPredeterminados_id_agujetas').val();
+		// id_color_agujeta = $('#ModelosMaterialesPredeterminados_id_color_agujetas').val();
+		// id_ojillo = $('#ModelosMaterialesPredeterminados_id_ojillos').val();
+		// id_color_ojillo = $('#ModelosMaterialesPredeterminados_id_color_ojillos').val();
+		// id_tacon = $('#ModelosMaterialesPredeterminados_id_tacones').val();
+		// id_color_tacon = $('#ModelosMaterialesPredeterminados_id_color_tacon').val();
+		// if (id_agujeta>0 && id_color_agujeta>0 && id_ojillo>0 && id_color_ojillo>0) {
+		// 	$('#agujetas_ojillos_panel').css('display', 'block');
+		// }
+		// if (id_tacon>0 && id_color_tacon>0) {
+		// 	$('#tacones_panel').css('display', 'block');
+		// }
 	});
 
 	jQuery(function($) {

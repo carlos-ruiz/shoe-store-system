@@ -1139,7 +1139,7 @@ class PedidosController extends Controller
 					if (isset($materialApartado->numero)) {
 						$errores .= ", numero: ".$materialApartado->numero; 
 					}
-					$errores .= ' en el inventario|';
+					$errores .= ' en el inventario<br/>';
 					continue;
 				}
 

@@ -727,6 +727,11 @@
 
 	function establecerMaterialesPredeterminados(datos_json){
 		id_modelo = datos_json.id_modelo;
+		if (!id_modelo > 0) {
+			limpiarCamposOrden();
+			alerta("Debe definir los materiales predeterminados para el modelo y color seleccionados");
+			return;
+		}
 		id_color_modelo = datos_json.id_color_modelo;
 		id_suela = datos_json.id_suela;
 		id_color_suela = datos_json.id_color_suela;
