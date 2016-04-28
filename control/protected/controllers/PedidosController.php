@@ -529,10 +529,6 @@ class PedidosController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		if (isset($_GET['mensaje'])) {
-			echo "mensaje: ".$_GET['mensaje'];
-			print_r($_GET['mensaje']);return;
-		}
 		$model=new Pedidos('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Pedidos']))
@@ -624,9 +620,9 @@ class PedidosController extends Controller
 	{
 		$list = SuelasColores::model()->findAll("id_suelas=?",array($_POST["PedidosZapatos"]["id_suelas"]));
 		echo "<option value=\"0\">Seleccione una opción</option>";
-		foreach($list as $i => $data){
+		foreach($list as $i => $data)
 			echo "<option value=\"{$data->color->id}\"".($i==0?'selected':'').">{$data->color->color}</option>";
-		}
+
 	}
 
 	/**
@@ -1120,7 +1116,9 @@ class PedidosController extends Controller
 	{
 		$pedido = $this->loadModel($id_pedido);
 		$transaction = Yii::app()->db->beginTransaction();
+
 		$errores = 'false';
+
 		try{
 			foreach ($pedido->materialesApartados as $materialApartado) {
 				$consulta = 'id_tipos_articulos_inventario=? AND id_articulo=?';
