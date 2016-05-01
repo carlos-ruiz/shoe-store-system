@@ -851,7 +851,11 @@ class PedidosController extends Controller
 
 				if($materialTieneColores){
 					$materialColorPredeterminado = MaterialesColoresPredeterminados::model()->find('id_modelos_materiales_predeterminados=? AND id_materiales=?', array($modeloMaterialPredeterminado->id, $modeloMaterial->id_materiales));
-				
+					echo "<br/>material: ".$modeloMaterial->material->nombre."<br/>";
+					if(!isset($materialColorPredeterminado)){
+						echo "<br/>No hay predeterminado<br/>";
+						return;
+					}
 					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id, $materialColorPredeterminado->id_colores));
 				}
 				if(!$materialTieneColores && !isset($materialApartado)){

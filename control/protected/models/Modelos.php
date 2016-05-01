@@ -97,6 +97,7 @@ class Modelos extends CActiveRecord
 		$criteria->compare('id',$this->id);
 		$criteria->compare('nombre',$this->nombre,true);
 		$criteria->compare('imagen',$this->imagen,true);
+		$criteria->compare('activo',1);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -115,7 +116,7 @@ class Modelos extends CActiveRecord
 	}
 
 	public function obtenerModelos(){
-		return CHtml::listData(Modelos::model()->findAll(array('order'=>'nombre')), 'id', 'nombre');
+		return CHtml::listData(Modelos::model()->findAll(array('condition'=>'activo=1','order'=>'nombre')), 'id', 'nombre');
 	}
 
 	public function obtenerSuelas($id_modelos){

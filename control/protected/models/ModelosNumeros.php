@@ -47,6 +47,7 @@ class ModelosNumeros extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'modelo' => array(self::BELONGS_TO, 'Modelos', 'id_modelos'),
+			'suelasNumeros' => array(self::HAS_MANY, 'ModelosSuelasNumeros', 'id_modelos_numeros'),
 		);
 	}
 

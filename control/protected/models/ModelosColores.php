@@ -50,6 +50,7 @@ class ModelosColores extends CActiveRecord
 			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
 			'modelo' => array(self::BELONGS_TO, 'Modelos', 'id_modelos'),
 			'zapatos' => array(self::HAS_MANY, 'Zapatos', 'id_modelos_colores'),
+			'materialesPredeterminados' => array(self::HAS_ONE, 'ModelosMaterialesPredeterminados', 'id_modelos_colores'),
 		);
 	}
 

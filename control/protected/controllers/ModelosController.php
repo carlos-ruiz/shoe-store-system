@@ -222,6 +222,14 @@ class ModelosController extends Controller
 				}
 				foreach ($model->modelosColores as $modeloColor) {
 					if (!in_array($modeloColor->color->id, $ids_colores_actuales)) {
+						if (isset($modeloColor->materialesPredeterminados)) {
+							if (isset($modeloColor->materialesPredeterminados->materialesColoresPredeterminados)) {
+								foreach ($modeloColor->materialesPredeterminados->materialesColoresPredeterminados as $mcp) {
+									$mcp->delete();
+								}
+							}
+							$modeloColor->materialesPredeterminados->delete();
+						}
 						$modeloColor->delete();
 					}else{
 						$ids_colores_actuales = array_diff($ids_colores_actuales, array($modeloColor->color->id));
@@ -240,11 +248,20 @@ class ModelosController extends Controller
 				}
 				foreach ($model->modelosNumeros as $modeloNumero) {
 					if (!in_array($modeloNumero->numero, $numeros_actuales)) {
+						if (isset($modeloNumero->suelasNumeros)) {
+							foreach ($modeloNumero->suelasNumeros as $msn) {
+								$msn->delete();
+							}
+						}
 						$modeloNumero->delete();
 					}else{
 						$numeros_actuales = array_diff($numeros_actuales, array($modeloNumero->numero));
 					}
 				}
+
+				//variable para saber si hay que borrar materiales predeterminados
+				$borrarPredeterminados = false;
+
 				foreach ($model->modelosMateriales as $modeloMaterial) {
 					$modeloMaterial->delete();
 				}
@@ -326,19 +343,19 @@ class ModelosController extends Controller
 		$model = $this->loadModel($id);
 		$transaction = Yii::app()->db->beginTransaction();
 		try{
-			foreach ($model->modelosSuelas as $modeloSuela) {
-				$modeloSuela->delete();
+			foreach ($model->modelosColores as $mc) {
+				if (isset($mc->materialesPredeterminados)) {
+					if (isset($mc->materialesPredeterminados->materialesColoresPredeterminados)) {
+						foreach ($mc->materialesPredeterminados->materialesColoresPredeterminados as $mcp) {
+							$mcp->delete();
+						}
+					}
+					$mc->materialesPredeterminados->delete();
+				}
 			}
-			foreach ($model->modelosColores as $modeloColor) {
-				$modeloColor->delete();
-			}
-			foreach ($model->modelosMateriales as $modeloMaterial) {
-				$modeloMaterial->delete();
-			}
-			foreach ($model->modelosNumeros as $modeloNumero) {
-				$modeloNumero->delete();
-			}
-			$model->delete();
+			$model->nombre = $model->nombre.' - eliminado';
+			$model->activo = 0;
+			$model->save();
 			$transaction->commit();
 		}catch(Exception $ex){
 			$transaction->rollback();
