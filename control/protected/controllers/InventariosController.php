@@ -16,7 +16,7 @@ class InventariosController extends Controller
 	{
 		return array(
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('index','view','create','update','admin','delete', 'agregarMaterial', 'agregarInsumo', 'unidadMedidaMaterial', 'agregarForm'),
+				'actions'=>array('index','view','create','update','admin','delete', 'agregarMaterial', 'agregarInsumo', 'unidadMedidaMaterial', 'agregarForm', 'descontarMaterial'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -165,7 +165,124 @@ class InventariosController extends Controller
 				$transaction->rollback();
 			}
 		}
-		$this->render('agregar_material', array('model'=>$model));
+		$this->render('agregar_material', array('model'=>$model, 'accion'=>'agregar'));
+	}
+
+	public function actionDescontarMaterial()
+	{
+		$model = new InventarioMateriales('agregarMaterial');
+		if(isset($_POST['InventarioMateriales'])){
+			$transaction = Yii::app()->db->beginTransaction();
+			try{
+				$model->attributes = $_POST['InventarioMateriales'];
+				
+				$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?', array('Materiales'));
+				$material = Materiales::model()->findByPk($model->id_materiales);
+				if (isset($material) && $material->nombre === 'Transfer' && isset($_POST['Transfer'])) {
+					foreach ($_POST['Transfer']['cantidad'] as $numero => $cantidad) {
+						if(isset($cantidad) && $cantidad > 0){
+							$existente = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND numero=?', array($tipoArticulo->id, $material->id, $numero));
+							if (!isset($existente)) {
+								$existente = new Inventarios;
+								$existente->id_tipos_articulos_inventario = $tipoArticulo->id;
+								$existente->id_articulo = $material->id;
+								$existente->nombre_articulo = $material->nombre;
+								$existente->numero = $numero;
+								$existente->cantidad_existente = 0;
+								$existente->cantidad_apartada = 0;
+								$existente->unidad_medida = $material->unidad_medida;
+							}
+							$existente->cantidad_existente -= $cantidad;
+							$existente->ultimo_precio = $_POST['Transfer']['precio'][''.$numero];
+							$existente->stock_minimo = $_POST['Transfer']['stock_minimo'][''.$numero];
+							$existente->save();
+						}
+					}
+				}
+				else if (isset($_POST['MaterialesColores'])) {
+					foreach ($_POST['MaterialesColores']['cantidad'] as $id_color => $cantidad) {
+						$inventarioMaterial = InventarioMateriales::model()->find('id_materiales=? AND id_colores=?', array($model->id_materiales, $id_color));
+						if (isset($inventarioMaterial)) {
+							$inventarioMaterial->existencia -= $cantidad;
+							$inventarioMaterial->stock_minimo = $_POST['MaterialesColores']['stock_minimo'][$id_color];
+							$inventarioMaterial->ultimo_precio = $_POST['MaterialesColores']['precio'][$id_color];
+							$inventarioMaterial->save();
+						}else{
+							$inventarioMaterial = new InventarioMateriales;
+							$inventarioMaterial->existencia = $cantidad;
+							$inventarioMaterial->cantidad_apartada = 0;
+							$inventarioMaterial->id_materiales = $model->id_materiales;
+							$inventarioMaterial->id_colores = $id_color;
+							$inventarioMaterial->stock_minimo = $_POST['MaterialesColores']['stock_minimo'][$id_color];
+							$inventarioMaterial->ultimo_precio = $_POST['MaterialesColores']['precio'][$id_color];
+							$inventarioMaterial->save();
+						}
+
+						// Agregando en el inventario general
+						$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=?', array($tipoArticulo->id, $model->id_materiales, $id_color));
+						if (!isset($inventario)) {
+							$inventario = new Inventarios;
+							$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+							$inventario->id_articulo = $model->id_materiales;
+							$inventario->id_colores = $id_color;
+							$inventario->cantidad_existente = 0;
+							$inventario->cantidad_apartada = 0;
+							$inventario->nombre_articulo = $model->material->nombre;
+							$inventario->unidad_medida = $model->material->unidad_medida;
+						}
+						$inventario->stock_minimo = $_POST['MaterialesColores']['stock_minimo'][$id_color];
+						$inventario->ultimo_precio = $_POST['MaterialesColores']['precio'][$id_color];
+						$inventario->cantidad_existente = $inventarioMaterial->existencia;
+						$inventario->save();
+					}
+				}else{
+					$model->existencia = 0; //Parche porque no se como permitir null solo en este contexto
+					if($model->validate()){
+						$existente = InventarioMateriales::model()->find('id_materiales=?', array($model->id_materiales));
+						if (isset($existente)) {
+							if (!isset($model->ultimo_precio) || !$model->ultimo_precio>0) {
+								$model->ultimo_precio = $existente->ultimo_precio;
+							}
+							if (!isset($model->stock_minimo) || !$model->stock_minimo>0) {
+								$model->stock_minimo = $existente->stock_minimo;
+							}
+							$existente->existencia -= $model->cantidad;
+							$existente->ultimo_precio = $model->ultimo_precio;
+							$existente->stock_minimo = $model->stock_minimo;
+							$existente->save();
+							$model->existencia = $existente->existencia;
+						}else{
+							$model->existencia = $model->cantidad;
+							$model->save();
+						}
+					}else{
+						echo "no validate";
+						print_r($model->getErrors());
+						return;
+					}
+
+					// Agregando al inventario general
+					$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=?', array($tipoArticulo->id, $model->id_materiales));
+					if (!isset($inventario)) {
+						$inventario = new Inventarios;
+						$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+						$inventario->id_articulo = $model->id_materiales;
+						$inventario->nombre_articulo = $model->material->nombre;
+						$inventario->unidad_medida = $model->material->unidad_medida;
+					}
+
+					$inventario->stock_minimo = $model->stock_minimo;
+					$inventario->ultimo_precio = $model->ultimo_precio;
+					$inventario->cantidad_existente = $model->existencia;
+					$inventario->save();
+				}
+				$transaction->commit();
+				$this->redirect(array('admin'));
+			}catch(Exception $ex){
+				$transaction->rollback();
+			}
+		}
+		$this->render('agregar_material', array('model'=>$model, 'accion'=>'descontar'));
 	}
 
 	public function actionAgregarInsumo()

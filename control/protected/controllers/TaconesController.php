@@ -30,7 +30,7 @@ class TaconesController extends Controller
 	{
 		return array(
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('index','view','create','update','admin','delete', 'agregarInventario', 'definirPrecios', 'actualizarPrecios'),
+				'actions'=>array('index','view','create','update','admin','delete', 'agregarInventario', 'definirPrecios', 'actualizarPrecios', 'descontarInventario'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -317,6 +317,54 @@ class TaconesController extends Controller
 		}
 		$this->render('add_stock',array(
 			'tacones'=>$tacones,
+			'accion'=>'agregar',
+		));
+	}
+
+	public function actionDescontarInventario()
+	{
+		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Tacones'));
+		$tacones = Tacones::model()->findAll();
+		if (isset($_POST['Inventario'])) {
+			if (isset($_POST['Tacones']['stock_minimo_general'])) {
+				$stock_minimo_suelas = $_POST['Tacones']['stock_minimo'];
+			}
+			if (isset($_POST['Inventario']['taconColor'])) {
+				$taconesColores = $_POST['Inventario']['taconColor'];
+				foreach ($taconesColores as $clave => $id_tacon_color) {
+					$taconColor = TaconesColores::model()->findByPk($id_tacon_color);
+					if (isset($_POST['Inventario']['numeros'][$clave])) {
+						$numeros = $_POST['Inventario']['numeros'][$clave];
+						foreach ($numeros as $numero => $cantidad) {
+							if($cantidad != 0){
+								$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=? AND numero=?', array($tipoArticulo->id, $taconColor->id_tacones, $taconColor->id_colores, $numero));
+								if (!isset($inventario)) {
+									$inventario = new Inventarios;
+									$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+									$inventario->id_articulo = $taconColor->id_tacones;
+									$inventario->nombre_articulo = $taconColor->tacon->nombre;
+									$inventario->id_colores = $taconColor->id_colores;
+									$inventario->numero = $numero;
+									$inventario->cantidad_existente = 0;
+									$inventario->cantidad_apartada = 0;
+									$inventario->unidad_medida = 'Pares';
+									$inventario->ultimo_precio = 0;
+								}
+								if (isset($stock_minimo_suelas)) {
+									$inventario->stock_minimo = $stock_minimo_suelas;
+								}
+								$inventario->cantidad_existente -= $cantidad;
+								$inventario->save();
+							}
+						}
+					}
+				}
+				$this->redirect(array('inventarios/admin'));
+			}
+		}
+		$this->render('add_stock',array(
+			'tacones'=>$tacones,
+			'accion'=>'descontar',
 		));
 	}
 

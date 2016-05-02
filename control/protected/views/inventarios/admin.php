@@ -14,15 +14,19 @@
 			<?php echo CHtml::link('<i class="fa fa-plus"></i> Tacones', array('tacones/agregarInventario'), array('class'=>'btn btn-red-stripped')); ?>
 			<?php echo CHtml::link('<i class="fa fa-plus"></i> Agujetas y ojillos', array('agujetas/agregarInventario'), array('class'=>'btn btn-red-stripped')); ?>
 			<?php echo CHtml::link('<i class="fa fa-plus"></i> Materiales', array('inventarios/agregarMaterial'), array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::link('<i class="fa fa-minus"></i> Descontar', array('#'), array('class'=>'btn btn-red-stripped remove-button')); ?>
+		</div>
+		<div class="inline-block remove-stock">
+			<h5>Dar de baja del inventario</h5>
+			<?php echo CHtml::link('<i class="fa fa-minus"></i> Suelas', array('suelas/descontarInventario'), array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::link('<i class="fa fa-minus"></i> Tacones', array('tacones/descontarInventario'), array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::link('<i class="fa fa-minus"></i> Agujetas y ojillos', array('agujetas/descontarInventario'), array('class'=>'btn btn-red-stripped')); ?>
+			<?php echo CHtml::link('<i class="fa fa-minus"></i> Materiales', array('inventarios/descontarMaterial'), array('class'=>'btn btn-red-stripped')); ?>
 		</div>
 	</div>
 </div>
 <br/>
 <hr/>
-
-<!-- <div class="text-right">
-	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nuevo registro', array('inventarios/create'), array('class'=>'btn btn-red-stripped')); ?>
-</div> -->
 
 <?php $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'modelos-grid',
@@ -57,3 +61,10 @@
 		// ),
 	),
 )); ?>
+
+<script type="text/javascript">
+	$('.remove-button').click(function(){
+		$('.remove-stock').toggle();
+		return false;
+	});
+</script>

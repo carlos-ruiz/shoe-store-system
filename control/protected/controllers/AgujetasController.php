@@ -30,7 +30,7 @@ class AgujetasController extends Controller
 	{
 		return array(
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('index','view','create','update','admin','delete', 'agregarInventario'),
+				'actions'=>array('index','view','create','update','admin','delete', 'agregarInventario', 'descontarInventario'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -282,6 +282,69 @@ class AgujetasController extends Controller
 			array(
 				'agujetas' => $agujetas,
 				'ojillos' => $ojillos,
+				'accion' => 'agregar',
+			)
+		);
+	}
+
+	public function actionDescontarInventario()
+	{
+		$agujetas = Agujetas::model()->findAll();
+		$ojillos = Ojillos::model()->findAll();
+
+		if (isset($_POST['Inventario'])) {
+			if(isset($_POST['Inventario']['agujeta'])){
+				$tipoArticulo = TiposArticulosInventario::model()->find('tipo="Agujetas"');
+				foreach ($_POST['Inventario']['agujeta'] as $clave => $datos) {
+					if($datos['cantidad'] >= 0){
+						$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=?', array($tipoArticulo->id, $datos['id'], $datos['id_color']));
+						if (!isset($inventario)) {
+							$inventario = new Inventarios;
+							$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+							$inventario->id_articulo = $datos['id'];
+							$inventario->nombre_articulo = $datos['nombre'];
+							$inventario->id_colores = $datos['id_color'];
+							$inventario->cantidad_existente = 0;
+							$inventario->cantidad_apartada = 0;
+							$inventario->unidad_medida = 'Piezas';
+						}
+						$inventario->ultimo_precio = $datos['precio'];
+						$inventario->stock_minimo = $datos['stock'];
+						$inventario->cantidad_existente -= $datos['cantidad'];
+						$inventario->save();
+					}
+				}
+			}
+			if(isset($_POST['Inventario']['ojillo'])){
+				$tipoArticulo = TiposArticulosInventario::model()->find('tipo="Ojillos"');
+				foreach ($_POST['Inventario']['ojillo'] as $clave => $datos) {
+					if($datos['cantidad'] >= 0){
+						$inventario = Inventarios::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_colores=?', array($tipoArticulo->id, $datos['id'], $datos['id_color']));
+						if (!isset($inventario)) {
+							$inventario = new Inventarios;
+							$inventario->id_tipos_articulos_inventario = $tipoArticulo->id;
+							$inventario->id_articulo = $datos['id'];
+							$inventario->nombre_articulo = $datos['nombre'];
+							$inventario->id_colores = $datos['id_color'];
+							$inventario->cantidad_existente = 0;
+							$inventario->cantidad_apartada = 0;
+							$inventario->unidad_medida = 'Piezas';
+						}
+						$inventario->ultimo_precio = $datos['precio'];
+						$inventario->stock_minimo = $datos['stock'];
+						$inventario->cantidad_existente -= $datos['cantidad'];
+						$inventario->save();
+					}
+				}
+			}
+			$this->redirect(array('inventarios/admin'));
+		}
+
+		$this->render('add_stock_agujetas_ojillos', 
+			array(
+				'agujetas' => $agujetas,
+				'ojillos' => $ojillos,
+				'accion' => 'descontar',
 			)
 		);
 	}

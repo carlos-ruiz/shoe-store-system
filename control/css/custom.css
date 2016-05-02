@@ -407,3 +407,7 @@ p.cantidad {
 .proveedor-direccion {
 	display: none;
 }
+
+.remove-stock {
+	display: none;
+}

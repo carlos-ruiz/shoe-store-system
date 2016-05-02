@@ -4,7 +4,7 @@
 /* @var $form CActiveForm */
 ?>
 
-<h1>Agregar al inventario</h1>
+<h1><?= (isset($accion) && $accion=='descontar')?'Descontar del inventario':'Agregar al inventario' ?></h1>
 <div class="form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
@@ -20,7 +20,7 @@
 		<hr/>
 		<div class="row">
 			<div class="panel panel-red panel-ordenes">
-				<div class="panel-heading">Agregar agujetas y ojillos al inventario</div>
+				<div class="panel-heading"><?= (isset($accion) && $accion=='descontar')?"Descontar agujetas y ojillos del inventario":"Agregar agujetas y ojillos al inventario" ?></div>
 				<div class="panel-body">
 					<table class="table table-hover table-striped without-padding-table" summary="Muestra todas las variantes de agujetas y ojillos para agregar a inventarios">
 						<thead>

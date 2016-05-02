@@ -34,10 +34,10 @@ class InventarioMateriales extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('existencia, id_materiales, stock_minimo', 'required'),
+			array('existencia, id_materiales', 'required'),
 			array('id_materiales, id_colores', 'numerical', 'integerOnly'=>true),
 			array('existencia, cantidad_apartada, cantidad, ultimo_precio, stock_minimo', 'numerical'),
-			array('cantidad, stock_minimo', 'required', 'on'=>'agregarMaterial'),
+			array('cantidad', 'required', 'on'=>'agregarMaterial'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, existencia, cantidad_apartada, id_materiales, id_colores, stock_minimo, ultimo_precio', 'safe', 'on'=>'search'),

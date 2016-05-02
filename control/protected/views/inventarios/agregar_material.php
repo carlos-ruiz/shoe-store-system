@@ -3,7 +3,7 @@
 /* @var $model Materiales */
 /* @var $form CActiveForm */
 ?>
-<h1>Agregar material</h1>
+<h1><?= (isset($accion) && $accion=='descontar')?"Descontar material":"Agregar material" ?></h1>
 <div class="form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(

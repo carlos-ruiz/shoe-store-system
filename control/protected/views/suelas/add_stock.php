@@ -17,7 +17,7 @@
 		}
 	}
 ?>
-<h1>Agregar al inventario</h1>
+<h1><?= (isset($accion) && $accion=='descontar')?"Descontar del inventario":"Agregar al inventario" ?></h1>
 <div class="form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
@@ -33,7 +33,7 @@
 		<hr/>
 		<div class="row">
 			<div class="panel panel-red panel-ordenes">
-				<div class="panel-heading">Agregar suelas a inventario</div>
+				<div class="panel-heading"><?= (isset($accion) && $accion=='descontar')?"Descontar suelas del inventario":"Agregar suelas a inventario" ?></div>
 				<div class="panel-body">
 					<table class="table table-hover table-striped without-padding-table" summary="Muestra todas las variantes de suelas para agregar a inventarios">
 						<thead>

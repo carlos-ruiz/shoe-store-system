@@ -332,7 +332,7 @@
 								
 								<?php for ($i=12; $i < 32 ; $i = $i + 0.5) { ?>
 									<td data-numero="<?= $i; ?>">
-										<input class="input-cantidad" type="text" name="Pedido[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'";} ?>/>
+										<input class="input-cantidad" title="<?= $i ?>" type="text" name="Pedido[numeros][<?= $time ?>][<?= $i; ?>]" maxlength="3" style="width:20px;" <?php if(!in_array($i, $numerosPosibles)) {echo "disabled value='X'";}else{echo "value='";if(isset($row[''.$i])){echo $row[''.$i];}echo "'";} ?>/>
 									</td>
 								<?php } ?>
 									<td>
