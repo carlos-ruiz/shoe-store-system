@@ -1113,7 +1113,7 @@ class PedidosController extends Controller
 	 * Actualizar los inventarios para descontar los materiales que se 
 	 * requieren para completar el pedido especificado
 	 * @param $id_pedido, id del pedido a considerar
-	 * @return true si es correcto, string de errores si no lo es
+	 * @return true si hay errores, false si todo salio bien
 	 */
 	public function actualizarInventario($id_pedido)
 	{
@@ -1138,7 +1138,15 @@ class PedidosController extends Controller
 				$inventario = Inventarios::model()->find($consulta, $parametros);
 				if (!isset($inventario)) {
 					$errores ='true';
-					$texto_errores .= 'No hay id_tipo: '.$materialApartado->id_tipos_articulos_inventario.', articulo: '.$materialApartado->id_articulo.'/n';
+					$datosArticulo = $this->obtenerDatosArticulo($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+					$texto_errores .= 'No hay '.$datosArticulo['nombre'];
+					if (isset($materialApartado->color)) {
+						$texto_errores .= ", color: ".$materialApartado->color->color; 
+					}
+					if (isset($materialApartado->numero)) {
+						$texto_errores .= ", numero: ".$materialApartado->numero; 
+					}
+					$texto_errores .= "\n\r";
 					continue;
 				}
 
@@ -1159,16 +1167,24 @@ class PedidosController extends Controller
 					}
 					$materialApartado->delete();
 				}else{
-					$texto_errores .= 'No hay suficiente id_tipo: '.$materialApartado->id_tipos_articulos_inventario.', articulo: '.$materialApartado->id_articulo.'/n';
+					$datosArticulo = $this->obtenerDatosArticulo($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+					$texto_errores .= 'No hay suficiente '.$datosArticulo['nombre'];
+					if (isset($materialApartado->color)) {
+						$texto_errores .= ", color: ".$materialApartado->color->color; 
+					}
+					if (isset($materialApartado->numero)) {
+						$texto_errores .= ", numero: ".$materialApartado->numero; 
+					}
+					$texto_errores .= "\n\r";
 					$errores='true';
 				}
 			}
 			if ($errores == 'true') {
 				$transaction->rollback();
 				// echo $texto_errores;
-				// $myfile = fopen(Yii::app()->request->baseUrl."/errores.txt", "w") or die("Unable to open file!");
-				// fwrite($myfile, $texto_errores);
-				// fclose($myfile);
+				$archivo_errores = fopen("C:\Users\Carlos\Desktop/errores.txt", "ct") or die("Unable to open file!");
+				fwrite($archivo_errores, $texto_errores);
+				fclose($archivo_errores);
 				return $errores;
 			}else{
 				$transaction->commit();
