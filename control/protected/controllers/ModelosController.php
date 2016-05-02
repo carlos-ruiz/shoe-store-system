@@ -259,11 +259,33 @@ class ModelosController extends Controller
 					}
 				}
 
-				//variable para saber si hay que borrar materiales predeterminados
-				$borrarPredeterminados = false;
-
+				$materialesActuales = array();
+				if(isset($_POST['ModelosMateriales'])){
+					foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value){
+						array_push($materialesActuales, $id);
+					}
+				}
+				if (sizeof($materialesActuales) < 1) {
+					$mensaje_error = '<br/> - Debe elegir al menos un material.';
+					$todo_bien = false;
+				}
 				foreach ($model->modelosMateriales as $modeloMaterial) {
-					$modeloMaterial->delete();
+					if(!in_array($modeloMaterial->id_materiales, $materialesActuales)){
+						foreach ($modeloMaterial->modelo->modelosColores as $mc) {
+							if (isset($mc->materialesPredeterminados->materialesColoresPredeterminados)) {
+								foreach ($mc->materialesPredeterminados->materialesColoresPredeterminados as $mcp) {
+									$mcp->delete();
+								}
+							}
+							if (isset($mc->materialesPredeterminados)) {
+								$mc->materialesPredeterminados->delete();
+							}
+						}
+						$modeloMaterial->delete();
+					}
+					else{
+						$materialesActuales = array_diff($materialesActuales, array($modeloMaterial->id_materiales));
+					}
 				}
 
 				$model->attributes=$_POST['Modelos'];
@@ -300,17 +322,26 @@ class ModelosController extends Controller
 							$modeloNumero->save();
 						}
 
-						if (isset($_POST['ModelosMateriales'])) {
-							if (isset($_POST['ModelosMateriales']['id_materiales'])) {
-								foreach ($_POST['ModelosMateriales']['id_materiales'] as $id => $value) {
-									$modeloMaterial = new ModelosMateriales;
-									$modeloMaterial->id_modelos = $model->id;
-									$modeloMaterial->id_materiales = $id;
-									$modeloMaterial->cantidad_extrachico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_extrachico'];
-									$modeloMaterial->cantidad_chico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_chico'];
-									$modeloMaterial->cantidad_mediano = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_mediano'];
-									$modeloMaterial->cantidad_grande = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_grande'];
-									$modeloMaterial->save();
+						foreach ($materialesActuales as $id) {
+							$modeloMaterial = new ModelosMateriales;
+							$modeloMaterial->id_modelos = $model->id;
+							$modeloMaterial->id_materiales = $id;
+							$modeloMaterial->cantidad_extrachico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_extrachico'];
+							$modeloMaterial->cantidad_chico = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_chico'];
+							$modeloMaterial->cantidad_mediano = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_mediano'];
+							$modeloMaterial->cantidad_grande = $_POST['ModelosMateriales']['cantidades'][$id]['cantidad_grande'];
+							$modeloMaterial->save();
+						}
+							
+						if (sizeof($materialesActuales)>0) {
+							foreach ($model->modelosColores as $mc) {
+								if (isset($mc->materialesPredeterminados->materialesColoresPredeterminados)) {
+									foreach ($mc->materialesPredeterminados->materialesColoresPredeterminados as $mcp) {
+										$mcp->delete();
+									}
+								}
+								if(isset($mc->materialesPredeterminados)){
+									$mc->materialesPredeterminados->delete();
 								}
 							}
 						}
