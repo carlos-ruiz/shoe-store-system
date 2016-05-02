@@ -41,7 +41,7 @@ class ModelosSuelasNumerosController extends Controller
 
 	public function actionAdmin()
 	{
-		$modelos = Modelos::model()->findAll();
+		$modelos = Modelos::model()->findAll('activo=1');
 
 		if (isset($_POST['Configuracion'])) {
 			$transaction = Yii::app()->db->beginTransaction();

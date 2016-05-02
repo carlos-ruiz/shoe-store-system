@@ -851,7 +851,6 @@ class PedidosController extends Controller
 
 				if($materialTieneColores){
 					$materialColorPredeterminado = MaterialesColoresPredeterminados::model()->find('id_modelos_materiales_predeterminados=? AND id_materiales=?', array($modeloMaterialPredeterminado->id, $modeloMaterial->id_materiales));
-					echo "<br/>material: ".$modeloMaterial->material->nombre."<br/>";
 					if(!isset($materialColorPredeterminado)){
 						echo "<br/>No hay predeterminado<br/>";
 						return;
@@ -1122,7 +1121,7 @@ class PedidosController extends Controller
 		$transaction = Yii::app()->db->beginTransaction();
 
 		$errores = 'false';
-
+		$texto_errores = '';
 		try{
 			foreach ($pedido->materialesApartados as $materialApartado) {
 				$consulta = 'id_tipos_articulos_inventario=? AND id_articulo=?';
@@ -1139,6 +1138,7 @@ class PedidosController extends Controller
 				$inventario = Inventarios::model()->find($consulta, $parametros);
 				if (!isset($inventario)) {
 					$errores ='true';
+					$texto_errores .= 'No hay id_tipo: '.$materialApartado->id_tipos_articulos_inventario.', articulo: '.$materialApartado->id_articulo.'/n';
 					continue;
 				}
 
@@ -1159,11 +1159,16 @@ class PedidosController extends Controller
 					}
 					$materialApartado->delete();
 				}else{
+					$texto_errores .= 'No hay suficiente id_tipo: '.$materialApartado->id_tipos_articulos_inventario.', articulo: '.$materialApartado->id_articulo.'/n';
 					$errores='true';
 				}
 			}
 			if ($errores == 'true') {
 				$transaction->rollback();
+				// echo $texto_errores;
+				// $myfile = fopen(Yii::app()->request->baseUrl."/errores.txt", "w") or die("Unable to open file!");
+				// fwrite($myfile, $texto_errores);
+				// fclose($myfile);
 				return $errores;
 			}else{
 				$transaction->commit();
