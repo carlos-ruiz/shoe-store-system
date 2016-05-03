@@ -17,6 +17,7 @@ $this->menu=array(
 
 <div class="text-right">
 	<?php echo CHtml::link('<i class="fa fa-plus"></i> Nuevo', array('provedores/create'), array('class'=>'btn btn-red-stripped')); ?>
+	<?php echo CHtml::link('<i class="fa fa-eye"></i> Ver adeudos', array('provedores/verAdeudos'), array('class'=>'btn btn-red-stripped')); ?>
 </div>
 
 <?php $this->widget('zii.widgets.grid.CGridView', array(

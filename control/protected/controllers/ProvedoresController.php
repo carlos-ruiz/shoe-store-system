@@ -28,17 +28,9 @@ class ProvedoresController extends Controller
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
-				'users'=>array('*'),
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
-				'users'=>array('@'),
-			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
-				'users'=>array('admin'),
+				'actions'=>array('index','view','create','update','admin','delete', 'verAdeudos', 'pagar'),
+				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
 				'users'=>array('*'),
@@ -440,5 +432,24 @@ class ProvedoresController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionVerAdeudos()
+	{
+		$deudas = DeudasPedidosProveedores::model()->findAll(array('order'=>'t.id_provedores'));
+		$deudasPorProveedor = array();
+		foreach ($deudas as $deudaProveedor) {
+			if (!isset($deudasPorProveedor[$deudaProveedor->proveedor->nombre])) {
+				$deudasPorProveedor[$deudaProveedor->proveedor->nombre] = 0;
+			}
+			$deudasPorProveedor[$deudaProveedor->proveedor->nombre] += $deudaProveedor->cantidad;
+		}
+		$this->render('adeudos', array('deudasPorProveedor'=>$deudasPorProveedor));
+	}
+
+	public function actionPagar()
+	{
+		$proveedores = Provedores::model()->findAll();
+		$this->render('reportar_pago', array('proveedores'=>$proveedores));
 	}
 }

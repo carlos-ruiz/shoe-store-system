@@ -79,6 +79,7 @@ class Pedidos extends CActiveRecord
 			'pedidosZapatos' => array(self::HAS_MANY, 'PedidosZapatos', 'id_pedidos', 'order'=>'caracteristicas_especiales ASC'),
 			'estatusPago' => array(self::BELONGS_TO, 'EstatusPagos', 'estatus_pagos_id'),
 			'materialesApartados' => array(self::HAS_MANY, 'MaterialesApartadosPedido', 'id_pedidos'),
+			'deudasProveedores' => array(self::HAS_MANY, 'DeudasPedidosProveedores', 'id_pedidos'),
 		);
 	}
 

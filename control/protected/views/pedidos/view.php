@@ -188,6 +188,20 @@ $this->menu=array(
 	</div>
 </div>
 
+<div class="pago-proveedores">
+	<h3>Por pagar a proveedores:</h3>
+	<?php 
+		$deudasProveedores = DeudasPedidosProveedores::model()->findAll('id_pedidos=?', array($model->id));
+		$total = 0;
+		foreach ($deudasProveedores as $deudaPedidoProveedor) { 
+			$total += $deudaPedidoProveedor->cantidad;	?>
+			<div class="col-md-3"><?= $deudaPedidoProveedor->proveedor->nombre ?>: <?= $deudaPedidoProveedor->cantidad ?></div>
+	<?php
+		}
+	?>
+		<h4 class="col-md-12">Total: <?= $total ?></h4>
+</div>
+
 <?php if(!Yii::app()->user->isGuest) { ?>
 	<div class="row">
 		<div class="col-md-12 padding-top">

@@ -54,6 +54,8 @@ class PedidosController extends Controller
 	 */
 	public function actionView($id)
 	{
+		// $this->calcularCostoPorProveedor($id);
+		// return;
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
@@ -235,6 +237,8 @@ class PedidosController extends Controller
 					}
 					$transaction->commit();
 					$this->apartarMateriales($model->id);
+					
+					$this->calcularCostoPorProveedor($model->id);
 
 					if($model->id_estatus_pedidos == $estatusPedidoEnProceso->id){
 						$errores = $this->actualizarInventario($model->id);
@@ -473,10 +477,15 @@ class PedidosController extends Controller
 		$model = $this->loadModel($id);
 		$transaction = Yii::app()->db->beginTransaction();
 		try{
-			foreach ($model->pedidosZapatos as $pedidoZapato) {
-				$pedidoZapato->delete();
-			}
 			if ($model->estatus->nombre == 'Pendiente') {
+				foreach ($model->pedidosZapatos as $pedidoZapato) {
+					$pedidoZapato->delete();
+				}
+				if (isset($model->deudasProveedores)) {
+					foreach ($model->deudasProveedores as $dp) {
+						$dp->delete();
+					}
+				}
 				foreach ($model->materialesApartados as $materialApartado) {
 					$query = "id_tipos_articulos_inventario=? AND id_articulo=?";
 					$params = array($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
@@ -1383,6 +1392,57 @@ class PedidosController extends Controller
 				return;
 			}
 			echo "ERROR";
+		}
+	}
+
+	public function calcularCostoPorProveedor($id_pedido, $nuevo=1)
+	{
+		$pedido = $this->loadModel($id_pedido);
+		$transaction = Yii::app()->db->beginTransaction();
+		if($nuevo){
+			try{
+				$proveedoresPedido = array();
+				foreach ($pedido->materialesApartados as $materialApartado) {
+					$consulta = 'id_tipos_articulos_inventario=? AND id_articulo=?';
+					$parametros = array($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo);
+					if (isset($materialApartado->numero)) {
+						$consulta .= ' AND numero=?';
+						array_push($parametros, $materialApartado->numero);
+					}
+					if (isset($materialApartado->id_colores)) {
+						$consulta .= ' AND id_colores=?';
+						array_push($parametros, $materialApartado->id_colores);
+					}
+
+					$inventario = Inventarios::model()->find($consulta, $parametros);
+
+					if(isset($inventario)){
+						$proveedorMaterial = ProveedoresMateriales::model()->find('id_tipos_articulos_inventario=? and id_articulo=?', array($materialApartado->id_tipos_articulos_inventario, $materialApartado->id_articulo));
+						if (isset($proveedorMaterial)) {
+							if (!isset($proveedoresPedido[$proveedorMaterial->id_provedores])) {
+								$proveedoresPedido[$proveedorMaterial->id_provedores] = 0;
+							}
+							$proveedoresPedido[$proveedorMaterial->id_provedores] += ($materialApartado->cantidad_apartada * $inventario->ultimo_precio);
+						}
+					}
+				}
+				if (sizeof($proveedoresPedido) > 0) {
+					foreach ($proveedoresPedido as $id_proveedor => $costo) {
+						$deudaProveedorPedido = new DeudasPedidosProveedores;
+						$deudaProveedorPedido->id_provedores = $id_proveedor;
+						$deudaProveedorPedido->id_pedidos = $id_pedido;
+						$deudaProveedorPedido->cantidad = $costo;
+						$deudaProveedorPedido->fecha = date('d-m-Y H:i:s');
+						$deudaProveedorPedido->save();
+					}
+				}
+				$transaction->commit();		
+			}catch(Exception $ex){
+				$transaction->rollback();
+			}
+		}
+		else{
+
 		}
 	}
 }
