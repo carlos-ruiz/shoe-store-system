@@ -29,7 +29,7 @@ class ProvedoresController extends Controller
 	{
 		return array(
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('index','view','create','update','admin','delete', 'verAdeudos', 'pagar'),
+				'actions'=>array('index','view','create','update','admin','delete', 'verAdeudos'),
 				'users'=>Usuarios::model()->obtenerPorPerfil('Administrador'),
 			),
 			array('deny',  // deny all users
@@ -445,11 +445,5 @@ class ProvedoresController extends Controller
 			$deudasPorProveedor[$deudaProveedor->proveedor->nombre] += $deudaProveedor->cantidad;
 		}
 		$this->render('adeudos', array('deudasPorProveedor'=>$deudasPorProveedor));
-	}
-
-	public function actionPagar()
-	{
-		$proveedores = Provedores::model()->findAll();
-		$this->render('reportar_pago', array('proveedores'=>$proveedores));
 	}
 }
