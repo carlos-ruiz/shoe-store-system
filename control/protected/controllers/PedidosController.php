@@ -54,8 +54,6 @@ class PedidosController extends Controller
 	 */
 	public function actionView($id)
 	{
-		// $this->calcularCostoPorProveedor($id);
-		// return;
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
@@ -861,8 +859,8 @@ class PedidosController extends Controller
 				if($materialTieneColores){
 					$materialColorPredeterminado = MaterialesColoresPredeterminados::model()->find('id_modelos_materiales_predeterminados=? AND id_materiales=?', array($modeloMaterialPredeterminado->id, $modeloMaterial->id_materiales));
 					if(!isset($materialColorPredeterminado)){
-						echo "<br/>No hay predeterminado<br/>";
-						return;
+						echo "<br/>No hay predeterminado<br/>".$modeloMaterial->modelo->nombre." - ".$modeloMaterial->material->nombre;
+						continue;
 					}
 					$materialApartado = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=?', array($tipoArticulo->id, $modeloMaterial->id_materiales, $pedido->id, $materialColorPredeterminado->id_colores));
 				}
@@ -882,7 +880,6 @@ class PedidosController extends Controller
 				if ($modeloMaterial->material->nombre === 'Transfer') {
 					$materialApartado->numero = $numero_zapato;
 				}
-
 				$materialApartado->cantidad_apartada += $cantidad_a_descontar;
 				$materialApartado->fecha_actualizacion = date('Y-m-d H:i:s');
 				$materialApartado->save();
