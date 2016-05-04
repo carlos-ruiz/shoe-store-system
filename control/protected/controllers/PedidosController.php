@@ -1195,7 +1195,7 @@ class PedidosController extends Controller
 			if ($errores == 'true') {
 				$transaction->rollback();
 				// echo $texto_errores;
-				$archivo_errores = fopen("C:\Users\Carlos\Desktop/errores.txt", "ct") or die("Unable to open file!");
+				$archivo_errores = fopen("C:\Users\Zapateria\Desktop/errores.txt", "ct") or die("Unable to open file!");
 				fwrite($archivo_errores, $texto_errores);
 				fclose($archivo_errores);
 				return $errores;
