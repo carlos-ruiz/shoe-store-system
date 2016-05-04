@@ -58,7 +58,7 @@ class TaconesController extends Controller
 	{
 		$model=new Tacones;
 		$colores = Colores::model()->findAll();
-		$suelas = Suelas::model()->findAll();
+		$suelas = Suelas::model()->findAll('activo=1');
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -110,7 +110,7 @@ class TaconesController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$colores = Colores::model()->findAll();
-		$suelas = Suelas::model()->findAll();
+		$suelas = Suelas::model()->findAll('activo=1');
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);

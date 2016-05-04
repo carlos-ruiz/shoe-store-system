@@ -358,7 +358,7 @@ class ModelosMaterialesPredeterminadosController extends Controller
 
 	public function actionSuelasPorModelo()
 	{
-		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["ModelosMaterialesPredeterminados"]["id_modelos"]));
+		$list = ModelosSuelas::model()->with(array('suela'))->findAll("id_modelos=? and suela.activo=1",array($_POST["ModelosMaterialesPredeterminados"]["id_modelos"]));
 		foreach($list as $i => $data){
 			if ($i==0) {
 				echo "<option value=\"{$data->suela->id}\" selected>{$data->suela->nombre}</option>";

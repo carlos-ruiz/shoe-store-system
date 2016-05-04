@@ -143,6 +143,16 @@ class SuelasController extends Controller
 				if($todo_bien){
 					foreach ($model->suelasColores as $suelaColor) {
 						if(!in_array($suelaColor->color->id, $ids_colores_actuales)){
+							if(isset($suelaColor->materialesPredeterminados)){
+								foreach ($suelaColor->materialesPredeterminados as $mp) {
+									if (isset($mp->materialesColoresPredeterminados)) {
+										foreach ($mp->materialesColoresPredeterminados as $mcp) {
+											$mcp->delete();
+										}
+									}
+									$mp->delete();
+								}
+							}
 							$suelaColor->delete();
 						}else{
 							$ids_colores_actuales = array_diff($ids_colores_actuales, array($suelaColor->color->id));
@@ -203,7 +213,28 @@ class SuelasController extends Controller
 	 */
 	public function actionDelete($id)
 	{
-		$this->loadModel($id)->delete();
+		$suela = $this->loadModel($id);
+		$transaction = Yii::app()->db->beginTransaction();
+		try{
+			foreach ($suela->suelasColores as $sc) {
+				if (isset($sc->materialesPredeterminados)) {
+					foreach ($sc->materialesPredeterminados as $mp) {
+						if (isset($mp->materialesColoresPredeterminados)) {
+							foreach ($mp->materialesColoresPredeterminados as $mcp) {
+								$mcp->delete();
+							}
+						}
+						$mp->delete();
+					}
+				}
+			}
+			$suela->nombre = $suela->nombre.' - eliminado';
+			$suela->activo = 0;
+			$suela->save();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+		}
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))
@@ -267,7 +298,7 @@ class SuelasController extends Controller
 	public function actionAgregarInventario()
 	{
 		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Suelas'));
-		$suelas = Suelas::model()->findAll();
+		$suelas = Suelas::model()->findAll('activo=1');
 
 		if (isset($_POST['Inventario'])) {
 			if (isset($_POST['Suelas']['stock_minimo_general'])) {
@@ -315,7 +346,7 @@ class SuelasController extends Controller
 	public function actionDescontarInventario()
 	{
 		$tipoArticulo = TiposArticulosInventario::model()->find('tipo=?',array('Suelas'));
-		$suelas = Suelas::model()->findAll();
+		$suelas = Suelas::model()->findAll('activo=1');
 
 		if (isset($_POST['Inventario'])) {
 			if (isset($_POST['Suelas']['stock_minimo_general'])) {

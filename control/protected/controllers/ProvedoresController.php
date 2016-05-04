@@ -75,7 +75,7 @@ class ProvedoresController extends Controller
 			array_push($ids_materiales, 0);
 		}
 		$suelas = Suelas::model()->findAll(array(
-						'condition'=>'id IN('.implode(',',$ids_suelas).')'
+						'condition'=>'id IN('.implode(',',$ids_suelas).') and activo=1'
 					)
 			);
 		$tacones = Tacones::model()->findAll(array(
@@ -142,11 +142,11 @@ class ProvedoresController extends Controller
 			array_push($idsSuelasOcupados, $to->id_articulo);
 		}
 		if (empty($idsSuelasOcupados)) {
-			$suelasDisponibles = Suelas::model()->findAll();
+			$suelasDisponibles = Suelas::model()->findAll('activo=1');
 		}
 		else {
 			$suelasDisponibles = Suelas::model()->findAll(array(
-						'condition'=>'id NOT IN('.implode(',',$idsSuelasOcupados).')'
+						'condition'=>'id NOT IN('.implode(',',$idsSuelasOcupados).')  and activo=1'
 					)
 			);
 		}
@@ -273,11 +273,11 @@ class ProvedoresController extends Controller
 			array_push($idsSuelasOcupados, $to->id_articulo);
 		}
 		if (empty($idsSuelasOcupados)) {
-			$suelasDisponibles = Suelas::model()->findAll();
+			$suelasDisponibles = Suelas::model()->findAll('activo=1');
 		}
 		else {
 			$suelasDisponibles = Suelas::model()->findAll(array(
-						'condition'=>'id NOT IN('.implode(',',$idsSuelasOcupados).')'
+						'condition'=>'id NOT IN('.implode(',',$idsSuelasOcupados).')  and activo=1'
 					)
 			);
 		}

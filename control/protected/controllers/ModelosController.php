@@ -59,7 +59,7 @@ class ModelosController extends Controller
 	{
 		$model=new Modelos;
 		$colores = Colores::model()->findAll();
-		$suelas = Suelas::model()->findAll();
+		$suelas = Suelas::model()->findAll('activo=1');
 		$materiales = Materiales::model()->findAll();
 		$mensaje_error = null;
 		$folderImagesPath = Yii::getPathOfAlias('webroot').'/images/modelos/';
@@ -180,7 +180,7 @@ class ModelosController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$colores = Colores::model()->findAll();
-		$suelas = Suelas::model()->findAll();
+		$suelas = Suelas::model()->findAll('activo=1');
 		$materiales = Materiales::model()->findAll();
 		$mensaje_error = null;
 		$folderImagesPath = Yii::getPathOfAlias('webroot').'/images/modelos/';

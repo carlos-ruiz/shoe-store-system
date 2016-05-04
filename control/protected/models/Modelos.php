@@ -120,7 +120,7 @@ class Modelos extends CActiveRecord
 	}
 
 	public function obtenerSuelas($id_modelos){
-		$modeloSuelas=ModelosSuelas::model()->findAll("id_modelos=?", array($id_modelos));
+		$modeloSuelas=ModelosSuelas::model()->with(array('suela'))->findAll("id_modelos=? and suela.activo=1", array($id_modelos));
 		$suelas = array();
 		foreach ($modeloSuelas as $modeloSuela) {
 			array_push($suelas, $modeloSuela->suela);

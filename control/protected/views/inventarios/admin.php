@@ -45,10 +45,15 @@
     	),
     	array(
 	        'name'=>'cantidad_existente',
-	        'cssClassExpression'=> '(($data->cantidad_existente < $data->stock_minimo) ? "under-stock" : "")',
+	        'cssClassExpression'=> '(($data->cantidad_existente < ($data->cantidad_apartada + $data->stock_minimo)) ? "under-stock" : "")',
     	),
     	'cantidad_apartada',
     	'stock_minimo',
+    	array(
+	        'name'=>'var_compra_minima',
+	        'value'=>'$data->cantidad_existente - $data->cantidad_apartada',
+	        'cssClassExpression'=> '(($data->cantidad_existente - $data->cantidad_apartada<0) ? "under-stock" : "")',
+    	),
     	array(
 	        'name'=>'var_total',
 	        'value'=>'$data->cantidad_existente - ($data->cantidad_apartada + $data->stock_minimo)',

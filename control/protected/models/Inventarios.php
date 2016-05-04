@@ -24,6 +24,7 @@ class Inventarios extends CActiveRecord
 	public $var_tipo_articulo;
 	public $var_color;
 	public $var_total;
+	public $var_compra_minima;
 
 	/**
 	 * @return string the associated database table name
@@ -48,7 +49,7 @@ class Inventarios extends CActiveRecord
 			array('ultimo_precio', 'length', 'max'=>7),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_tipos_articulos_inventario, id_articulo, nombre_articulo, numero, id_colores, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, stock_minimo, var_tipo_articulo, var_color, var_total', 'safe', 'on'=>'search'),
+			array('id, id_tipos_articulos_inventario, id_articulo, nombre_articulo, numero, id_colores, cantidad_existente, cantidad_apartada, unidad_medida, ultimo_precio, stock_minimo, var_tipo_articulo, var_color, var_total, var_compra_minima', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -91,8 +92,9 @@ class Inventarios extends CActiveRecord
 			'var_tipo_articulo' => 'Tipo de artículo',
 			'var_color' => 'Color',
 			'nombre_articulo' => 'Artículo',
-			'stock_minimo' => 'Cantidad mínima',
+			'stock_minimo' => 'Stock mínimo',
 			'var_total' => 'Total',
+			'var_compra_minima' => 'Compra mínima',
 		);
 	}
 
@@ -129,6 +131,7 @@ class Inventarios extends CActiveRecord
 		$criteria->compare('tipoArticulo.tipo', $this->var_tipo_articulo, true);
 		$criteria->compare('color.color', $this->var_color, true);
 		$criteria->compare('cantidad_existente - (cantidad_apartada + t.stock_minimo)', $this->var_total);
+		$criteria->compare('cantidad_existente - cantidad_apartada', $this->var_compra_minima);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -144,6 +147,10 @@ class Inventarios extends CActiveRecord
 		            'var_total'=>array(
 		            	'asc'=>'cantidad_existente - (cantidad_apartada + t.stock_minimo)',
 		            	'desc'=>'cantidad_existente - (cantidad_apartada + t.stock_minimo) DESC',
+		            ),
+		            'var_compra_minima'=>array(
+		            	'asc'=>'cantidad_existente - cantidad_apartada',
+		            	'desc'=>'cantidad_existente - cantidad_apartada DESC',
 		            ),
 		            'nombre_articulo',
 		            'numero',

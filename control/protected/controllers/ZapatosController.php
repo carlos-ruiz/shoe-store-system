@@ -249,7 +249,7 @@ class ZapatosController extends Controller
 
 	public function actionSuelasPorModelo()
 	{
-		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["ZapatoPrecios"]["id_modelos"]));
+		$list = ModelosSuelas::model()->with(array('suela'))->findAll("id_modelos=? and suela.activo=1",array($_POST["ZapatoPrecios"]["id_modelos"]));
 		foreach($list as $data)
 			echo "<option value=\"{$data->suela->id}\">{$data->suela->nombre}</option>";
 	}

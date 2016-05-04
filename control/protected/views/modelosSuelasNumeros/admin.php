@@ -15,17 +15,19 @@ $id_suela = 0;
 $contador = 0;
 foreach ($modelos as $modelo) {
 	foreach ($modelo->modelosSuelas as $modeloSuela) {
-		if(
-			$modelo->id != $id_modelo ||
-			$modeloSuela->suela->id != $id_suela
-		) {
-			$contador++;
-			$zapatosDiferentes[$contador]['id_modelo'] = $modelo->id;
-			$zapatosDiferentes[$contador]['modelo'] = $modelo->nombre;
-			$zapatosDiferentes[$contador]['id_suela'] = $modeloSuela->suela->id;
-			$zapatosDiferentes[$contador]['suela'] = $modeloSuela->suela->nombre;
-			$id_modelo = $modelo->id;
-			$id_suela = $modeloSuela->suela->id;
+		if($modeloSuela->suela->activo == 1){
+			if(
+				$modelo->id != $id_modelo ||
+				$modeloSuela->suela->id != $id_suela
+			) {
+				$contador++;
+				$zapatosDiferentes[$contador]['id_modelo'] = $modelo->id;
+				$zapatosDiferentes[$contador]['modelo'] = $modelo->nombre;
+				$zapatosDiferentes[$contador]['id_suela'] = $modeloSuela->suela->id;
+				$zapatosDiferentes[$contador]['suela'] = $modeloSuela->suela->nombre;
+				$id_modelo = $modelo->id;
+				$id_suela = $modeloSuela->suela->id;
+			}
 		}
 	}	
 }

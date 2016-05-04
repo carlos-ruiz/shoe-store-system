@@ -188,6 +188,10 @@ $this->menu=array(
 	</div>
 </div>
 
+<div class="row">
+	<h4 class="col-md-12">Cantidad de pares: <?= $total_pares ?></h4>
+</div>
+
 <div class="pago-proveedores">
 	<h3>Por pagar a proveedores:</h3>
 	<?php 

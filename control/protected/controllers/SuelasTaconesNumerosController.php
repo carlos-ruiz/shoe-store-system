@@ -25,7 +25,7 @@ class SuelasTaconesNumerosController extends Controller
 
 	public function actionAdmin()
 	{
-		$suelas = Suelas::model()->findAll();
+		$suelas = Suelas::model()->findAll('activo=1');
 		if (isset($_POST['Configuracion'])) {
 			$datos = $_POST['Configuracion'];
 			$transaction = Yii::app()->db->beginTransaction();

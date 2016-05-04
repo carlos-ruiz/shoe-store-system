@@ -88,6 +88,7 @@ class Suelas extends CActiveRecord
 
 		$criteria->compare('id',$this->id);
 		$criteria->compare('nombre',$this->nombre,true);
+		$criteria->compare('activo',1);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

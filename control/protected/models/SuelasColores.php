@@ -55,6 +55,7 @@ class SuelasColores extends CActiveRecord
 		return array(
 			'color' => array(self::BELONGS_TO, 'Colores', 'id_colores'),
 			'suela' => array(self::BELONGS_TO, 'Suelas', 'id_suelas'),
+			'materialesPredeterminados' => array(self::HAS_MANY, 'ModelosMaterialesPredeterminados', 'id_suelas_colores'),
 		);
 	}
 

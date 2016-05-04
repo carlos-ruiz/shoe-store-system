@@ -54,8 +54,15 @@ class PedidosController extends Controller
 	 */
 	public function actionView($id)
 	{
+		$pedido = $this->loadModel($id);
+		$cantidad_pares = 0;
+		foreach ($pedido->pedidosZapatos as $pz) {
+			$cantidad_pares += $pz->cantidad_total;
+		}
+
 		$this->render('view',array(
-			'model'=>$this->loadModel($id),
+			'model'=>$pedido,
+			'total_pares'=>$cantidad_pares,
 		));
 	}
 
@@ -583,7 +590,7 @@ class PedidosController extends Controller
 	 */
 	public function actionSuelasPorModelo()
 	{
-		$list = ModelosSuelas::model()->findAll("id_modelos=?",array($_POST["PedidosZapatos"]["id_modelos"]));
+		$list = ModelosSuelas::model()->with(array('suela'))->findAll("id_modelos=? and suela.activo=1",array($_POST["PedidosZapatos"]["id_modelos"]));
 		echo "<option value=\"0\">Seleccione una opción</option>";
 		foreach($list as $i => $data){
 			echo "<option value=\"{$data->suela->id}\"".($i==0?'selected':'').">{$data->suela->nombre}</option>";
