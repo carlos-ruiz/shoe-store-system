@@ -48,8 +48,8 @@ else{
 	$fechaInicial = date('Y-m-d H:i:s', mktime(0, 0, 0, $mesActual, 1,   $anioActual));
 	$fechaFinal = date('Y-m-d H:i:s', mktime(23, 59, 59, $mesActual+1, 0, $anioActual));
 	$pedidosDelMes = Pedidos::model()->findAll('fecha_pedido BETWEEN ? AND ?', array($fechaInicial, $fechaFinal));
-	$pedidosDelMes = Pedidos::model()->findAll('fecha_pedido BETWEEN ? AND ?', array($fechaInicial, $fechaFinal));
 	$ventasDelMes = 0;
+    $paresDelMes = 0;
 	$porCobrar = 0;
 	foreach ($pedidosDelMes as $pedido) {
 		$ventasDelMes += $pedido->total;
@@ -57,19 +57,23 @@ else{
 		foreach ($pedido->pagos as $pago) {
 			$porCobrar -= $pago->importe;
 		}
+        foreach ($pedido->pedidosZapatos as $pedidoZapato) {
+            $paresDelMes += $pedidoZapato->cantidad_total;
+        }
 	}
 
 ?>
 <div id="tab-general">
+    <H1>Datos del mes</H1>
     <div id="sum_box" class="row mbl">
         <div class="col-sm-6 col-md-4">
             <div class="panel profit db mbm">
                 <div class="panel-body">
                     <p class="icon">
-                        <i class="icon fa fa-shopping-cart"></i>
+                        <i class="icon fa fa-money"></i>
                     </p>
                     <h4 class="value">
-                        <span data-counter="" data-start="10" data-end="50" data-step="1" data-duration="0"><?= number_format($ventasDelMes, 2) ?></span><span>$</span></h4>
+                        <span data-counter="" data-start="10" data-end="50" data-step="1" data-duration="0"><span>$</span><?= number_format($ventasDelMes, 2) ?></span></h4>
                     <p class="description">
                         Ventas del mes</p>
                     <div class="progress progress-sm mbn">
@@ -83,12 +87,12 @@ else{
             <div class="panel income db mbm">
                 <div class="panel-body">
                     <p class="icon">
-                        <i class="icon fa fa-money"></i>
+                        <i class="icon fa fa-cog"></i>
                     </p>
                     <h4 class="value">
-                        <span><?= number_format($porCobrar, 2) ?></span><span>$</span></h4>
+                        <span><?= $paresDelMes ?></span></h4>
                     <p class="description">
-                        Por cobrar</p>
+                        Número de pares elaborados</p>
                     <div class="progress progress-sm mbn">
                         <div role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;" class="progress-bar progress-bar-info">
                             <span class="sr-only">60% Complete (success)</span></div>
