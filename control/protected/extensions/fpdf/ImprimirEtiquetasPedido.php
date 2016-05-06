@@ -46,13 +46,15 @@ class ImprimirEtiquetasPedido extends FPDF{
 			Barcode::fpdf($this, $black, $this->GetX()+1.7,$this->getY()+0.8, $angle, $type, array('code'=>$code), $width, $height);
 			$this->Cell(3.5,3,$datos['codigo'],'T',0,'C');
 			$this->Cell(3,3,$this->Image($url.'/controlbom/control/images/icons/logo.png',$this->GetX()+0.5,$this->getY()+0.7,2),'TR',1,'C');
-			$this->Cell(2,$y,'Modelo',1,0,'C');
+			$this->SetFont('Arial','',12);
+			$this->Cell(2,$y,'Modelo',1,0,'L');
 			$this->Cell(7.5,$y,$datos['modelo'],1,1,'L');
-			$this->Cell(2,$y,'Color',1,0,'C');
+			$this->Cell(2,$y,'Color',1,0,'L');
 			$this->Cell(7.5,$y,$datos['color'],1,1,'L');
-			$this->Cell(2,$y,'Número',1,0,'C');
+			$this->Cell(2,$y,'Número',1,0,'L');
 			$this->Cell(7.5,$y,$datos['numero'],1,1,'L');
 			$this->ln(0.2);
+			$this->SetFont('Arial','',10);
 		}
 	}
 }
