@@ -910,6 +910,27 @@ class PedidosController extends Controller
 			$suelasApartadas->fecha_actualizacion = date('Y-m-d H:i:s');
 			$suelasApartadas->save();
 
+			// Apartar tacones
+			if (isset($modeloMaterialPredeterminado->id_tacones_colores)) {
+				$tipoArticuloTacon = TiposArticulosInventario::model()->find('tipo=?', array('Tacones'));
+				$suelaTaconNumero = SuelasTaconesNumeros::model()->with(array('taconNumero.tacon'=>array('alias'=>'tacon')))->find('id_suelas_numeros=? and tacon.id=?', array($modeloSuelaNumero->id_suelas_numeros, $modeloMaterialPredeterminado->taconColor->tacon->id));
+				if (isset($suelaTaconNumero)) {
+					$numero_tacon = $suelaTaconNumero->taconNumero->numero;
+					$taconesApartados = MaterialesApartadosPedido::model()->find('id_tipos_articulos_inventario=? AND id_articulo=? AND id_pedidos=? AND id_colores=? AND numero=?', array($tipoArticuloTacon->id, $modeloMaterialPredeterminado->taconColor->id_tacones, $pedido->id, $modeloMaterialPredeterminado->taconColor->id_colores, $numero_tacon));
+					if (!isset($taconesApartados)) {
+						$taconesApartados = new MaterialesApartadosPedido;
+						$taconesApartados->id_tipos_articulos_inventario = $tipoArticuloTacon->id;
+						$taconesApartados->id_articulo = $modeloMaterialPredeterminado->taconColor->id_tacones;
+						$taconesApartados->id_colores = $modeloMaterialPredeterminado->taconColor->id_colores;
+						$taconesApartados->numero = $numero_tacon;
+						$taconesApartados->id_pedidos = $pedido->id;
+					}
+					$taconesApartados->cantidad_apartada += $cantidad_pares;
+					$taconesApartados->fecha_actualizacion = date('Y-m-d H:i:s');
+					$taconesApartados->save();
+				}
+			}
+
 			// Apartar agujetas
 			if (isset($pedidoZapato->zapato->agujetaColor)) {
 				$agujetaColor = $pedidoZapato->zapato->agujetaColor;
