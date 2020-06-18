@@ -191,7 +191,7 @@
 		id_modelo = $('#ModelosMaterialesPredeterminados_id_modelos').val();
 		if (id_modelo > 0) {
 			jQuery.ajax({
-				'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiTieneAgujetas',
+				'url':'../../modelosmaterialespredeterminados/revisarSiTieneAgujetas',
 				'type':'POST',
 				'cache':false,
 				'data':jQuery("#modelos-materiales-predeterminados-form").serialize(),
@@ -205,7 +205,7 @@
 		}
 		id_suela = $('#ModelosMaterialesPredeterminados_id_suelas').val();
 		if (id_suela > 0) {
-			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiSuelaTieneTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){
+			jQuery.ajax({'url':'../../modelosmaterialespredeterminados/revisarSiSuelaTieneTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){
 					if (html == 'true') {
 						$('#tacones_panel').show(500);
 						suelaTieneTacon = true;
@@ -231,18 +231,18 @@
 		jQuery('body').on('change','#ModelosMaterialesPredeterminados_id_modelos',function(){
 			id_modelo = $(this).val();
 			if (id_modelo > 0) {
-				jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),
+				jQuery.ajax({'url':'../../modelosmaterialespredeterminados/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),
 					'success':function(html){
 						jQuery("#ModelosMaterialesPredeterminados_id_color_modelo").html(html);
 						actualizarMaterialesDeColores(id_modelo);
 					}
 				});
-				jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+				jQuery.ajax({'url':'../../modelosmaterialespredeterminados/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 						jQuery("#ModelosMaterialesPredeterminados_id_suelas").html(html);
 						actualizarDatosDependientesDeSuela();
 					}
 				});
-				jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiTieneAgujetas','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+				jQuery.ajax({'url':'../../modelosmaterialespredeterminados/revisarSiTieneAgujetas','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 						if (html == 'true') {
 							$('#agujetas_ojillos_panel').show(500);
 							modeloTieneAgujetas = true;
@@ -271,10 +271,10 @@
 
 	function actualizarDatosDependientesDeSuela(){
 		//Actualizando los colores disponibles de la suela
-		jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#ModelosMaterialesPredeterminados_id_color_suela").html(html);}});
+		jQuery.ajax({'url':'../../modelosmaterialespredeterminados/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#ModelosMaterialesPredeterminados_id_color_suela").html(html);}});
 
 		//Revisando si la suela lleva tacon
-		jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/revisarSiSuelaTieneTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){
+		jQuery.ajax({'url':'../../modelosmaterialespredeterminados/revisarSiSuelaTieneTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){
 				if (html == 'true') {
 					$('#tacones_panel').show(500);
 					suelaTieneTacon = true;
@@ -293,7 +293,7 @@
 	function actualizarTaconesPorSuela(){
 		if (suelaTieneTacon) {
 			//Actualizando los tacones que puede tener la suela (Si es que tiene)
-			jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/taconesPorSuela','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){
+			jQuery.ajax({'url':'../../modelosmaterialespredeterminados/taconesPorSuela','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){
 					jQuery("#ModelosMaterialesPredeterminados_id_tacones").html(html);
 					actualizarDatosDependientesDeTacon();
 				}
@@ -303,12 +303,12 @@
 
 	function actualizarDatosDependientesDeTacon(){
 		//Actualizando los colores disponibles del tacón
-		jQuery.ajax({'url':'/controlbom/control/modelosmaterialespredeterminados/coloresPorTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#ModelosMaterialesPredeterminados_id_color_tacon").html(html);}});
+		jQuery.ajax({'url':'../../modelosmaterialespredeterminados/coloresPorTacon','type':'POST','cache':false,'data':jQuery('#ModelosMaterialesPredeterminados_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#ModelosMaterialesPredeterminados_id_color_tacon").html(html);}});
 	}
 
 	function actualizarMaterialesDeColores(id_modelo){
 		jQuery.ajax({
-			'url':'/controlbom/control/modelosmaterialespredeterminados/materialesDeColores',
+			'url':'../../modelosmaterialespredeterminados/materialesDeColores',
 			'type':'POST',
 			'cache':false,
 			'data':{'id_modelo':id_modelo},

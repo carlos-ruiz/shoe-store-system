@@ -60,8 +60,8 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		jQuery('body').on('change','#Modelos_id',function(){
-			jQuery.ajax({'url':'/controlbom/control/modelos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#Modelos_id_colores").html(html)}});
-			jQuery.ajax({'url':'/controlbom/control/modelos/numerosPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#Modelos_numero").html(html)}});
+			jQuery.ajax({'url':'../../modelos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#Modelos_id_colores").html(html)}});
+			jQuery.ajax({'url':'../../modelos/numerosPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#Modelos_numero").html(html)}});
 			return false;
 		});
 	});

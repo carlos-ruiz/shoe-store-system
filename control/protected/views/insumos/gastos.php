@@ -39,7 +39,7 @@
 										<input class="form-control input-costo" type='number' min='0' step='0.50' name="GastosOperativos[existentes][<?= $gasto->id ?>][costo]" value="<?= $gasto->costo ?>" required />
 									</td>
 									<td>
-										<a class="delete" title="Borrar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Borrar"></a>
+										<a class="delete" title="Borrar" href="javascript:void(0);"><img src="../../images/icons/delete.png" alt="Borrar"></a>
 									</td>
 								</tr>
 							<?php }	?>
@@ -99,7 +99,7 @@
 		tr = "<tr>";
 		tr += "<td><input class='form-control' type='text' name=\"GastosOperativos[nuevo]["+rows+"][concepto]\" value='' required/></td>";
 		tr += "<td><input class='form-control input-costo' type='number' min='0' step='0.50' name=\"GastosOperativos[nuevo]["+rows+"][costo]\" value='' required /></td>";
-		tr += "<td><a class='delete' title='Borrar' href='javascript:void(0);'><img src='/controlbom/control/images/icons/delete.png' alt='Borrar'></a></td>";
+		tr += "<td><a class='delete' title='Borrar' href='javascript:void(0);'><img src='../../images/icons/delete.png' alt='Borrar'></a></td>";
 		tr += "</tr>";
 		$('#body_table').append(tr);
 	});

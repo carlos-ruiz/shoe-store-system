@@ -21,7 +21,7 @@ $this->menu=array(
 		<h1>Modelo #<?php echo $model->id.' - '.$model->nombre; ?></h1>
 	</div>
 	<div class="col-md-6">
-		<a href="<?= $model->imagen; ?>"><img class="col-md-3 imagen-modelo" src="<?php echo $model->imagen;?>" width="100" /></a>
+		<a href="<?= '/'.$model->imagen; ?>"><img class="col-md-3 imagen-modelo" src="<?php echo '/'.$model->imagen;?>" width="100" /></a>
 	</div>
 </div>
 <div class="modelo-informacion row">

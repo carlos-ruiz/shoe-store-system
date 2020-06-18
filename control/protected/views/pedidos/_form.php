@@ -336,7 +336,7 @@
 									</td>
 								<?php } ?>
 									<td>
-										<a data-row="<?= $time ?>" class="delete" title="Borrar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Borrar"></a>
+										<a data-row="<?= $time ?>" class="delete" title="Borrar" href="javascript:void(0);"><img src="../../images/icons/delete.png" alt="Borrar"></a>
 									</td>
 								</tr>
 								<?php if(isset($row['especial'])) { ?>
@@ -345,7 +345,7 @@
 											<?= $row['especial'] ?><input type="hidden" name="Pedido[especiales][<?= $time ?>]" value="<?= $row['especial'] ?>">
 										</td>
 										<td colspan="2">
-											<a data-row="<?= $time ?>" class="quitar-especial" title="Quitar" href="javascript:void(0);"><img src="/controlbom/control/images/icons/delete.png" alt="Quitar">Quitar</a>
+											<a data-row="<?= $time ?>" class="quitar-especial" title="Quitar" href="javascript:void(0);"><img src="../../images/icons/delete.png" alt="Quitar">Quitar</a>
 										</td>
 									</tr>
 								<?php } ?>
@@ -479,20 +479,20 @@
 
 	jQuery(function($) {
 		jQuery('body').on('change','#PedidosZapatos_id_modelos',function(){
-			jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+			jQuery.ajax({'url':'../../pedidos/coloresPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 					jQuery("#PedidosZapatos_id_colores").html(html);
-					jQuery.ajax({'url':'/controlbom/control/pedidos/materialesPredeterminados','type':'POST','dataType':'json','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(json_response){
+					jQuery.ajax({'url':'../../pedidos/materialesPredeterminados','type':'POST','dataType':'json','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(json_response){
 							establecerMaterialesPredeterminados(json_response);
 						}
 					});
 				}
 			});
-			jQuery.ajax({'url':'/controlbom/control/pedidos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+			jQuery.ajax({'url':'../../pedidos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 					jQuery("#PedidosZapatos_id_suelas").html(html);
 					actualizarColoresSuelas();
 				}
 			});
-			jQuery.ajax({'url':'/controlbom/control/pedidos/revisarSiTieneAgujetas','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
+			jQuery.ajax({'url':'../../pedidos/revisarSiTieneAgujetas','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){
 					if (html == 'true') {
 						$('#agujetas_ojillos_panel').show(500);
 						tieneAgujetas = true;
@@ -507,7 +507,7 @@
 		});
 
 		jQuery('body').on('change','#PedidosZapatos_id_colores',function(){
-			jQuery.ajax({'url':'/controlbom/control/pedidos/materialesPredeterminados','type':'POST','dataType':'json','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(json_response){
+			jQuery.ajax({'url':'../../pedidos/materialesPredeterminados','type':'POST','dataType':'json','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(json_response){
 					establecerMaterialesPredeterminados(json_response);
 				}
 			});
@@ -524,14 +524,14 @@
 		});
 	});
 	function actualizarColoresDeAgujetas(){
-		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorAgujeta','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
+		jQuery.ajax({'url':'../../pedidos/coloresPorAgujeta','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
 				jQuery("#PedidosZapatos_id_agujetas_color").html(html);
 			}
 		});
 	}
 
 	function actualizarColoresDeOjillos(){
-		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorOjillo','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
+		jQuery.ajax({'url':'../../pedidos/coloresPorOjillo','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
 				jQuery("#PedidosZapatos_id_ojillos_color").html(html);
 			}
 		});
@@ -539,7 +539,7 @@
 
 	function actualizarColoresSuelas(){
 		jQuery.ajax({
-			'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html);}});
+			'url':'../../pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){jQuery("#PedidosZapatos_id_suelas_color").html(html);}});
 	}
 
 	$('#boton_agregar_orden').click(function(){
@@ -656,7 +656,7 @@
 		total = parseFloat($('#Pedidos_subtotal').val());
 		row = $(this).data('row');
 		jQuery.ajax({
-			'url':'/controlbom/control/zapatoprecios/totalRow',
+			'url':'../../zapatoprecios/totalRow',
 			'type':'POST',
 			'cache':false,
 			'data':$('#ordenes_table #row_'+row+' :input').serialize(),
@@ -742,11 +742,11 @@
 		id_ojillos = datos_json.id_ojillos;
 		id_color_ojillos = datos_json.id_color_ojillos;
 		$('#PedidosZapatos_id_suelas').val(id_suela);
-		jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
+		jQuery.ajax({'url':'../../pedidos/coloresPorSuela','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
 				jQuery("#PedidosZapatos_id_suelas_color").html(html);
 				$('#PedidosZapatos_id_suelas_color').val(id_color_suela);
 				$('#PedidosZapatos_id_agujetas').val(id_agujetas);
-				jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorAgujeta','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
+				jQuery.ajax({'url':'../../pedidos/coloresPorAgujeta','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
 						jQuery("#PedidosZapatos_id_agujetas_color").html(html);
 						$("select#PedidosZapatos_id_agujetas option").each(function(){
 							$(this).removeAttr('selected');
@@ -760,7 +760,7 @@
 					}
 				});
 				$('#PedidosZapatos_id_ojillos').val(id_ojillos);
-				jQuery.ajax({'url':'/controlbom/control/pedidos/coloresPorOjillo','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
+				jQuery.ajax({'url':'../../pedidos/coloresPorOjillo','type':'POST','cache':false,'data':jQuery('#PedidosZapatos_id_modelos').parents("form").serialize(),'success':function(html){
 						jQuery("#PedidosZapatos_id_ojillos_color").html(html);
 						$("select#PedidosZapatos_id_ojillos option").each(function(){
 							$(this).removeAttr('selected');

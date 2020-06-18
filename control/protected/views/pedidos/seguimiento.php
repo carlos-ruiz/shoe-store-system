@@ -350,7 +350,7 @@
 		}
 
 		jQuery.ajax({
-			'url':'/controlbom/control/pedidos/actualizarEstatusZapatos',
+			'url':'../../pedidos/actualizarEstatusZapatos',
 			'type':'POST',
 			'cache':false,
 			'data':{ 'estatus': estatus, 'id': idPedidoZapato },
@@ -363,7 +363,7 @@
 	function definirFaltantes(idPedidoZapato, faltantes)
 	{
 		jQuery.ajax({
-			'url':'/controlbom/control/pedidos/actualizarFaltantes',
+			'url':'../../pedidos/actualizarFaltantes',
 			'type':'POST',
 			'cache':false,
 			'data':{ 'faltantes': faltantes, 'id': idPedidoZapato },

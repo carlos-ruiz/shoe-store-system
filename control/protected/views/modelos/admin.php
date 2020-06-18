@@ -29,7 +29,7 @@ $this->menu=array(
 		array(
             'name'  => 'imagen',
             'type'  => 'raw',
-            'value' => 'CHtml::image($data->imagen,"",array(\'height\'=>\'50\'))',
+            'value' => 'CHtml::image("/".$data->imagen,"",array(\'height\'=>\'50\'))',
         ),
 		array(
 			'class'=>'CButtonColumn',

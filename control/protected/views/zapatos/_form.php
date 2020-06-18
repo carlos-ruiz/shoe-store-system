@@ -81,7 +81,7 @@
 <script type="text/javascript">
 	jQuery(function($) {
 		jQuery('body').on('change','#ZapatoPrecios_id_modelos',function(){
-			jQuery.ajax({'url':'/controlbom/control/zapatos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#ZapatoPrecios_id_suelas").html(html)}});
+			jQuery.ajax({'url':'../../zapatos/suelasPorModelo','type':'POST','cache':false,'data':jQuery(this).parents("form").serialize(),'success':function(html){jQuery("#ZapatoPrecios_id_suelas").html(html)}});
 			return false;
 		});
 	});
