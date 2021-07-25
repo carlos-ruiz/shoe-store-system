@@ -4,10 +4,10 @@
 return array(
 	// 'connectionString' => 'sqlite:'.dirname(__FILE__).'/../data/testdrive.db',
 	// uncomment the following lines to use a MySQL database
-	
-	'connectionString' => 'mysql:host=localhost;dbname=controlbom',
+
+	'connectionString' => 'mysql:host=bom-db;dbname=controlbom',
 	'emulatePrepare' => true,
-	'username' => 'root',
-	'password' => '',
+	'username' => 'appuser',
+	'password' => 'appuserPasswd',
 	'charset' => 'utf8',
 );

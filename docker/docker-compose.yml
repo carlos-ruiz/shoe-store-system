@@ -1,0 +1,20 @@
+version: "3"
+services:
+    app:
+        build:
+            context: .
+            dockerfile: ./APP.Dockerfile
+        container_name: bom-app
+        ports:
+            - "80:80"
+        volumes:
+            - ..:/var/www/html
+    db:
+        build:
+            context: .
+            dockerfile: ./DB.Dockerfile
+        container_name: bom-db
+        environment:
+            MYSQL_ROOT_PASSWORD: "root"
+        ports:
+            - 3306:3306
