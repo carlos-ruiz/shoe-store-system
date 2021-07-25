@@ -2,3 +2,6 @@
 .idea/
 *.log
 nbproject/
+docker/
+backups/
+sftp-config.json
